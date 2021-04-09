@@ -23,6 +23,7 @@
 
 ###> symfony/mercure-bundle ###
 /Mercure
+/mercure.db
 ###< symfony/mercure-bundle ###
 
 ###> MacOS ###

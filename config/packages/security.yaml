@@ -3,7 +3,6 @@ security:
         App\Entity\User:
             algorithm: auto
 
-
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
         # used to reload user from session & other features (e.g. switch_user)
@@ -53,6 +52,7 @@ security:
 
             logout:
                 path: app_logout
+                # target: '/api'
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#firewalls-authentication

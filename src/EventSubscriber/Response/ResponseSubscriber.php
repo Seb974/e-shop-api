@@ -49,8 +49,8 @@ class ResponseSubscriber implements EventSubscriberInterface
         $allowedOrigin = $origin == $this->adminClientDomain ? $this->adminClientDomain : $this->serverDomain;
         $response->headers->set("Access-Control-Allow-Credentials", 'true');
         $response->headers->set("Access-Control-Allow-Origin", $allowedOrigin);
+        
         // $response->headers->set("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept, Cookie, Set-Cookie");
-
         // $response->headers->set("X-Frame-Options", 'Deny');
         // $response->headers->set("X-XSS-Protection", 1);
         // $response->headers->set("X-Content-Type-Options", 'nosniff');
