@@ -68,3 +68,4 @@ services:
         arguments:
             $server: '%env(SERVER_DOMAIN)%'
             $admin: '%env(ADMIN_DOMAIN)%'
+            $public: '%env(PUBLIC_DOMAIN)%'

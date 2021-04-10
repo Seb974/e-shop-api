@@ -19,13 +19,15 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class ResponseSubscriber implements EventSubscriberInterface
 {
-    private $serverDomain;
-    private $adminClientDomain;
+    private $apiDomain;
+    private $adminDomain;
+    private $publicDomain;
 
-    public function __construct(string $server, string $admin)
+    public function __construct(string $server, string $admin, string $public)
     {
-        $this->serverDomain = $server;
-        $this->adminClientDomain = $admin;
+        $this->apiDomain = $server;
+        $this->adminDomain = $admin;
+        $this->publicDomain = $public;
     }
 
     /** @inheritdoc */
@@ -46,7 +48,8 @@ class ResponseSubscriber implements EventSubscriberInterface
         $response = $event->getResponse();
         
         $origin = $request->headers->get('origin');
-        $allowedOrigin = $origin == $this->adminClientDomain ? $this->adminClientDomain : $this->serverDomain;
+        $allowedOrigin = $origin == $this->adminDomain ? $this->adminDomain :
+                        ($origin == $this->publicDomain ? $this->publicDomain : $this->apiDomain);
         $response->headers->set("Access-Control-Allow-Credentials", 'true');
         $response->headers->set("Access-Control-Allow-Origin", $allowedOrigin);
         
