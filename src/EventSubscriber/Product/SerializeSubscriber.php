@@ -48,7 +48,7 @@ class SerializeSubscriber implements EventSubscriberInterface
         {
             $response = $this->priceFilter->filter($result);
             dump($response);
+            $event->setControllerResult(json_encode($response));
         }
-        $event->setControllerResult(json_encode($response));
     }
 }
