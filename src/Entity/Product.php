@@ -37,12 +37,17 @@ class Product
     private $name;
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Column(type="string", length=20, nullable=true)
      * @Groups({"products_read"})
      */
-    private $code;
+    private $sku;
 
-    // @Assert\NotBlank(message="Au moins un prix est obligatoire.")
+    /**
+     * @ORM\OneToOne(targetEntity=Picture::class, cascade={"persist", "remove"})
+     * @Groups({"products_read"})
+     */
+    private $image;
+
     /**
      * @ORM\Column(type="array", nullable=true)
      * @Groups({"products_read"})
@@ -50,34 +55,82 @@ class Product
     private $prices = [];
 
     /**
-     * @ORM\OneToOne(targetEntity=Picture::class, cascade={"persist", "remove"})
+     * @ORM\Column(type="float", nullable=true)
      * @Groups({"products_read"})
      */
-    private $picture;
+    private $discount;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Groups({"products_read"})
+     */
+    private $offerEnd;
 
     /**
      * @ORM\Column(type="text", nullable=true)
      * @Groups({"products_read"})
      */
-    private $description;
+    private $fullDescription;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"products_read"})
+     */
+    private $saleCount;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
      * @Groups({"products_read"})
      */
-    private $isAvailable;
+    private $new;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
      * @Groups({"products_read"})
      */
-    private $isOnTop;
+    private $available;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
      * @Groups({"products_read"})
      */
-    private $isStockManaged;
+    private $stockManaged;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"products_read"})
+     */
+    private $requireLegalAge;
+
+    /**
+     * @ORM\Column(type="array", nullable=true)
+     * @Groups({"products_read"})
+     */
+    private $userGroups = [];
+
+    /**
+     * @ORM\Column(type="string", length=12, nullable=true)
+     * @Groups({"products_read"})
+     */
+    private $unit;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     * @Groups({"products_read"})
+     */
+    private $weight;
+
+    /**
+     * @ORM\Column(type="string", length=60, nullable=true)
+     * @Groups({"products_read"})
+     */
+    private $productGroup;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"products_read"})
+     */
+    private $isMixed;
 
     public function getId(): ?int
     {
@@ -96,14 +149,26 @@ class Product
         return $this;
     }
 
-    public function getCode(): ?int
+    public function getSku(): ?string
     {
-        return $this->code;
+        return $this->sku;
     }
 
-    public function setCode(?int $code): self
+    public function setSku(?string $sku): self
     {
-        $this->code = $code;
+        $this->sku = $sku;
+
+        return $this;
+    }
+
+    public function getImage(): ?Picture
+    {
+        return $this->image;
+    }
+
+    public function setImage(?Picture $image): self
+    {
+        $this->image = $image;
 
         return $this;
     }
@@ -120,62 +185,158 @@ class Product
         return $this;
     }
 
-    public function getPicture(): ?Picture
+    public function getDiscount(): ?float
     {
-        return $this->picture;
+        return $this->discount;
     }
 
-    public function setPicture(?Picture $picture): self
+    public function setDiscount(?float $discount): self
     {
-        $this->picture = $picture;
+        $this->discount = $discount;
 
         return $this;
     }
 
-    public function getDescription(): ?string
+    public function getOfferEnd(): ?\DateTimeInterface
     {
-        return $this->description;
+        return $this->offerEnd;
     }
 
-    public function setDescription(?string $description): self
+    public function setOfferEnd(?\DateTimeInterface $offerEnd): self
     {
-        $this->description = $description;
+        $this->offerEnd = $offerEnd;
 
         return $this;
     }
 
-    public function getIsAvailable(): ?bool
+    public function getFullDescription(): ?string
     {
-        return $this->isAvailable;
+        return $this->fullDescription;
     }
 
-    public function setIsAvailable(?bool $isAvailable): self
+    public function setFullDescription(?string $fullDescription): self
     {
-        $this->isAvailable = $isAvailable;
+        $this->fullDescription = $fullDescription;
 
         return $this;
     }
 
-    public function getIsOnTop(): ?bool
+    public function getSaleCount(): ?int
     {
-        return $this->isOnTop;
+        return $this->saleCount;
     }
 
-    public function setIsOnTop(?bool $isOnTop): self
+    public function setSaleCount(?int $saleCount): self
     {
-        $this->isOnTop = $isOnTop;
+        $this->saleCount = $saleCount;
 
         return $this;
     }
 
-    public function getIsStockManaged(): ?bool
+    public function getNew(): ?bool
     {
-        return $this->isStockManaged;
+        return $this->new;
     }
 
-    public function setIsStockManaged(?bool $isStockManaged): self
+    public function setNew(?bool $new): self
     {
-        $this->isStockManaged = $isStockManaged;
+        $this->new = $new;
+
+        return $this;
+    }
+
+    public function getAvailable(): ?bool
+    {
+        return $this->available;
+    }
+
+    public function setAvailable(?bool $available): self
+    {
+        $this->available = $available;
+
+        return $this;
+    }
+
+    public function getStockManaged(): ?bool
+    {
+        return $this->stockManaged;
+    }
+
+    public function setStockManaged(?bool $stockManaged): self
+    {
+        $this->stockManaged = $stockManaged;
+
+        return $this;
+    }
+
+    public function getRequireLegalAge(): ?bool
+    {
+        return $this->requireLegalAge;
+    }
+
+    public function setRequireLegalAge(?bool $requireLegalAge): self
+    {
+        $this->requireLegalAge = $requireLegalAge;
+
+        return $this;
+    }
+
+    public function getUserGroups(): ?array
+    {
+        return $this->userGroups;
+    }
+
+    public function setUserGroups(?array $userGroups): self
+    {
+        $this->userGroups = $userGroups;
+
+        return $this;
+    }
+
+    public function getUnit(): ?string
+    {
+        return $this->unit;
+    }
+
+    public function setUnit(?string $unit): self
+    {
+        $this->unit = $unit;
+
+        return $this;
+    }
+
+    public function getWeight(): ?float
+    {
+        return $this->weight;
+    }
+
+    public function setWeight(?float $weight): self
+    {
+        $this->weight = $weight;
+
+        return $this;
+    }
+
+    public function getProductGroup(): ?string
+    {
+        return $this->productGroup;
+    }
+
+    public function setProductGroup(?string $productGroup): self
+    {
+        $this->productGroup = $productGroup;
+
+        return $this;
+    }
+
+    public function getIsMixed(): ?bool
+    {
+        return $this->isMixed;
+    }
+
+    public function setIsMixed(?bool $isMixed): self
+    {
+        $this->isMixed = $isMixed;
 
         return $this;
     }
