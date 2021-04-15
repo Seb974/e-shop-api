@@ -16,8 +16,16 @@ use Symfony\Component\Validator\Constraints as Assert;
  *      normalizationContext={
  *          "groups"={"products_read"}
  *      },
- *      collectionOperations={"GET", "POST"},
- *      itemOperations={"GET", "PUT", "PATCH", "DELETE"}
+ *      collectionOperations={
+ *          "GET"
+ *          "POST"={"security"="is_granted('ROLE_TEAM')"},
+ *     },
+ *     itemOperations={
+ *          "GET",
+ *          "PUT"={"security"="is_granted('ROLE_TEAM') or object == user"},
+ *          "PATCH"={"security"="is_granted('ROLE_TEAM') or object == user"},
+ *          "DELETE"={"security"="is_granted('ROLE_TEAM') or object == user"}
+ *     },
  */
 class Product
 {
