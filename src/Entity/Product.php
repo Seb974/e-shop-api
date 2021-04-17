@@ -166,9 +166,16 @@ class Product
      */
     private $stock;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Variation::class, mappedBy="product")
+     * @Groups({"products_read", "product_write"})
+     */
+    private $variations;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
+        $this->variations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -424,6 +431,36 @@ class Product
     public function setStock(?Stock $stock): self
     {
         $this->stock = $stock;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Variation[]
+     */
+    public function getVariations(): Collection
+    {
+        return $this->variations;
+    }
+
+    public function addVariation(Variation $variation): self
+    {
+        if (!$this->variations->contains($variation)) {
+            $this->variations[] = $variation;
+            $variation->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVariation(Variation $variation): self
+    {
+        if ($this->variations->removeElement($variation)) {
+            // set the owning side to null (unless already changed)
+            if ($variation->getProduct() === $this) {
+                $variation->setProduct(null);
+            }
+        }
 
         return $this;
     }
