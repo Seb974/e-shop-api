@@ -3,53 +3,52 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use App\Repository\CategoryRepository;
+use App\Repository\TaxRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Entity(repositoryClass=CategoryRepository::class)
+ * @ORM\Entity(repositoryClass=TaxRepository::class)
  * @ApiResource(
- *      mercure={"private": false}),
  *      denormalizationContext={"disable_type_enforcement"=true},
  *      normalizationContext={
- *          "groups"={"categories_read"}
+ *          "groups"={"taxes_read"}
  *      },
  *      collectionOperations={
- *          "GET"
+ *          "GET",
  *          "POST"={"security"="is_granted('ROLE_TEAM')"},
  *     },
  *     itemOperations={
  *          "GET",
- *          "PUT"={"security"="is_granted('ROLE_TEAM') or object == user"},
- *          "PATCH"={"security"="is_granted('ROLE_TEAM') or object == user"},
- *          "DELETE"={"security"="is_granted('ROLE_TEAM') or object == user"}
+ *          "PUT"={"security"="is_granted('ROLE_TEAM')"},
+ *          "PATCH"={"security"="is_granted('ROLE_TEAM')"},
+ *          "DELETE"={"security"="is_granted('ROLE_TEAM')"}
  *     },
  * )
  */
-class Category
+class Tax
 {
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"categories_read", "products_read"})
+     * @Groups({"taxes_read", "products_read"})
      */
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=60, nullable=true)
-     * @Groups({"categories_read", "products_read"})
+     * @ORM\Column(type="string", length=120, nullable=true)
+     * @Groups({"taxes_read", "products_read"})
      * @Assert\NotBlank(message="Un nom est obligatoire.")
      */
     private $name;
 
     /**
      * @ORM\Column(type="array", nullable=true)
-     * @Groups({"categories_read"})
+     * @Groups({"taxes_read", "products_read"})
      */
-    private $userGroups = [];
+    private $rates = [];
 
     public function getId(): ?int
     {
@@ -68,14 +67,14 @@ class Category
         return $this;
     }
 
-    public function getUserGroups(): ?array
+    public function getRates(): ?array
     {
-        return $this->userGroups;
+        return $this->rates;
     }
 
-    public function setUserGroups(?array $userGroups): self
+    public function setRates(?array $rates): self
     {
-        $this->userGroups = $userGroups;
+        $this->rates = $rates;
 
         return $this;
     }

@@ -15,14 +15,12 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
  * @ORM\Entity
  * @ApiResource(
  *     iri="http://schema.org/Picture",
- *     normalizationContext={
- *         "groups"={"picture_read"}
- *     },
+ *     normalizationContext={ "groups"={"picture_read"} },
  *     collectionOperations={
  *         "post"={
- *             "controller"=CreatePictureAction::class,
+ *             "controller"=App\Controller\CreatePictureAction::class,
  *             "deserialize"=false,
- *             "security"="is_granted('ROLE_USER')",
+ *             "security"="is_granted('ROLE_TEAM')",
  *             "validation_groups"={"Default", "picture_create"},
  *             "openapi_context"={
  *                 "requestBody"={
@@ -45,8 +43,55 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
  *         "get"
  *     },
  *     itemOperations={
- *         "get"
- *     }
+ *          "get",
+ *          "put"={
+ *             "controller"=App\Controller\CreatePictureAction::class,
+ *             "deserialize"=false,
+ *             "access_control"="is_granted('ROLE_TEAM')",
+ *             "validation_groups"={"Default", "picture_create"},
+ *             "openapi_context"={
+ *                 "requestBody"={
+ *                     "content"={
+ *                         "multipart/form-data"={
+ *                             "schema"={
+ *                                 "type"="object",
+ *                                 "properties"={
+ *                                     "file"={
+ *                                         "type"="string",
+ *                                         "format"="binary"
+ *                                     }
+ *                                 }
+ *                             }
+ *                         }
+ *                     }
+ *                 }
+ *             }
+ *         },
+ *          "patch"={
+ *             "controller"=App\Controller\CreatePictureAction::class,
+ *             "deserialize"=false,
+ *             "access_control"="is_granted('ROLE_TEAM')",
+ *             "validation_groups"={"Default", "picture_create"},
+ *             "openapi_context"={
+ *                 "requestBody"={
+ *                     "content"={
+ *                         "multipart/form-data"={
+ *                             "schema"={
+ *                                 "type"="object",
+ *                                 "properties"={
+ *                                     "file"={
+ *                                         "type"="string",
+ *                                         "format"="binary"
+ *                                     }
+ *                                 }
+ *                             }
+ *                         }
+ *                     }
+ *                 }
+ *             }
+ *         },
+ *          "delete"={"security"="is_granted('ROLE_TEAM')"},
+ *    }
  * )
  * @Vich\Uploadable
  */

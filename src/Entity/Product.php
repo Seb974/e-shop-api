@@ -2,30 +2,36 @@
 
 namespace App\Entity;
 
+use App\Entity\Picture;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ProductRepository;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-
 /**
  * @ORM\Entity(repositoryClass=ProductRepository::class)
  * @ApiResource(
- *      mercure={"private": false}),
- *      denormalizationContext={"disable_type_enforcement"=true},
+ *      mercure={"private": false},
+ *      denormalizationContext={
+ *          "groups"={"product_write"},
+ *          "disable_type_enforcement"=true
+ *      },
  *      normalizationContext={
  *          "groups"={"products_read"}
  *      },
  *      collectionOperations={
- *          "GET"
- *          "POST"={"security"="is_granted('ROLE_TEAM')"},
+ *          "GET",
+ *          "POST"={"security"="is_granted('ROLE_TEAM')"}
  *     },
  *     itemOperations={
  *          "GET",
- *          "PUT"={"security"="is_granted('ROLE_TEAM') or object == user"},
- *          "PATCH"={"security"="is_granted('ROLE_TEAM') or object == user"},
- *          "DELETE"={"security"="is_granted('ROLE_TEAM') or object == user"}
- *     },
+ *          "PUT"={"security"="is_granted('ROLE_TEAM')"},
+ *          "PATCH"={"security"="is_granted('ROLE_TEAM')"},
+ *          "DELETE"={"security"="is_granted('ROLE_TEAM')"}
+ *     }
+ * )
  */
 class Product
 {
@@ -39,106 +45,131 @@ class Product
 
     /**
      * @ORM\Column(type="string", length=120, nullable=true)
-     * @Groups({"products_read"})
+     * @Groups({"products_read", "product_write"})
      * @Assert\NotBlank(message="Un nom est obligatoire.")
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=20, nullable=true)
-     * @Groups({"products_read"})
+     * @Groups({"products_read", "product_write"})
      */
     private $sku;
 
     /**
+     * @var Picture|null
+     * 
      * @ORM\OneToOne(targetEntity=Picture::class, cascade={"persist", "remove"})
-     * @Groups({"products_read"})
+     * @Groups({"products_read", "product_write"})
      */
     private $image;
 
     /**
      * @ORM\Column(type="array", nullable=true)
-     * @Groups({"products_read"})
+     * @Groups({"products_read", "product_write"})
      */
     private $prices = [];
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"products_read"})
+     * @Groups({"products_read", "product_write"})
      */
     private $discount;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
-     * @Groups({"products_read"})
+     * @Groups({"products_read", "product_write"})
      */
     private $offerEnd;
 
     /**
      * @ORM\Column(type="text", nullable=true)
-     * @Groups({"products_read"})
+     * @Groups({"products_read", "product_write"})
      */
     private $fullDescription;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
-     * @Groups({"products_read"})
+     * @Groups({"products_read", "product_write"})
      */
     private $saleCount;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"products_read"})
+     * @Groups({"products_read", "product_write"})
      */
     private $new;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"products_read"})
+     * @Groups({"products_read", "product_write"})
      */
     private $available;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"products_read"})
+     * @Groups({"products_read", "product_write"})
      */
     private $stockManaged;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"products_read"})
+     * @Groups({"products_read", "product_write"})
      */
     private $requireLegalAge;
 
     /**
      * @ORM\Column(type="array", nullable=true)
-     * @Groups({"products_read"})
+     * @Groups({"products_read", "product_write"})
      */
     private $userGroups = [];
 
     /**
      * @ORM\Column(type="string", length=12, nullable=true)
-     * @Groups({"products_read"})
+     * @Groups({"products_read", "product_write"})
      */
     private $unit;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"products_read"})
+     * @Groups({"products_read", "product_write"})
      */
     private $weight;
 
     /**
      * @ORM\Column(type="string", length=60, nullable=true)
-     * @Groups({"products_read"})
+     * @Groups({"products_read", "product_write"})
      */
     private $productGroup;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"products_read"})
+     * @Groups({"products_read", "product_write"})
      */
     private $isMixed;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Tax::class)
+     * @Groups({"products_read", "product_write"})
+     */
+    private $tax;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Category::class)
+     * @Groups({"products_read", "product_write"})
+     */
+    private $categories;
+
+    /**
+     * @ORM\OneToOne(targetEntity=Stock::class, cascade={"persist", "remove"})
+     * @Groups({"products_read", "product_write"})
+     */
+    private $stock;
+
+    public function __construct()
+    {
+        $this->categories = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -345,6 +376,54 @@ class Product
     public function setIsMixed(?bool $isMixed): self
     {
         $this->isMixed = $isMixed;
+
+        return $this;
+    }
+
+    public function getTax(): ?Tax
+    {
+        return $this->tax;
+    }
+
+    public function setTax(?Tax $tax): self
+    {
+        $this->tax = $tax;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Category[]
+     */
+    public function getCategories(): Collection
+    {
+        return $this->categories;
+    }
+
+    public function addCategory(Category $category): self
+    {
+        if (!$this->categories->contains($category)) {
+            $this->categories[] = $category;
+        }
+
+        return $this;
+    }
+
+    public function removeCategory(Category $category): self
+    {
+        $this->categories->removeElement($category);
+
+        return $this;
+    }
+
+    public function getStock(): ?Stock
+    {
+        return $this->stock;
+    }
+
+    public function setStock(?Stock $stock): self
+    {
+        $this->stock = $stock;
 
         return $this;
     }

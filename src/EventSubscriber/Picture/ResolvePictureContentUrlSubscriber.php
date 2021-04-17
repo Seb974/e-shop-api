@@ -59,7 +59,6 @@ final class ResolvePictureContentUrlSubscriber implements EventSubscriberInterfa
             if (!$picture instanceof Picture) {
                 continue;
             }
-
             $picture->contentUrl = $this->storage->resolveUri($picture, 'file');
         }
     }
