@@ -13,6 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass=ProductRepository::class)
  * @ApiResource(
+ *      attributes={"force_eager"=false},
  *      mercure={"private": false},
  *      denormalizationContext={
  *          "groups"={"product_write"},
@@ -172,10 +173,17 @@ class Product
      */
     private $variations;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Component::class, mappedBy="owner", cascade={"persist", "remove"})
+     * @Groups({"products_read", "product_write"})
+     */
+    private $components;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
         $this->variations = new ArrayCollection();
+        $this->components = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -459,6 +467,36 @@ class Product
             // set the owning side to null (unless already changed)
             if ($variation->getProduct() === $this) {
                 $variation->setProduct(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Component[]
+     */
+    public function getComponents(): Collection
+    {
+        return $this->components;
+    }
+
+    public function addComponent(Component $component): self
+    {
+        if (!$this->components->contains($component)) {
+            $this->components[] = $component;
+            $component->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComponent(Component $component): self
+    {
+        if ($this->components->removeElement($component)) {
+            // set the owning side to null (unless already changed)
+            if ($component->getOwner() === $this) {
+                $component->setOwner(null);
             }
         }
 

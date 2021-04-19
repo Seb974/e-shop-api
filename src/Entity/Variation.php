@@ -53,7 +53,7 @@ class Variation
     private $image;
 
     /**
-     * @ORM\OneToMany(targetEntity=Size::class, mappedBy="variation")
+     * @ORM\OneToMany(targetEntity=Size::class, mappedBy="variation", cascade={"persist", "remove"})
      * @Groups({"variations_read", "variation_write", "products_read"})
      */
     private $sizes;
