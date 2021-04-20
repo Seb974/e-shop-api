@@ -65,11 +65,11 @@ class Product
      */
     private $image;
 
-    /**
+    /*
      * @ORM\Column(type="array", nullable=true)
      * @Groups({"products_read", "product_write"})
      */
-    private $prices = [];
+    // private $prices = [];
 
     /**
      * @ORM\Column(type="float", nullable=true)
@@ -179,11 +179,24 @@ class Product
      */
     private $components;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Price::class, mappedBy="product", cascade={"persist", "remove"})
+     * @Groups({"products_read", "product_write"})
+     */
+    private $prices;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Groups({"products_read", "product_write"})
+     */
+    private $updatedAt;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
         $this->variations = new ArrayCollection();
         $this->components = new ArrayCollection();
+        $this->prices = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -227,17 +240,17 @@ class Product
         return $this;
     }
 
-    public function getPrices(): ?array
-    {
-        return $this->prices;
-    }
+    // public function getPrices(): ?array
+    // {
+    //     return $this->prices;
+    // }
 
-    public function setPrices(?array $prices): self
-    {
-        $this->prices = $prices;
+    // public function setPrices(?array $prices): self
+    // {
+    //     $this->prices = $prices;
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
     public function getDiscount(): ?float
     {
@@ -499,6 +512,48 @@ class Product
                 $component->setOwner(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Price[]
+     */
+    public function getPrices(): Collection
+    {
+        return $this->prices;
+    }
+
+    public function addPrice(Price $price): self
+    {
+        if (!$this->prices->contains($price)) {
+            $this->prices[] = $price;
+            $price->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removePrice(Price $price): self
+    {
+        if ($this->prices->removeElement($price)) {
+            // set the owning side to null (unless already changed)
+            if ($price->getProduct() === $this) {
+                $price->setProduct(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }

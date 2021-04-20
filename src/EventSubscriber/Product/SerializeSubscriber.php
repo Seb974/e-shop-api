@@ -47,7 +47,6 @@ class SerializeSubscriber implements EventSubscriberInterface
             strpos(strtoupper($result['hydra:member'][0]['@type']), "PRODUCT") !== false)) )
         {
             $response = $this->priceFilter->filter($result);
-            dump($response);
             $event->setControllerResult(json_encode($response));
         }
     }
