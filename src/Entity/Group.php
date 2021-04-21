@@ -18,6 +18,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *     message="Un groupe possédant ce nom existe déjà."
  * )
  * @ApiResource(
+ *     attributes={"enable_max_depth"=true},
  *     normalizationContext={
  *          "groups"={"groups_read"}
  *     },

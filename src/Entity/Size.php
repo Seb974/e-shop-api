@@ -11,6 +11,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass=SizeRepository::class)
  * @ApiResource(
+ *       attributes={
+ *          "enable_max_depth"=true
+ *      },
  *      normalizationContext={"groups"={"sizes_read"}},
  *      collectionOperations={
  *          "GET",

@@ -13,6 +13,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass=VariationRepository::class)
  * @ApiResource(
+ *       attributes={
+ *          "enable_max_depth"=true
+ *      },
  *      denormalizationContext={
  *          "groups"={"variation_write"},
  *          "disable_type_enforcement"=true

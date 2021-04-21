@@ -5,13 +5,18 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ComponentRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ComponentRepository::class)
  * @ApiResource(
- *      attributes={"enable_max_depth"=true},
+ *      attributes={
+ *          "force_eager"=false,
+ *          "enable_max_depth"=true
+ *      },
  *      normalizationContext={"groups"={"components_read"}},
  *      collectionOperations={
  *          "GET",
@@ -43,12 +48,14 @@ class Component
 
     /**
      * @ORM\ManyToOne(targetEntity=Variation::class)
+     * @ApiSubresource(maxDepth=1)
      * @Groups({"components_read", "products_read", "product_write"})
      */
     private $variation;
 
     /**
      * @ORM\ManyToOne(targetEntity=Size::class)
+     * @ApiSubresource(maxDepth=1)
      * @Groups({"components_read", "products_read", "product_write"})
      */
     private $size;
