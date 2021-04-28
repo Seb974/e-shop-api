@@ -69,6 +69,12 @@ class Group
      */
     private $priceGroup;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"groups_read", "priceGroups_read"})
+     */
+    private $subjectToTaxes;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -118,6 +124,18 @@ class Group
     public function setPriceGroup(?PriceGroup $priceGroup): self
     {
         $this->priceGroup = $priceGroup;
+
+        return $this;
+    }
+
+    public function getSubjectToTaxes(): ?bool
+    {
+        return $this->subjectToTaxes;
+    }
+
+    public function setSubjectToTaxes(?bool $subjectToTaxes): self
+    {
+        $this->subjectToTaxes = $subjectToTaxes;
 
         return $this;
     }

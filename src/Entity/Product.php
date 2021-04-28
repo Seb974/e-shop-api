@@ -240,18 +240,6 @@ class Product
         return $this;
     }
 
-    // public function getPrices(): ?array
-    // {
-    //     return $this->prices;
-    // }
-
-    // public function setPrices(?array $prices): self
-    // {
-    //     $this->prices = $prices;
-
-    //     return $this;
-    // }
-
     public function getDiscount(): ?float
     {
         return $this->discount;

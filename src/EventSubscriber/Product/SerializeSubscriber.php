@@ -23,10 +23,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class SerializeSubscriber implements EventSubscriberInterface
 {
+    private $admin;
+    private $server;
     private $priceFilter;
 
-    public function __construct(PriceFilter $priceFilter)
+    public function __construct($admin, $server, PriceFilter $priceFilter)
     {
+        $this->admin = $admin;
+        $this->server = $server;
         $this->priceFilter = $priceFilter;
     }
 
@@ -41,8 +45,9 @@ class SerializeSubscriber implements EventSubscriberInterface
     {
         $result = json_decode($event->getControllerResult(), true);
         $method = $event->getRequest()->getMethod();
+        $origin = $event->getRequest()->headers->get("origin");
 
-        if ($method == "GET" && (strpos(strtoupper($result['@type']), "PRODUCT") !== false || 
+        if ($origin != $this->admin && $origin != $this->server && $method == "GET" && (strpos(strtoupper($result['@type']), "PRODUCT") !== false || 
            (strpos(strtoupper($result['@type']), "COLLECTION") !== false && count($result['hydra:member']) > 0 && 
             strpos(strtoupper($result['hydra:member'][0]['@type']), "PRODUCT") !== false)) )
         {

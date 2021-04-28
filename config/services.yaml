@@ -71,3 +71,8 @@ services:
             $server: '%env(SERVER_DOMAIN)%'
             $admin: '%env(ADMIN_DOMAIN)%'
             $public: '%env(PUBLIC_DOMAIN)%'
+
+    App\EventSubscriber\Product\SerializeSubscriber:
+        arguments:
+            $admin: '%env(ADMIN_DOMAIN)%'
+            $server: '%env(SERVER_DOMAIN)%'
