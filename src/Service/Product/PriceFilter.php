@@ -3,7 +3,7 @@
 namespace App\Service\Product;
 
 use Symfony\Component\Security\Core\Security;
-use App\Repository\GroupRepository;
+use App\Service\User\UserGroupDefiner;
 
 /**
  * SerializerSubscriber
@@ -21,17 +21,18 @@ use App\Repository\GroupRepository;
 class PriceFilter
 {
     private $security;
-    private $groupRepository;
+    private $userGroupDefiner;
 
-    public function __construct(Security $security, GroupRepository $groupRepository)
+    public function __construct(Security $security, UserGroupDefiner $userGroupDefiner)
     {
         $this->security = $security;
-        $this->groupRepository = $groupRepository;
+        $this->userGroupDefiner = $userGroupDefiner;
     }
 
     public function filter($response)
     {
-        $userGroup = $this->getUserGroup();
+        $user = $this->security->getUser();
+        $userGroup = $this->userGroupDefiner->getUserGroup($user);
         if ( !array_key_exists('hydra:member', $response) ) {
             $this->setPrice($response, $userGroup);
             $this->setTaxes($response, $userGroup);
@@ -42,14 +43,6 @@ class PriceFilter
             }
         }
         return $response;
-    }
-
-    private function getUserGroup() {
-        $user = $this->security->getUser();
-        $roles = $user !== null ? $user->getRoles() : ["ROLE_USER"];
-        $filteredRoles = array_diff($roles, ["ROLE_USER"]);
-        $role = count($filteredRoles) > 0 ? $filteredRoles[0] : "ROLE_USER";
-        return $this->groupRepository->findOneBy(['value' => $role]);
     }
 
     private function setPrice(&$product, $userGroup)

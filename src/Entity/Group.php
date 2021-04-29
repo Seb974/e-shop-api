@@ -75,6 +75,24 @@ class Group
      */
     private $subjectToTaxes;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"groups_read", "priceGroups_read"})
+     */
+    private $dayInterval;
+
+    /**
+     * @ORM\Column(type="time", nullable=true)
+     * @Groups({"groups_read", "priceGroups_read"})
+     */
+    private $hourLimit;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"groups_read", "priceGroups_read"})
+     */
+    private $onlinePayment;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -136,6 +154,42 @@ class Group
     public function setSubjectToTaxes(?bool $subjectToTaxes): self
     {
         $this->subjectToTaxes = $subjectToTaxes;
+
+        return $this;
+    }
+
+    public function getDayInterval(): ?int
+    {
+        return $this->dayInterval;
+    }
+
+    public function setDayInterval(?int $dayInterval): self
+    {
+        $this->dayInterval = $dayInterval;
+
+        return $this;
+    }
+
+    public function getHourLimit(): ?\DateTimeInterface
+    {
+        return $this->hourLimit;
+    }
+
+    public function setHourLimit(?\DateTimeInterface $hourLimit): self
+    {
+        $this->hourLimit = $hourLimit;
+
+        return $this;
+    }
+
+    public function getOnlinePayment(): ?bool
+    {
+        return $this->onlinePayment;
+    }
+
+    public function setOnlinePayment(?bool $onlinePayment): self
+    {
+        $this->onlinePayment = $onlinePayment;
 
         return $this;
     }

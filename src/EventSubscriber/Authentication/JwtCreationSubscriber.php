@@ -3,6 +3,7 @@
 namespace App\EventSubscriber\Authentication;
 
 use App\Service\Serializer\ObjectSerializer;
+use App\Service\User\UserGroupDefiner;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTCreatedEvent;
 
 /**
