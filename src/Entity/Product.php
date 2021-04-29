@@ -120,12 +120,6 @@ class Product
     private $requireLegalAge;
 
     /**
-     * @ORM\Column(type="array", nullable=true)
-     * @Groups({"products_read", "product_write"})
-     */
-    private $userGroups = [];
-
-    /**
      * @ORM\Column(type="string", length=12, nullable=true)
      * @Groups({"products_read", "product_write"})
      */
@@ -191,12 +185,19 @@ class Product
      */
     private $updatedAt;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Group::class)
+     * @Groups({"products_read", "product_write"})
+     */
+    private $userGroups;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
         $this->variations = new ArrayCollection();
         $this->components = new ArrayCollection();
         $this->prices = new ArrayCollection();
+        $this->userGroups = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -332,18 +333,6 @@ class Product
     public function setRequireLegalAge(?bool $requireLegalAge): self
     {
         $this->requireLegalAge = $requireLegalAge;
-
-        return $this;
-    }
-
-    public function getUserGroups(): ?array
-    {
-        return $this->userGroups;
-    }
-
-    public function setUserGroups(?array $userGroups): self
-    {
-        $this->userGroups = $userGroups;
 
         return $this;
     }
@@ -542,6 +531,30 @@ class Product
     public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Group[]
+     */
+    public function getUserGroups(): Collection
+    {
+        return $this->userGroups;
+    }
+
+    public function addUserGroup(Group $userGroup): self
+    {
+        if (!$this->userGroups->contains($userGroup)) {
+            $this->userGroups[] = $userGroup;
+        }
+
+        return $this;
+    }
+
+    public function removeUserGroup(Group $userGroup): self
+    {
+        $this->userGroups->removeElement($userGroup);
 
         return $this;
     }

@@ -36,10 +36,12 @@ class PriceFilter
         if ( !array_key_exists('hydra:member', $response) ) {
             $this->setPrice($response, $userGroup);
             $this->setTaxes($response, $userGroup);
+            unset($response['userGroups']);
         } else {
             foreach($response['hydra:member'] as &$product) {
                 $this->setPrice($product, $userGroup);
                 $this->setTaxes($product, $userGroup);
+                unset($product['userGroups']);
             }
         }
         return $response;
