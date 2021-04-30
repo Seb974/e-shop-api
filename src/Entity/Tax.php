@@ -33,20 +33,20 @@ class Tax
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"taxes_read", "products_read"})
+     * @Groups({"taxes_read", "products_read", "conditions_read", "cities_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=120, nullable=true)
-     * @Groups({"taxes_read", "products_read"})
+     * @Groups({"taxes_read", "products_read", "conditions_read", "cities_read"})
      * @Assert\NotBlank(message="Un nom est obligatoire.")
      */
     private $name;
 
     /**
      * @ORM\Column(type="array", nullable=true)
-     * @Groups({"taxes_read", "products_read"})
+     * @Groups({"taxes_read", "products_read", "conditions_read", "cities_read"})
      */
     private $rates = [];
 
