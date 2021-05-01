@@ -7,6 +7,7 @@ use App\Repository\MetaRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+
 /**
  * @ORM\Entity(repositoryClass=MetaRepository::class)
  * @ApiResource(
@@ -24,7 +25,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          "PATCH"={"security"="is_granted('ROLE_ADMIN') or object.getUser() == user"},
  *          "DELETE"={"security"="is_granted('ROLE_ADMIN') or object.getUser() == user"}
  *     },
- *     mercure="object.getMercureOptions(object.getUser().getId())"
+ *     mercure="object.getMercureOptions(object.getUser())"
  * )
  */
 class Meta
@@ -194,10 +195,10 @@ class Meta
         return $this;
     }
 
-    public function getMercureOptions(int $id): array
+    public function getMercureOptions($user): array
     {
-        return ["private" => true, 
-                "topics" => self::$domain . "/api/users/" . $id . "/metas",
+        return $user == null ? ["private" => false] : ["private" => true, 
+                "topics" => self::$domain . "/api/users/" . $user->getId() . "/metas",
                 "normalization_context" => [ "group" => "users_read"]
         ];
     }
