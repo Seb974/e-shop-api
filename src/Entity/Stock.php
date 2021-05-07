@@ -30,25 +30,25 @@ class Stock
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"stocks_read", "products_read", "product_write", "variation_write"})
+     * @Groups({"stocks_read", "products_read", "containers_read", "product_write", "variation_write", "container_write"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"stocks_read",  "products_read", "product_write", "variation_write"})
+     * @Groups({"stocks_read", "products_read", "containers_read", "product_write", "variation_write", "container_write"})
      */
     private $quantity;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"stocks_read",  "products_read", "product_write", "variation_write"})
+     * @Groups({"stocks_read", "products_read", "containers_read", "product_write", "variation_write", "container_write"})
      */
     private $security;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"stocks_read",  "products_read", "product_write", "variation_write"})
+     * @Groups({"stocks_read", "products_read", "containers_read", "product_write", "variation_write", "container_write"})
      */
     private $alert;
 
