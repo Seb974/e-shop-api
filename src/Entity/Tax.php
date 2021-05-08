@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\TaxRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -11,7 +13,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass=TaxRepository::class)
  * @ApiResource(
- *      denormalizationContext={"disable_type_enforcement"=true},
+ *      denormalizationContext={
+ *          "groups"={"tax_write"},
+ *          "disable_type_enforcement"=true
+ *      },
  *      normalizationContext={
  *          "groups"={"taxes_read"}
  *      },
@@ -33,22 +38,33 @@ class Tax
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"taxes_read", "products_read", "conditions_read", "cities_read"})
+     * @Groups({"taxes_read", "products_read", "conditions_read", "cities_read", "tax_write"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=120, nullable=true)
-     * @Groups({"taxes_read", "products_read", "conditions_read", "cities_read"})
+     * @Groups({"taxes_read", "products_read", "conditions_read", "cities_read", "tax_write"})
      * @Assert\NotBlank(message="Un nom est obligatoire.")
      */
     private $name;
 
     /**
      * @ORM\Column(type="array", nullable=true)
-     * @Groups({"taxes_read", "products_read", "conditions_read", "cities_read"})
+     * @Groups({"taxes_read", "products_read", "conditions_read", "cities_read", "tax_write"})
      */
     private $rates = [];
+
+    /**
+     * @ORM\OneToMany(targetEntity=CatalogTax::class, mappedBy="tax", cascade={"persist", "remove"})
+     * @Groups({"taxes_read", "products_read", "conditions_read", "cities_read", "tax_write"})
+     */
+    private $catalogTaxes;
+
+    public function __construct()
+    {
+        $this->catalogTaxes = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -75,6 +91,36 @@ class Tax
     public function setRates(?array $rates): self
     {
         $this->rates = $rates;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|CatalogTax[]
+     */
+    public function getCatalogTaxes(): Collection
+    {
+        return $this->catalogTaxes;
+    }
+
+    public function addCatalogTax(CatalogTax $catalogTax): self
+    {
+        if (!$this->catalogTaxes->contains($catalogTax)) {
+            $this->catalogTaxes[] = $catalogTax;
+            $catalogTax->setTax($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCatalogTax(CatalogTax $catalogTax): self
+    {
+        if ($this->catalogTaxes->removeElement($catalogTax)) {
+            // set the owning side to null (unless already changed)
+            if ($catalogTax->getTax() === $this) {
+                $catalogTax->setTax(null);
+            }
+        }
 
         return $this;
     }

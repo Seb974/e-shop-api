@@ -35,12 +35,12 @@ class PriceFilter
         $userGroup = $this->userGroupDefiner->getUserGroup($user);
         if ( !array_key_exists('hydra:member', $response) ) {
             $this->setPrice($response, $userGroup);
-            $this->setTaxes($response, $userGroup);
+            // $this->setTaxes($response, $userGroup);
             unset($response['userGroups']);
         } else {
             foreach($response['hydra:member'] as &$product) {
                 $this->setPrice($product, $userGroup);
-                $this->setTaxes($product, $userGroup);
+                // $this->setTaxes($product, $userGroup);
                 unset($product['userGroups']);
             }
         }
@@ -53,10 +53,10 @@ class PriceFilter
         unset($product['prices']);
     }
 
-    private function setTaxes(&$product, $userGroup) {
-        $product['taxes'] = $this->getCorrespondingTaxes($product, $userGroup);
-        unset($product['tax']);
-    }
+    // private function setTaxes(&$product, $userGroup) {
+    //     $product['taxes'] = $this->getCorrespondingTaxes($product, $userGroup);
+    //     unset($product['tax']);
+    // }
 
     private function getCorrespondingPrice($userGroup, $product)
     {
