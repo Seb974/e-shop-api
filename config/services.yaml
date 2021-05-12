@@ -53,6 +53,10 @@ services:
         arguments:
             $mercurePath: '%env(MERCURE_PATH)%'
             $cookieDomain: '%env(STRICT_DOMAIN)%'
+    
+    App\Service\Stripe\Stripe:
+        arguments:
+            $secretKey: '%env(STRIPE_SECRET_KEY)%'
 
     App\EventSubscriber\Authentication\JwtCreationSubscriber:
         tags:

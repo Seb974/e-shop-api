@@ -191,6 +191,12 @@ class Product
      */
     private $userGroups;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Catalog::class)
+     * @Groups({"products_read", "product_write"})
+     */
+    private $catalogs;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
@@ -198,6 +204,7 @@ class Product
         $this->components = new ArrayCollection();
         $this->prices = new ArrayCollection();
         $this->userGroups = new ArrayCollection();
+        $this->catalogs = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -555,6 +562,30 @@ class Product
     public function removeUserGroup(Group $userGroup): self
     {
         $this->userGroups->removeElement($userGroup);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Catalog[]
+     */
+    public function getCatalogs(): Collection
+    {
+        return $this->catalogs;
+    }
+
+    public function addCatalog(Catalog $catalog): self
+    {
+        if (!$this->catalogs->contains($catalog)) {
+            $this->catalogs[] = $catalog;
+        }
+
+        return $this;
+    }
+
+    public function removeCatalog(Catalog $catalog): self
+    {
+        $this->catalogs->removeElement($catalog);
 
         return $this;
     }

@@ -50,12 +50,6 @@ class Tax
     private $name;
 
     /**
-     * @ORM\Column(type="array", nullable=true)
-     * @Groups({"taxes_read", "products_read", "conditions_read", "cities_read", "tax_write"})
-     */
-    private $rates = [];
-
-    /**
      * @ORM\OneToMany(targetEntity=CatalogTax::class, mappedBy="tax", cascade={"persist", "remove"})
      * @Groups({"taxes_read", "products_read", "conditions_read", "cities_read", "tax_write"})
      */
@@ -79,18 +73,6 @@ class Tax
     public function setName(?string $name): self
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getRates(): ?array
-    {
-        return $this->rates;
-    }
-
-    public function setRates(?array $rates): self
-    {
-        $this->rates = $rates;
 
         return $this;
     }

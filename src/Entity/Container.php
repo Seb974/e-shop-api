@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ContainerRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -56,12 +58,6 @@ class Container
     private $tare;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
-     * @Groups({"containers_read", "container_write"})
-     */
-    private $price;
-
-    /**
      * @ORM\ManyToOne(targetEntity=Tax::class)
      * @Groups({"containers_read", "container_write"})
      */
@@ -96,6 +92,17 @@ class Container
      * @Groups({"containers_read", "container_write"})
      */
     private $available;
+
+    /**
+     * @ORM\OneToMany(targetEntity=CatalogPrice::class, mappedBy="container", cascade={"persist", "remove"})
+     * @Groups({"containers_read", "container_write"})
+     */
+    private $catalogPrices;
+
+    public function __construct()
+    {
+        $this->catalogPrices = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -134,18 +141,6 @@ class Container
     public function setTare(?float $tare): self
     {
         $this->tare = $tare;
-
-        return $this;
-    }
-
-    public function getPrice(): ?float
-    {
-        return $this->price;
-    }
-
-    public function setPrice(?float $price): self
-    {
-        $this->price = $price;
 
         return $this;
     }
@@ -218,6 +213,36 @@ class Container
     public function setAvailable(?bool $available): self
     {
         $this->available = $available;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|CatalogPrice[]
+     */
+    public function getCatalogPrices(): Collection
+    {
+        return $this->catalogPrices;
+    }
+
+    public function addCatalogPrice(CatalogPrice $catalogPrice): self
+    {
+        if (!$this->catalogPrices->contains($catalogPrice)) {
+            $this->catalogPrices[] = $catalogPrice;
+            $catalogPrice->setContainer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCatalogPrice(CatalogPrice $catalogPrice): self
+    {
+        if ($this->catalogPrices->removeElement($catalogPrice)) {
+            // set the owning side to null (unless already changed)
+            if ($catalogPrice->getContainer() === $this) {
+                $catalogPrice->setContainer(null);
+            }
+        }
 
         return $this;
     }

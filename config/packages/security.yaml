@@ -67,6 +67,7 @@ security:
         - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/products, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/categories, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/create-payment, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/users, roles: ROLE_ADMIN, methods: ['GET'] }
         - { path: ^/api/units, roles: ROLE_ADMIN, methods: ['POST', 'PUT', 'PATCH', 'DELETE'] }
         - { path: ^/api/suppliers, roles: ROLE_ADMIN, methods: ['POST', 'PUT', 'PATCH', 'DELETE'] }
