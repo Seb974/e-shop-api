@@ -13,6 +13,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
+use App\Entity\Promotion;
 
 class CurrentUserExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
@@ -42,6 +43,7 @@ class CurrentUserExtension implements QueryCollectionExtensionInterface, QueryIt
         $user = $this->security->getUser();
         $group = [Group::class];
         $groupFilterable = [Category::class, Product::class];
+        $needingAvailability = [Promotion::class];
         $userGroup = $this->userGroupDefiner->getUserGroup($user);
 
         if (!$this->auth->isGranted('ROLE_ADMIN') && ($user instanceof User || $user == null)) {
@@ -55,6 +57,12 @@ class CurrentUserExtension implements QueryCollectionExtensionInterface, QueryIt
             if (in_array($resourceClass, $groupFilterable)) {
                 $queryBuilder->andWhere(":userGroup MEMBER OF $rootAlias.userGroups")
                              ->setParameter("userGroup", $userGroup);
+            }
+
+            if (in_array($resourceClass, $needingAvailability)) {
+                $queryBuilder->andWhere("$rootAlias.used < $rootAlias.maxUsage")
+                             ->andWhere("$rootAlias.endsAt >= :today")
+                             ->setParameter("today", new \DateTime());
             }
         }
     }
