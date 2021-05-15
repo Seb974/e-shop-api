@@ -15,9 +15,9 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
  * UserCreationSubscriber
  *
  * Informations :
- * When a user is created with POST method (register or using admin panel), 
- * this eventSusbcriber hashes the plaintext password sent and 
- * add empty metadatas (represented by Meta entity) if metas aren't sent.
+ * When a user is created with POST method (register or using admin panel) or updated with PUT method, 
+ * this eventSusbcriber hashes the plaintext password sent and add empty metadatas 
+ * (represented by Meta entity) if metas aren't sent.
  *
  * @author Sébastien : sebastien.maillot@coding-academy.fr
  */
@@ -44,12 +44,12 @@ class UserCreationSubscriber implements EventSubscriberInterface
         $result = $event->getControllerResult();
         $method = $event->getRequest()->getMethod();
 
-        if ($result instanceof User && $method === "POST") {
-            if ($result->getPassword() !== null) {
+        if ($result instanceof User && ($method === "POST" || $method === "PUT")) {
+            if ($result->getPassword() !== null && ($method === "POST" || ($method === "PUT" && !str_contains($result->getPassword(), 'argon2')))) {
                 $hash = $this->encoder->encodePassword($result, $result->getPassword());
                 $result->setPassword($hash);
             }
-            if ($result->getMetas() == null) {
+            if ($method === "POST" && $result->getMetas() == null) {
                 $meta = new Meta();
                 $this->em->persist($meta);
                 $result->setMetas($meta);
