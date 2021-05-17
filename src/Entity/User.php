@@ -43,13 +43,13 @@ class User implements UserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"users_read", "user_write"})
+     * @Groups({"users_read", "user_write", "orders_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
-     * @Groups({"users_read", "user_write"})
+     * @Groups({"users_read", "user_write", "orders_read"})
      * @Assert\Email(message="L'adresse email saisie n'est pas valide.")
      */
     private $email;
@@ -70,7 +70,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=100, nullable=true)
-     * @Groups({"users_read", "user_write"})
+     * @Groups({"users_read", "user_write", "orders_read"})
      * @Assert\Length(min = 3, minMessage = "Le nom doit contenir au moins {{ limit }} caractères.",
      *                max = 100, maxMessage= "Le nom ne peut dépasser {{ limit }} caractères.")
      */
@@ -81,6 +81,18 @@ class User implements UserInterface
      * @Groups({"users_read", "user_write"})
      */
     private $metas;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"users_read", "user_write", "orders_read", "order_write"})
+     */
+    private $orderCount;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Groups({"users_read", "user_write", "orders_read", "order_write"})
+     */
+    private $lastOrder;
 
     public function getId(): ?int
     {
@@ -183,6 +195,30 @@ class User implements UserInterface
     public function setMetas(?Meta $metas): self
     {
         $this->metas = $metas;
+
+        return $this;
+    }
+
+    public function getOrderCount(): ?int
+    {
+        return $this->orderCount;
+    }
+
+    public function setOrderCount(?int $orderCount): self
+    {
+        $this->orderCount = $orderCount;
+
+        return $this;
+    }
+
+    public function getLastOrder(): ?\DateTimeInterface
+    {
+        return $this->lastOrder;
+    }
+
+    public function setLastOrder(?\DateTimeInterface $lastOrder): self
+    {
+        $this->lastOrder = $lastOrder;
 
         return $this;
     }

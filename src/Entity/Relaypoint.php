@@ -71,12 +71,6 @@ class Relaypoint
     private $accessCode;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
-     * @Groups({"relaypoints_read", "relaypoint_write"})
-     */
-    private $discount;
-
-    /**
      * @ORM\Column(type="text", nullable=true)
      * @Groups({"relaypoints_read", "relaypoint_write"})
      */
@@ -87,6 +81,12 @@ class Relaypoint
      * @Groups({"relaypoints_read", "relaypoint_write"})
      */
     private $conditions;
+
+    /**
+     * @ORM\OneToOne(targetEntity=Promotion::class, cascade={"persist", "remove"})
+     * @Groups({"relaypoints_read", "relaypoint_write"})
+     */
+    private $promotion;
 
     public function __construct()
     {
@@ -158,18 +158,6 @@ class Relaypoint
         return $this;
     }
 
-    public function getDiscount(): ?float
-    {
-        return $this->discount;
-    }
-
-    public function setDiscount(?float $discount): self
-    {
-        $this->discount = $discount;
-
-        return $this;
-    }
-
     public function getInformations(): ?string
     {
         return $this->informations;
@@ -202,6 +190,18 @@ class Relaypoint
     public function removeCondition(Condition $condition): self
     {
         $this->conditions->removeElement($condition);
+
+        return $this;
+    }
+
+    public function getPromotion(): ?Promotion
+    {
+        return $this->promotion;
+    }
+
+    public function setPromotion(?Promotion $promotion): self
+    {
+        $this->promotion = $promotion;
 
         return $this;
     }

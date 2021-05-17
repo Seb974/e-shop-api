@@ -37,10 +37,21 @@ class Calculator
         $userGroup = $this->userGroupDefiner->getUserGroup($user);
         $catalog = $this->catalogRepository->find($parameters->get('area')['id']);
         $itemsCost = $this->getItemsCost($parameters->get('items'), $catalog, $userGroup);
+        $finalItemsCost = $this->applyDiscount($parameters->get('promotion'), $itemsCost);
         $packagesCost = $catalog->getNeedsParcel() ?
                         $this->getPackagesCost($parameters->get('items'), $catalog) : 0;
 
-        return $itemsCost + $packagesCost;
+        return $finalItemsCost + $packagesCost;
+    }
+
+    private function applyDiscount($discount, $itemsCost)
+    {
+        if ($discount === null)
+            return $itemsCost;
+        else if ($discount['percentage'])
+            return round($itemsCost * 100) / 100 * (1 - ($discount['discount'] < 1 ? $discount['discount'] : $discount['discount'] / 100));
+        else
+            return (round($itemsCost * 100) / 100) - $discount['discount'];
     }
 
     private function getItemsCost(array $items, Catalog $catalog, Group $userGroup)

@@ -80,3 +80,7 @@ services:
         arguments:
             $admin: '%env(ADMIN_DOMAIN)%'
             $server: '%env(SERVER_DOMAIN)%'
+    
+    # App\EventSubscriber\Order\OrderCreationSubscriber:
+    #     tags:
+    #         - { name: kernel.event_listener, event: kernel.view }

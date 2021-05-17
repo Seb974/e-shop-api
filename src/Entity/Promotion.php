@@ -33,7 +33,7 @@ class Promotion
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"promotions_read"})
+     * @Groups({"promotions_read", "relaypoints_read", "orders_read", "relaypoint_write"})
      */
     private $id;
 
@@ -41,37 +41,37 @@ class Promotion
      * @ORM\Column(type="string", length=15, nullable=true)
      * @Assert\Length(min = 4, minMessage = "Le code doit contenir au moins {{ limit }} caractères.",
      *                max = 15, maxMessage = "Le code ne peut contenir plus de {{ limit }} caractères.")
-     * @Groups({"promotions_read"})
+     * @Groups({"promotions_read", "relaypoints_read", "orders_read", "relaypoint_write"})
      */
     private $code;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"promotions_read"})
+     * @Groups({"promotions_read", "relaypoints_read", "orders_read", "relaypoint_write"})
      */
     private $percentage;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"promotions_read"})
+     * @Groups({"promotions_read", "relaypoints_read", "orders_read", "relaypoint_write"})
      */
     private $discount;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
-     * @Groups({"promotions_read"})
+     * @Groups({"promotions_read", "relaypoints_read", "orders_read", "relaypoint_write"})
      */
     private $maxUsage;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
-     * @Groups({"promotions_read"})
+     * @Groups({"promotions_read", "relaypoints_read", "orders_read", "relaypoint_write"})
      */
     private $used;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
-     * @Groups({"promotions_read"})
+     * @Groups({"promotions_read", "relaypoints_read", "orders_read", "relaypoint_write"})
      */
     private $endsAt;
 
