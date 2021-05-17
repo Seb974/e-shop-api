@@ -42,7 +42,7 @@ class Constructor
     private function updateItem(&$item, $catalog, $userGroup)
     {
         $product = $item->getProduct();
-        $price = $this->getProductPrice($product, $catalog, $userGroup);
+        $price = $this->getProductPrice($product, $userGroup);
         $tax = $this->tax->getTaxRate($product, $catalog);
         $item->setPrice($price)
              ->setTaxRate($tax)
