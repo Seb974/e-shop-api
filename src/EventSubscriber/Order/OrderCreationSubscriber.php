@@ -32,8 +32,6 @@ class OrderCreationSubscriber implements EventSubscriberInterface
 
         if ($result instanceof OrderEntity && $method === "POST") {
             $this->constructor->adjustOrder($result);
-            dump($result);
-
         }
     }
 
