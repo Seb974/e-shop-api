@@ -80,7 +80,13 @@ services:
         arguments:
             $admin: '%env(ADMIN_DOMAIN)%'
             $server: '%env(SERVER_DOMAIN)%'
-    
-    # App\EventSubscriber\Order\OrderCreationSubscriber:
-    #     tags:
-    #         - { name: kernel.event_listener, event: kernel.view }
+
+    App\Serializer\OrderEntityContextBuilder:
+        decorates: 'api_platform.serializer.context_builder'
+        arguments: [ '@App\Serializer\OrderEntityContextBuilder.inner' ]
+        autoconfigure: false
+
+    App\Serializer\ItemContextBuilder:
+        decorates: 'api_platform.serializer.context_builder'
+        arguments: [ '@App\Serializer\ItemContextBuilder.inner' ]
+        autoconfigure: false

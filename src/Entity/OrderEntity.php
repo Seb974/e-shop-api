@@ -19,14 +19,14 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     },
  *     normalizationContext={"groups"={"orders_read"}},
  *     collectionOperations={
- *          "GET"={"security"="is_granted('ROLE_ADMIN') or object.user == user"},
+ *          "GET"={"security"="is_granted('ROLE_ADMIN') or object.getUser() == user"},
  *          "POST"
  *     },
  *     itemOperations={
- *          "GET"={"security"="is_granted('ROLE_ADMIN') or object.user == user"},
- *          "PUT"={"security"="is_granted('ROLE_ADMIN')"},
+ *          "GET"={"security"="is_granted('ROLE_ADMIN') or object.getUser() == user"},
+ *          "PUT"={"security"="is_granted('ROLE_ADMIN') or object.isOwner(request, object)"},
  *          "PATCH"={"security"="is_granted('ROLE_ADMIN')"},
- *          "DELETE"={"security"="is_granted('ROLE_ADMIN')"}
+ *          "DELETE"={"security"="is_granted('ROLE_ADMIN') or object.isOwner(request, object)"}
  *     },
  * )
  */
@@ -53,8 +53,8 @@ class OrderEntity
     private $email;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Meta::class, cascade={"persist"})
-     * @Groups({"orders_read", "order_write"})
+     * @ORM\ManyToOne(targetEntity=Meta::class, cascade={"persist", "remove"})
+     * @Groups({"admin:orders_read", "order_write"})
      */
     private $metas;
 
@@ -78,7 +78,7 @@ class OrderEntity
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"orders_read", "order_write"})
+     * @Groups({"admin:orders_read", "order_write"})
      */
     private $isRemains;
 
@@ -96,7 +96,7 @@ class OrderEntity
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class)
-     * @Groups({"orders_read", "order_write"})
+     * @Groups({"admin:orders_read", "order_write"})
      */
     private $user;
 
@@ -108,19 +108,37 @@ class OrderEntity
 
     /**
      * @ORM\ManyToOne(targetEntity=Catalog::class)
-     * @Groups({"orders_read", "order_write"})
+     * @Groups({"admin:orders_read", "order_write"})
      */
     private $catalog;
 
     /**
      * @ORM\ManyToOne(targetEntity=Promotion::class)
-     * @Groups({"orders_read", "order_write"})
+     * @Groups({"admin:orders_read", "order_write"})
      */
     private $promotion;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"orders_read", "order_write"})
+     */
+    private $paymentId;
+
+    /**
+     * @ORM\Column(type="guid", nullable=true)
+     * @Groups({"admin:orders_read", "order_write"})
+     */
+    private $uuid;
 
     public function __construct()
     {
         $this->items = new ArrayCollection();
+    }
+
+    public function isOwner($request, $object)
+    {
+        $data = $request->query->get('id');
+        return $object->getUuid() === $data;
     }
 
     public function getId(): ?int
@@ -298,6 +316,30 @@ class OrderEntity
     public function setPromotion(?Promotion $promotion): self
     {
         $this->promotion = $promotion;
+
+        return $this;
+    }
+
+    public function getPaymentId(): ?string
+    {
+        return $this->paymentId;
+    }
+
+    public function setPaymentId(?string $paymentId): self
+    {
+        $this->paymentId = $paymentId;
+
+        return $this;
+    }
+
+    public function getUuid(): ?string
+    {
+        return $this->uuid;
+    }
+
+    public function setUuid(?string $uuid): self
+    {
+        $this->uuid = $uuid;
 
         return $this;
     }

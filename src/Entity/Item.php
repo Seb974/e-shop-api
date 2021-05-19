@@ -8,16 +8,19 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
+// 'admin:items_read';
+// 'admin:item_write';
+
 /**
  * @ORM\Entity(repositoryClass=ItemRepository::class)
  * @ApiResource(
  *     normalizationContext={"groups"={"items_read"}},
  *     collectionOperations={
- *          "GET"={"security"="is_granted('ROLE_ADMIN') or object.orderEntity.user == user"},
+ *          "GET"={"security"="is_granted('ROLE_ADMIN') or object.orderEntity.getUser() == user"},
  *          "POST"
  *     },
  *     itemOperations={
- *          "GET"={"security"="is_granted('ROLE_ADMIN') or object.orderEntity.user == user"},
+ *          "GET"={"security"="is_granted('ROLE_ADMIN') or object.orderEntity.getUser() == user"},
  *          "PUT"={"security"="is_granted('ROLE_ADMIN')"},
  *          "PATCH"={"security"="is_granted('ROLE_ADMIN')"},
  *          "DELETE"={"security"="is_granted('ROLE_ADMIN')"}
@@ -48,37 +51,37 @@ class Item
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"items_read", "orders_read", "order_write"})
+     * @Groups({"items_read", "orders_read", "admin:order_write"})
      */
     private $preparedQty;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"items_read", "orders_read", "order_write"})
+     * @Groups({"items_read", "orders_read", "admin:order_write"})
      */
     private $deliveredQty;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"items_read", "orders_read", "order_write"})
+     * @Groups({"items_read", "orders_read", "admin:order_write"})
      */
     private $price;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"items_read", "orders_read", "order_write"})
+     * @Groups({"items_read", "orders_read", "admin:order_write"})
      */
     private $taxRate;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"items_read", "orders_read", "order_write"})
+     * @Groups({"admin:items_read", "admin:orders_read", "admin:order_write"})
      */
     private $isAdjourned;
 
     /**
      * @ORM\ManyToOne(targetEntity=OrderEntity::class, inversedBy="items")
-     * @Groups({"items_read"})
+     * @Groups({"admin:items_read"})
      */
     private $orderEntity;
 

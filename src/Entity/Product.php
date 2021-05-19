@@ -46,7 +46,7 @@ class Product
 
     /**
      * @ORM\Column(type="string", length=120, nullable=true)
-     * @Groups({"products_read", "product_write"})
+     * @Groups({"products_read", "product_write", "orders_read"})
      * @Assert\NotBlank(message="Un nom est obligatoire.")
      */
     private $name;
@@ -61,7 +61,7 @@ class Product
      * @var Picture|null
      * 
      * @ORM\OneToOne(targetEntity=Picture::class, cascade={"persist", "remove"})
-     * @Groups({"products_read", "product_write"})
+     * @Groups({"products_read", "product_write", "orders_read"})
      */
     private $image;
 

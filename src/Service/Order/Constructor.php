@@ -24,11 +24,15 @@ class Constructor
         $user = $order->getUser();
         $catalog = $order->getCatalog();
         $userGroup = $this->userGroupDefiner->getUserGroup($user);
+        $status = $userGroup->getOnlinePayment() ? "ON_PAYMENT" : "WAITING";
         $items = $this->updateItems($order->getItems(), $catalog, $userGroup);
         $totalHT = $this->getItemsCostHT($items, 'ORDERED');
         $totalTTC = $this->getItemsCostTTC($items, 'ORDERED');
-        $order->setTotalHT($totalHT);
-        $order->setTotalTTC($totalTTC);
+        $order->setUser($user)
+              ->setIsRemains(false)
+              ->setStatus($status)
+              ->setTotalHT($totalHT)
+              ->setTotalTTC($totalTTC);
     }
 
     private function updateItems($items, $catalog, $userGroup)

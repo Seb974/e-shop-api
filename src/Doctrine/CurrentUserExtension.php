@@ -60,11 +60,9 @@ class CurrentUserExtension implements QueryCollectionExtensionInterface, QueryIt
             }
 
             if (in_array($resourceClass, $needingAvailability)) {
-                $queryBuilder->andWhere("$rootAlias.used < $rootAlias.maxUsage")
-                             ->andWhere("$rootAlias.endsAt >= :today")
-                             ->orWhere("$rootAlias.code = :code")
-                             ->setParameter("today", new \DateTime())
-                             ->setParameter("code", "relaypoint");
+                $queryBuilder->andWhere("$rootAlias.used is NULL OR $rootAlias.used < $rootAlias.maxUsage")
+                             ->andWhere("$rootAlias.endsAt is NULL OR $rootAlias.endsAt >= :today")
+                             ->setParameter("today", new \DateTime());
             }
         }
     }
