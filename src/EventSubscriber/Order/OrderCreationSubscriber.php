@@ -32,7 +32,8 @@ class OrderCreationSubscriber implements EventSubscriberInterface
     public function fitOrder(ViewEvent $event)
     {
         $result = $event->getControllerResult();
-        $method = $event->getRequest()->getMethod();
+        $request = $event->getRequest();
+        $method = $request->getMethod();
         $user = $this->security->getUser();
         $userGroup = $this->userGroupDefiner->getUserGroup($user);
 
@@ -40,9 +41,19 @@ class OrderCreationSubscriber implements EventSubscriberInterface
             if ( $method === "POST" ) {
                 $this->constructor->adjustOrder($result);
             } else if ( $method === "PUT" ) {
-                throw new \Exception();
+                if (!$userGroup->getOnlinePayment() || ($userGroup->getOnlinePayment() && $this->isCurrentUser($result->getPaymentId(), $request)) )
+                    throw new \Exception();
                 $result->setStatus("WAITING");
             }
         }
+    }
+
+    private function isCurrentUser($uuid, $request)
+    {
+        $userUuid = $request->query->get('id');
+        $pattern = "/^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/";
+        if ($uuid === null || preg_match($pattern, $uuid) === 0 || preg_match($pattern, $uuid) === false)
+            return false;
+        return $userUuid == $uuid;
     }
 }

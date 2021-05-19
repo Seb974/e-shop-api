@@ -6,22 +6,24 @@ use App\Entity\Group;
 use App\Entity\Product;
 use App\Service\Tax\Tax;
 use App\Service\User\UserGroupDefiner;
+use Symfony\Component\Security\Core\Security;
 
 class Constructor
 {
     private $tax;
+    private $security;
     private $userGroupDefiner;
 
-    public function __construct(UserGroupDefiner $userGroupDefiner, Tax $tax)
+    public function __construct(UserGroupDefiner $userGroupDefiner, Tax $tax, Security $security)
     {
-
         $this->tax = $tax;
+        $this->security = $security;
         $this->userGroupDefiner = $userGroupDefiner;
     }
 
     public function adjustOrder(&$order)
     {
-        $user = $order->getUser();
+        $user = $this->security->getUser();
         $catalog = $order->getCatalog();
         $userGroup = $this->userGroupDefiner->getUserGroup($user);
         $status = $userGroup->getOnlinePayment() ? "ON_PAYMENT" : "WAITING";

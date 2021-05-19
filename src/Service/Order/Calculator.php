@@ -47,9 +47,10 @@ class Calculator
     private function applyDiscount($discount, $itemsCost)
     {
         if ($discount === null)
-            return $itemsCost;
+            return round($itemsCost * 100) / 100;
         else if ($discount['percentage'])
-            return round($itemsCost * 100) / 100 * (1 - ($discount['discount'] < 1 ? $discount['discount'] : $discount['discount'] / 100));
+            return round($itemsCost * (1 - ($discount['discount'] < 1 ? $discount['discount'] : $discount['discount'] / 100)) * 100) / 100 ;
+            // return round($itemsCost * 100) / 100 * (1 - ($discount['discount'] < 1 ? $discount['discount'] : $discount['discount'] / 100));
         else
             return (round($itemsCost * 100) / 100) - $discount['discount'];
     }
@@ -82,7 +83,7 @@ class Calculator
         $tax = $this->tax->getTaxRate($product, $catalog);
         foreach ($product->getPrices() as $price) {
             if ($price->getPriceGroup()->getId() == $priceGroup->getId())
-                return ($price->getAmount() * (1 + $tax));
+                return round($price->getAmount() * (1 + $tax) * 100) / 100;
         }
         return 0;
     }
