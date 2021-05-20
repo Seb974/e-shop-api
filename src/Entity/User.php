@@ -4,11 +4,13 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
+use App\Filter\UserFilterByNameAndEmailFilter;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -36,6 +38,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *     },
  *     mercure={"private"=true, "normalization_context"={"group"="users_read"}},
  * )
+ * @ApiFilter(UserFilterByNameAndEmailFilter::class, properties={"name"="partial", "email"="partial"})
  */
 class User implements UserInterface
 {
@@ -43,13 +46,13 @@ class User implements UserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"users_read", "user_write", "orders_read"})
+     * @Groups({"users_read", "user_write", "orders_read", "sellers_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
-     * @Groups({"users_read", "user_write", "orders_read"})
+     * @Groups({"users_read", "user_write", "orders_read", "sellers_read"})
      * @Assert\Email(message="L'adresse email saisie n'est pas valide.")
      */
     private $email;
@@ -70,7 +73,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=100, nullable=true)
-     * @Groups({"users_read", "user_write", "orders_read"})
+     * @Groups({"users_read", "user_write", "orders_read", "sellers_read"})
      * @Assert\Length(min = 3, minMessage = "Le nom doit contenir au moins {{ limit }} caractères.",
      *                max = 100, maxMessage= "Le nom ne peut dépasser {{ limit }} caractères.")
      */

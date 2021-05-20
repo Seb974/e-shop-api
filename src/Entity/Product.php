@@ -197,6 +197,12 @@ class Product
      */
     private $catalogs;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Seller::class)
+     * @Groups({"products_read", "product_write", "orders_read"})
+     */
+    private $seller;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
@@ -586,6 +592,18 @@ class Product
     public function removeCatalog(Catalog $catalog): self
     {
         $this->catalogs->removeElement($catalog);
+
+        return $this;
+    }
+
+    public function getSeller(): ?Seller
+    {
+        return $this->seller;
+    }
+
+    public function setSeller(?Seller $seller): self
+    {
+        $this->seller = $seller;
 
         return $this;
     }
