@@ -31,11 +31,7 @@ class JWTDecodedListener
         $payload = $event->getPayload();
         $role = $this->getMainRole($payload['roles']);
 
-        dump("JWT Decoded");
-        dump($origin);
-        dump($this->adminDomain);
         if ( !($origin == $this->adminDomain && ($this->isAdmin($role) || $this->isProvider($payload))) ) {
-            dump("captured");
             $event->markAsInvalid();
         }
     }
