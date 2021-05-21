@@ -18,7 +18,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class SellerCreationSubscriber implements EventSubscriberInterface 
 {
-
     public static function getSubscribedEvents()
     {
         return [ KernelEvents::VIEW => ['fitDatas', EventPriorities::PRE_WRITE] ];
@@ -29,9 +28,19 @@ class SellerCreationSubscriber implements EventSubscriberInterface
         $result = $event->getControllerResult();
         $method = $event->getRequest()->getMethod();
 
-        if ($result instanceof Seller && $method === "POST") {
-            $result->setTurnover(0)
-                   ->setTotalToPay(0);
+        if ($result instanceof Seller && ($method === "POST" || $method === "PUT")) {
+            if ($method === "POST") {
+                $result->setTurnover(0)
+                        ->setTotalToPay(0);
+            }
+            $this->addSellersRights($result->getUsers());
+        }
+    }
+
+    private function addSellersRights($users)
+    {
+        foreach ($users as $user) {
+            $user->setIsSeller(true);
         }
     }
 }

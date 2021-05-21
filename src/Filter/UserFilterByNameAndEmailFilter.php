@@ -17,7 +17,7 @@ final class UserFilterByNameAndEmailFilter extends AbstractContextAwareFilter
         $parameterName = $queryNameGenerator->generateParameterName($property);
         $queryBuilder
             ->andWhere(sprintf('o.name LIKE :%s OR o.email LIKE :%s', $parameterName, $parameterName))
-            ->setParameter($parameterName, $value .'%');
+            ->setParameter($parameterName, '%'. $value .'%');
     }
 
     public function getDescription(string $resourceClass): array

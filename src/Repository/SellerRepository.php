@@ -19,22 +19,18 @@ class SellerRepository extends ServiceEntityRepository
         parent::__construct($registry, Seller::class);
     }
 
-    // /**
-    //  * @return Seller[] Returns an array of Seller objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @return Seller[] Returns an array of Seller objects
+     */
+    public function findUserSellers($user)
     {
         return $this->createQueryBuilder('s')
-            ->andWhere('s.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('s.id', 'ASC')
-            ->setMaxResults(10)
+            ->andWhere(':user MEMBER OF s.users')
+            ->setParameter('user', $user)
             ->getQuery()
             ->getResult()
         ;
     }
-    */
 
     /*
     public function findOneBySomeField($value): ?Seller

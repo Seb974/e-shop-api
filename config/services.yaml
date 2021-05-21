@@ -59,6 +59,10 @@ services:
             $secretKey: '%env(STRIPE_SECRET_KEY)%'
 
     App\EventSubscriber\Authentication\JwtCreationSubscriber:
+        # arguments: [ '@request_stack' ]
+        arguments:
+            $requestStack: '@request_stack'
+            $admin: '%env(ADMIN_DOMAIN)%'
         tags:
             - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_created, method: updateJwtData }
 
@@ -69,6 +73,15 @@ services:
     App\EventSubscriber\Authentication\LogoutSuccessSubscriber:
         tags:
             - { name: 'kernel.event_listener', event: 'Symfony\Component\Security\Http\Event\LogoutEvent', dispatcher: security.event_dispatcher.main, method: onLogoutSuccess }
+    
+    acme_api.event.jwt_decoded_listener:
+        class: App\EventSubscriber\Authentication\JWTDecodedListener
+        # arguments: [ '@request_stack' ]
+        arguments:
+            $requestStack: '@request_stack'
+            $admin: '%env(ADMIN_DOMAIN)%'
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_decoded, method: onJWTDecoded }
     
     App\EventSubscriber\Response\ResponseSubscriber:
         arguments:

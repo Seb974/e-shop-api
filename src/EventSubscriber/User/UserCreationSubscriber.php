@@ -49,10 +49,14 @@ class UserCreationSubscriber implements EventSubscriberInterface
                 $hash = $this->encoder->encodePassword($result, $result->getPassword());
                 $result->setPassword($hash);
             }
-            if ($method === "POST" && $result->getMetas() == null) {
-                $meta = new Meta();
-                $this->em->persist($meta);
-                $result->setMetas($meta);
+            if ($method === "POST") {
+                if ($result->getMetas() == null) {
+                    $meta = new Meta();
+                    $this->em->persist($meta);
+                    $result->setMetas($meta);
+                }
+                $result->setIsSeller($result->getIsSeller() == null ? false : $result->getIsSeller());
+                $result->setIsDeliverer($result->getIsDeliverer() == null ? false : $result->getIsDeliverer());
             }
         }
     }
