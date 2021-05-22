@@ -2,21 +2,20 @@
 
 namespace App\EventSubscriber\Authentication;
 
-use Symfony\Component\Security\Core\Security;
+use App\Service\User\RolesManager;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTDecodedEvent;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class JWTDecodedListener
 {
     private $adminDomain;
     private $requestStack;
-    private $security;
+    private $rolesManager;
 
-    public function __construct($requestStack, $admin, Security $security)
+    public function __construct($requestStack, $admin, RolesManager $rolesManager)
     {
         $this->adminDomain = $admin;
+        $this->rolesManager = $rolesManager;
         $this->requestStack = $requestStack;
-        $this->security = $security;
     }
 
     /**
@@ -29,27 +28,9 @@ class JWTDecodedListener
         $request = $this->requestStack->getCurrentRequest();
         $origin = $request->headers->get('origin');
         $payload = $event->getPayload();
-        $role = $this->getMainRole($payload['roles']);
 
-        if ( !($origin == $this->adminDomain && ($this->isAdmin($role) || $this->isProvider($payload))) ) {
+        if ( !($origin == $this->adminDomain && $this->rolesManager->hasAdminAccess($payload['roles'])) ) {
             $event->markAsInvalid();
         }
     }
-
-    private function getMainRole($roles)
-    {
-        $filteredRoles = array_diff($roles, ["ROLE_USER"]);
-        return count($filteredRoles) > 0 ? $filteredRoles[0] : "ROLE_USER";
-    }
-
-    private function isAdmin($role)
-    {
-        return str_contains($role, "ADMIN");
-    }
-
-    private function isProvider($user)
-    {
-        return $user['isSeller'] === true || $user['isDeliverer'] === true;
-    }
-
 }

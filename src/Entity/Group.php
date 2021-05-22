@@ -20,7 +20,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ApiResource(
  *     attributes={"enable_max_depth"=true},
  *     normalizationContext={
- *          "groups"={"groups_read"}
+ *          "groups"={"groups_read", "admin:groups_read"}
  *     },
  *     collectionOperations={
  *          "GET",
@@ -92,6 +92,18 @@ class Group
      * @Groups({"groups_read", "priceGroups_read"})
      */
     private $onlinePayment;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"admin:groups_read"})
+     */
+    private $hasAdminAccess;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"admin:groups_read"})
+     */
+    private $hasShopAccess;
 
     public function getId(): ?int
     {
@@ -190,6 +202,30 @@ class Group
     public function setOnlinePayment(?bool $onlinePayment): self
     {
         $this->onlinePayment = $onlinePayment;
+
+        return $this;
+    }
+
+    public function getHasAdminAccess(): ?bool
+    {
+        return $this->hasAdminAccess;
+    }
+
+    public function setHasAdminAccess(?bool $hasAdminAccess): self
+    {
+        $this->hasAdminAccess = $hasAdminAccess;
+
+        return $this;
+    }
+
+    public function getHasShopAccess(): ?bool
+    {
+        return $this->hasShopAccess;
+    }
+
+    public function setHasShopAccess(?bool $hasShopAccess): self
+    {
+        $this->hasShopAccess = $hasShopAccess;
 
         return $this;
     }

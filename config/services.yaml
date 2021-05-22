@@ -63,6 +63,7 @@ services:
         arguments:
             $requestStack: '@request_stack'
             $admin: '%env(ADMIN_DOMAIN)%'
+            $public: '%env(PUBLIC_DOMAIN)%'
         tags:
             - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_created, method: updateJwtData }
 

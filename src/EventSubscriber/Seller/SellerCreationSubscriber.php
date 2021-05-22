@@ -40,7 +40,10 @@ class SellerCreationSubscriber implements EventSubscriberInterface
     private function addSellersRights($users)
     {
         foreach ($users as $user) {
-            $user->setIsSeller(true);
+            $originalRoles = $user->getRoles();
+            $originalRoles[] = "ROLE_SELLER";
+            $user->setRoles(array_unique($originalRoles));
+            // $user->setIsSeller(true);
         }
     }
 }

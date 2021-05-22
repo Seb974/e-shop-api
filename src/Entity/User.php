@@ -97,18 +97,6 @@ class User implements UserInterface
      */
     private $lastOrder;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"admin:users_read", "admin:user_write", "sellers_read"})
-     */
-    private $isSeller;
-
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"admin:users_read", "admin:user_write"})
-     */
-    private $isDeliverer;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -234,30 +222,6 @@ class User implements UserInterface
     public function setLastOrder(?\DateTimeInterface $lastOrder): self
     {
         $this->lastOrder = $lastOrder;
-
-        return $this;
-    }
-
-    public function getIsSeller(): ?bool
-    {
-        return $this->isSeller;
-    }
-
-    public function setIsSeller(?bool $isSeller): self
-    {
-        $this->isSeller = $isSeller;
-
-        return $this;
-    }
-
-    public function getIsDeliverer(): ?bool
-    {
-        return $this->isDeliverer;
-    }
-
-    public function setIsDeliverer(?bool $isDeliverer): self
-    {
-        $this->isDeliverer = $isDeliverer;
 
         return $this;
     }
