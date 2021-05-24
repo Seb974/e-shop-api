@@ -13,8 +13,10 @@ security:
         # used to reload user from session & other features (e.g. switch_user)
 
     role_hierarchy:
-        ROLE_TEAM: [ROLE_USER, ROLE_PRO, ROLE_CHR, ROLE_GC, ROLE_VIP, ROLE_USER_EXT, ROLE_USER_VIP, ROLE_USER_EXT_VIP]
-        ROLE_ADMIN: [ROLE_TEAM]
+        ROLE_TEAM: [ROLE_USER]
+        ROLE_SELLER: [ROLE_TEAM]
+        ROLE_DELIVERER: [ROLE_TEAM]
+        ROLE_ADMIN: [ROLE_SELLER, ROLE_DELIVERER]
         ROLE_SUPER_ADMIN : [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
 
     firewalls:

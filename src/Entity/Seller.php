@@ -15,14 +15,14 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ApiResource(
  *      normalizationContext={"groups"={"sellers_read"}},
  *      collectionOperations={
- *          "GET"={"security"="is_granted('ROLE_ADMIN')"},
- *          "POST"={"security"="is_granted('ROLE_ADMIN')"},
+ *          "GET",
+ *          "POST"={"security"="is_granted('ROLE_TEAM')"},
  *     },
  *     itemOperations={
- *          "GET"={"security"="is_granted('ROLE_ADMIN')"},
- *          "PUT"={"security"="is_granted('ROLE_ADMIN')"},
- *          "PATCH"={"security"="is_granted('ROLE_ADMIN')"},
- *          "DELETE"={"security"="is_granted('ROLE_ADMIN')"}
+ *          "GET",
+ *          "PUT"={"security"="is_granted('ROLE_TEAM')"},
+ *          "PATCH"={"security"="is_granted('ROLE_TEAM')"},
+ *          "DELETE"={"security"="is_granted('ROLE_TEAM')"}
  *     }
  * )
  */
@@ -32,7 +32,7 @@ class Seller
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"sellers_read", "products_read"})
+     * @Groups({"sellers_read", "products_read", "admin:orders_read"})
      */
     private $id;
 
@@ -40,7 +40,7 @@ class Seller
      * @ORM\Column(type="string", length=120, nullable=true)
      * @Assert\Length(min = 3, minMessage = "Le nom doit contenir au moins {{ limit }} caractères.",
      *                max = 120, maxMessage = "Le nom ne peut contenir plus de {{ limit }} caractères.")
-     * @Groups({"sellers_read", "products_read"})
+     * @Groups({"sellers_read", "products_read", "admin:orders_read"})
      */
     private $name;
 
@@ -70,7 +70,7 @@ class Seller
 
     /**
      * @ORM\ManyToMany(targetEntity=User::class)
-     * @Groups({"sellers_read"})
+     * @Groups({"sellers_read", "seller:products_read", "admin:orders_read"})
      */
     private $users;
 

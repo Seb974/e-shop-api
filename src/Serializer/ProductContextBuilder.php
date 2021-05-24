@@ -2,12 +2,12 @@
 
 namespace App\Serializer;
 
-use App\Entity\OrderEntity;
+use App\Entity\Product;
 use Symfony\Component\HttpFoundation\Request;
 use ApiPlatform\Core\Serializer\SerializerContextBuilderInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-final class OrderEntityContextBuilder implements SerializerContextBuilderInterface
+final class ProductContextBuilder implements SerializerContextBuilderInterface
 {
     private $decorated;
     private $authorizationChecker;
@@ -23,9 +23,9 @@ final class OrderEntityContextBuilder implements SerializerContextBuilderInterfa
         $context = $this->decorated->createFromRequest($request, $normalization, $extractedAttributes);
         $resourceClass = $context['resource_class'] ?? null;
 
-        if ( $resourceClass === OrderEntity::class && isset($context['groups']) ) {
-            if ($this->authorizationChecker->isGranted('ROLE_TEAM')) {
-                $context['groups'][] = $normalization ? 'admin:orders_read' : 'admin:order_write';
+        if ( $resourceClass === Product::class && isset($context['groups']) ) {
+            if ($this->authorizationChecker->isGranted('ROLE_SELLER')) {
+                $context['groups'][] = $normalization ? 'seller:products_read' : 'seller:product_write';
             } 
         }
 

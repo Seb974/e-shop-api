@@ -1,5 +1,4 @@
 <?php
-
 namespace App\EventSubscriber\Authentication;
 
 use App\Service\User\RolesManager;
@@ -29,8 +28,14 @@ class JWTDecodedListener
         $origin = $request->headers->get('origin');
         $payload = $event->getPayload();
 
-        if ( !($origin == $this->adminDomain && $this->rolesManager->hasAdminAccess($payload['roles'])) ) {
-            $event->markAsInvalid();
+        if ($origin == $this->adminDomain) {
+            if (!$this->rolesManager->hasAdminAccess($payload['roles']))
+                $event->markAsInvalid();
+            else
+                $payload['roles'] = $this->rolesManager->filterAdminRoles($payload['roles']);
+        } else {
+            $payload['roles'] = $this->rolesManager->filterShopRoles($payload['roles']);
         }
+        $event->setPayload($payload);
     }
 }

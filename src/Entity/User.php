@@ -27,11 +27,11 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *          "groups"={"users_read"}
  *     },
  *     collectionOperations={
- *          "GET"={"security"="is_granted('ROLE_ADMIN')"},
+ *          "GET"={"security"="is_granted('ROLE_TEAM')"},
  *          "POST"
  *     },
  *     itemOperations={
- *          "GET"={"security"="is_granted('ROLE_ADMIN') or object == user"},
+ *          "GET"={"security"="is_granted('ROLE_TEAM') or object == user"},
  *          "PUT"={"security"="is_granted('ROLE_ADMIN') or object == user"},
  *          "PATCH"={"security"="is_granted('ROLE_ADMIN') or object == user"},
  *          "DELETE"={"security"="is_granted('ROLE_ADMIN') or object == user"}
@@ -46,7 +46,7 @@ class User implements UserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"users_read", "user_write", "orders_read", "sellers_read"})
+     * @Groups({"users_read", "user_write", "orders_read", "sellers_read", "seller:products_read"})
      */
     private $id;
 

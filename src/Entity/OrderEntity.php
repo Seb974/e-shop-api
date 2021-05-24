@@ -4,11 +4,14 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\OrderEntityRepository;
+use ApiPlatform\Core\Annotation\ApiFilter;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 /**
  * @ORM\Entity(repositoryClass=OrderEntityRepository::class)
@@ -17,18 +20,20 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          "disable_type_enforcement"=true,
  *          "groups"={"order_write"}
  *     },
- *     normalizationContext={"groups"={"orders_read"}},
+ *     normalizationContext={"groups"={"orders_read", "admin:orders_read"}},
  *     collectionOperations={
- *          "GET"={"security"="is_granted('ROLE_ADMIN') or object.getUser() == user"},
+ *          "GET"={"security"="is_granted('ROLE_TEAM') or object.getUser() == user"},
  *          "POST"
  *     },
  *     itemOperations={
- *          "GET"={"security"="is_granted('ROLE_ADMIN') or object.getUser() == user"},
- *          "PUT"={"security"="is_granted('ROLE_ADMIN') or object.isOwner(request, object)"},
+ *          "GET"={"security"="is_granted('ROLE_TEAM') or object.getUser() == user"},
+ *          "PUT"={"security"="is_granted('ROLE_TEAM') or object.isOwner(request, object)"},
  *          "PATCH"={"security"="is_granted('ROLE_ADMIN')"},
  *          "DELETE"={"security"="is_granted('ROLE_ADMIN') or object.isOwner(request, object)"}
  *     },
  * )
+ * @ApiFilter(SearchFilter::class, properties={"status"="exact"})
+ * @ApiFilter(DateFilter::class, properties={"deliveryDate"})
  */
 class OrderEntity
 {

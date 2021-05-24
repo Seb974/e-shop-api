@@ -20,18 +20,18 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          "disable_type_enforcement"=true
  *      },
  *      normalizationContext={
- *          "groups"={"products_read"}
+ *          "groups"={"products_read", "seller:products_read"}
  *      },
  *      collectionOperations={
  *          "GET",
- *          "POST"={"security"="is_granted('ROLE_TEAM')"}
+ *          "POST"={"security"="is_granted('ROLE_TEAM')"},
  *     },
  *     itemOperations={
  *          "GET",
  *          "PUT"={"security"="is_granted('ROLE_TEAM')"},
  *          "PATCH"={"security"="is_granted('ROLE_TEAM')"},
  *          "DELETE"={"security"="is_granted('ROLE_TEAM')"}
- *     }
+ *     },
  * )
  */
 class Product

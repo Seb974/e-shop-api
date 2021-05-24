@@ -57,6 +57,23 @@ services:
     App\Service\Stripe\Stripe:
         arguments:
             $secretKey: '%env(STRIPE_SECRET_KEY)%'
+    
+    App\Service\User\UserGroupDefiner:
+        arguments:
+            $requestStack: '@request_stack'
+            $admin: '%env(ADMIN_DOMAIN)%'
+
+    App\Doctrine\CurrentUserExtension:
+        arguments:
+            $requestStack: '@request_stack'
+            $admin: '%env(ADMIN_DOMAIN)%'
+            $public: '%env(PUBLIC_DOMAIN)%'
+
+    App\Doctrine\CurrentAdminExtension:
+        arguments:
+            $requestStack: '@request_stack'
+            $admin: '%env(ADMIN_DOMAIN)%'
+            $public: '%env(PUBLIC_DOMAIN)%'
 
     App\EventSubscriber\Authentication\JwtCreationSubscriber:
         # arguments: [ '@request_stack' ]
