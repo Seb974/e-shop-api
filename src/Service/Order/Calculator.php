@@ -11,6 +11,7 @@ use App\Service\Order\Packer;
 use App\Repository\CatalogRepository;
 use App\Repository\ProductRepository;
 use App\Service\User\UserGroupDefiner;
+use App\Repository\ConditionRepository;
 use Symfony\Component\Security\Core\Security;
 
 class Calculator
@@ -20,8 +21,9 @@ class Calculator
     private $security;
     private $userGroupDefiner;
     private $productRepository;
+    private $conditionRepository;
 
-    public function __construct(Security $security, UserGroupDefiner $userGroupDefiner, Packer $packer, Tax $tax, CatalogRepository $catalogRepository, ProductRepository $productRepository)
+    public function __construct(Security $security, UserGroupDefiner $userGroupDefiner, Packer $packer, Tax $tax, CatalogRepository $catalogRepository, ProductRepository $productRepository, ConditionRepository $conditionRepository)
     {
         $this->tax = $tax;
         $this->packer = $packer;
@@ -29,6 +31,7 @@ class Calculator
         $this->userGroupDefiner = $userGroupDefiner;
         $this->catalogRepository = $catalogRepository;
         $this->productRepository = $productRepository;
+        $this->conditionRepository = $conditionRepository;
     }
 
     public function getTotalCost($parameters)
@@ -36,10 +39,15 @@ class Calculator
         $user = $this->security->getUser();
         $userGroup = $this->userGroupDefiner->getUserGroup($user);
         $catalog = $this->catalogRepository->find($parameters->get('area')['id']);
+        $condition = $parameters->get('condition') !== null ? $this->conditionRepository->find($parameters->get('condition')['id']) : 0;
+        dump($condition);
+        dump($catalog);
         $itemsCost = $this->getItemsCost($parameters->get('items'), $catalog, $userGroup);
         $finalItemsCost = $this->applyDiscount($parameters->get('promotion'), $itemsCost);
         $packagesCost = $catalog->getNeedsParcel() ?
-                        $this->getPackagesCost($parameters->get('items'), $catalog) : 0;
+                        $this->getPackagesCost($parameters->get('items'), $catalog) :
+                        $this->getDeliveryCost($condition, $catalog, $itemsCost);
+        dump($packagesCost);
 
         return $finalItemsCost + $packagesCost;
     }
@@ -75,6 +83,16 @@ class Calculator
             $accumulator += ($package['quantity'] * $price);
         }
         return $accumulator;
+    }
+
+    private function getDeliveryCost($condition, $catalog, $itemsCost)
+    {
+        if ($condition == null)
+            return 0;
+
+        $tax = $this->tax->getTaxRate($condition, $catalog);
+        $price = $itemsCost < $condition->getMinForFree() ? $condition->getPrice() : 0;
+        return round($price * (1 + $tax) * 100) / 100;
     }
 
     private function getProductPrice(Product $product, Catalog $catalog, Group $userGroup)

@@ -23,18 +23,23 @@ class Constructor
 
     public function adjustOrder(&$order)
     {
-        $user = $this->security->getUser();
         $catalog = $order->getCatalog();
+        if ($catalog === null || !$catalog->getNeedsParcel() && $order->getAppliedCondition() === null) {
+            throw new \Exception();
+        }
+        $user = $this->security->getUser();
         $userGroup = $this->userGroupDefiner->getUserGroup($user);
         $status = $userGroup->getOnlinePayment() ? "ON_PAYMENT" : "WAITING";
         $items = $this->updateItems($order->getItems(), $catalog, $userGroup);
         $totalHT = $this->getItemsCostHT($items, 'ORDERED');
         $totalTTC = $this->getItemsCostTTC($items, 'ORDERED');
+        $deliveryCostHT = $this->getDeliveryCostHT($order->getAppliedCondition(), $totalHT);
+        $deliveryCostTTC = $this->getDeliveryCostTTC($order->getAppliedCondition(), $catalog, $deliveryCostHT);
         $order->setUser($user)
               ->setIsRemains(false)
               ->setStatus($status)
-              ->setTotalHT($totalHT)
-              ->setTotalTTC($totalTTC);
+              ->setTotalHT($totalHT + $deliveryCostHT)
+              ->setTotalTTC($totalTTC + $deliveryCostTTC);
     }
 
     private function updateItems($items, $catalog, $userGroup)
@@ -52,7 +57,8 @@ class Constructor
         $tax = $this->tax->getTaxRate($product, $catalog);
         $item->setPrice($price)
              ->setTaxRate($tax)
-             ->setIsAdjourned(false);
+             ->setIsAdjourned(false)
+             ->setIsPrepared(false);
     }
 
     private function getItemsCostHT($items, $qtyToUse)
@@ -65,6 +71,22 @@ class Constructor
             $accumulator += ($qty * $item->getPrice());
         }
         return $accumulator;
+    }
+
+    private function getDeliveryCostHT($condition, $totalHT)
+    {
+        if ($condition == null)
+            return 0;
+        return $totalHT < $condition->getMinForFree() ? $condition->getPrice() : 0;
+    }
+
+    private function getDeliveryCostTTC($condition, $catalog, $deliveryCostHT)
+    {
+        if ($condition == null)
+            return 0;
+        
+        $tax = $this->tax->getTaxRate($condition, $catalog);
+        return round($deliveryCostHT * (1 + $tax) * 100) / 100;
     }
 
     private function getItemsCostTTC($items, $qtyToUse)

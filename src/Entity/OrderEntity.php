@@ -135,6 +135,12 @@ class OrderEntity
      */
     private $uuid;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Condition::class)
+     * @Groups({"admin:orders_read", "order_write"})
+     */
+    private $appliedCondition;
+
     public function __construct()
     {
         $this->items = new ArrayCollection();
@@ -345,6 +351,18 @@ class OrderEntity
     public function setUuid(?string $uuid): self
     {
         $this->uuid = $uuid;
+
+        return $this;
+    }
+
+    public function getAppliedCondition(): ?Condition
+    {
+        return $this->appliedCondition;
+    }
+
+    public function setAppliedCondition(?Condition $appliedCondition): self
+    {
+        $this->appliedCondition = $appliedCondition;
 
         return $this;
     }

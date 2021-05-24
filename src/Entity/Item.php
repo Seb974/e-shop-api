@@ -85,6 +85,12 @@ class Item
      */
     private $orderEntity;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"items_read", "orders_read", "order_write"})
+     */
+    private $isPrepared;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -182,6 +188,18 @@ class Item
     public function setOrderEntity(?OrderEntity $orderEntity): self
     {
         $this->orderEntity = $orderEntity;
+
+        return $this;
+    }
+
+    public function getIsPrepared(): ?bool
+    {
+        return $this->isPrepared;
+    }
+
+    public function setIsPrepared(?bool $isPrepared): self
+    {
+        $this->isPrepared = $isPrepared;
 
         return $this;
     }
