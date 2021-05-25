@@ -91,6 +91,18 @@ class Item
      */
     private $isPrepared;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Variation::class)
+     * @Groups({"items_read", "orders_read", "order_write"})
+     */
+    private $variation;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Size::class)
+     * @Groups({"items_read", "orders_read", "order_write"})
+     */
+    private $size;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -200,6 +212,30 @@ class Item
     public function setIsPrepared(?bool $isPrepared): self
     {
         $this->isPrepared = $isPrepared;
+
+        return $this;
+    }
+
+    public function getVariation(): ?Variation
+    {
+        return $this->variation;
+    }
+
+    public function setVariation(?Variation $variation): self
+    {
+        $this->variation = $variation;
+
+        return $this;
+    }
+
+    public function getSize(): ?Size
+    {
+        return $this->size;
+    }
+
+    public function setSize(?Size $size): self
+    {
+        $this->size = $size;
 
         return $this;
     }

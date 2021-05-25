@@ -16,10 +16,14 @@ class OrderCreationSubscriber implements EventSubscriberInterface
     private $security;
     private $constructor;
     private $userGroupDefiner;
+    private $adminDomain;
+    private $publicDomain;
 
-    public function __construct(Constructor $constructor, Security $security, UserGroupDefiner $userGroupDefiner)
+    public function __construct($admin, $public, Constructor $constructor, Security $security, UserGroupDefiner $userGroupDefiner)
     {
+        $this->adminDomain = $admin;
         $this->security = $security;
+        $this->publicDomain = $public;
         $this->constructor = $constructor;
         $this->userGroupDefiner = $userGroupDefiner;
     }
@@ -34,16 +38,21 @@ class OrderCreationSubscriber implements EventSubscriberInterface
         $result = $event->getControllerResult();
         $request = $event->getRequest();
         $method = $request->getMethod();
+        $origin = $request->headers->get('origin');
         $user = $this->security->getUser();
         $userGroup = $this->userGroupDefiner->getUserGroup($user);
 
         if ($result instanceof OrderEntity) {
-            if ( $method === "POST" ) {
-                $this->constructor->adjustOrder($result);
-            } else if ( $method === "PUT" ) {
-                if (!$userGroup->getOnlinePayment() || ($userGroup->getOnlinePayment() && $this->isCurrentUser($result->getPaymentId(), $request)) )
-                    throw new \Exception();
-                $result->setStatus("WAITING");
+            if ($origin === $this->publicDomain) {
+                if ($method === "POST")
+                    $this->constructor->adjustOrder($result);
+                else if ($method === "PUT") {
+                    if (!$userGroup->getOnlinePayment() || ($userGroup->getOnlinePayment() && $this->isCurrentUser($result->getPaymentId(), $request)) )
+                        throw new \Exception();
+                    $result->setStatus("WAITING");
+                }
+            } else if ($origin === $this->adminDomain && ($method === "POST" || $method === "PUT")) {
+                $this->constructor->adjustAdminOrder($result);
             }
         }
     }

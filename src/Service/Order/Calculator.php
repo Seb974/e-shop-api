@@ -40,15 +40,11 @@ class Calculator
         $userGroup = $this->userGroupDefiner->getUserGroup($user);
         $catalog = $this->catalogRepository->find($parameters->get('area')['id']);
         $condition = $parameters->get('condition') !== null ? $this->conditionRepository->find($parameters->get('condition')['id']) : 0;
-        dump($condition);
-        dump($catalog);
         $itemsCost = $this->getItemsCost($parameters->get('items'), $catalog, $userGroup);
         $finalItemsCost = $this->applyDiscount($parameters->get('promotion'), $itemsCost);
         $packagesCost = $catalog->getNeedsParcel() ?
                         $this->getPackagesCost($parameters->get('items'), $catalog) :
                         $this->getDeliveryCost($condition, $catalog, $itemsCost);
-        dump($packagesCost);
-
         return $finalItemsCost + $packagesCost;
     }
 

@@ -40,7 +40,7 @@ class Product
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"products_read"})
+     * @Groups({"products_read", "orders_read"})
      */
     private $id;
 

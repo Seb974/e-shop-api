@@ -42,6 +42,17 @@ class Constructor
               ->setTotalTTC($totalTTC + $deliveryCostTTC);
     }
 
+    public function adjustAdminOrder(&$order)
+    {
+        $catalog = $order->getCatalog();
+        $totalHT = $this->getItemsCostHT($order->getItems(), 'ORDERED');
+        $totalTTC = $this->getItemsCostTTC($order->getItems(), 'ORDERED');
+        $deliveryCostHT = $this->getDeliveryCostHT($order->getAppliedCondition(), $totalHT);
+        $deliveryCostTTC = $this->getDeliveryCostTTC($order->getAppliedCondition(), $catalog, $deliveryCostHT);
+        $order->setTotalHT($totalHT + $deliveryCostHT)
+              ->setTotalTTC($totalTTC + $deliveryCostTTC);
+    }
+
     private function updateItems($items, $catalog, $userGroup)
     {
         foreach ($items as $item) {
