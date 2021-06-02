@@ -23,7 +23,7 @@ final class ItemContextBuilder implements SerializerContextBuilderInterface
         $context = $this->decorated->createFromRequest($request, $normalization, $extractedAttributes);
         $resourceClass = $context['resource_class'] ?? null;
 
-        if ($resourceClass === Item::class && isset($context['groups']) && $this->authorizationChecker->isGranted('ROLE_ADMIN')) {
+        if ($resourceClass === Item::class && isset($context['groups']) && $this->authorizationChecker->isGranted('ROLE_TEAM')) {
             if ($normalization)
                 $context['groups'][] = 'admin:items_read';
             else

@@ -12,12 +12,14 @@ class Constructor
 {
     private $tax;
     private $security;
+    private $remainsCreator;
     private $userGroupDefiner;
 
-    public function __construct(UserGroupDefiner $userGroupDefiner, Tax $tax, Security $security)
+    public function __construct(UserGroupDefiner $userGroupDefiner, Tax $tax, Security $security, RemainsCreator $remainsCreator)
     {
         $this->tax = $tax;
         $this->security = $security;
+        $this->remainsCreator = $remainsCreator;
         $this->userGroupDefiner = $userGroupDefiner;
     }
 
@@ -53,6 +55,31 @@ class Constructor
               ->setTotalTTC($totalTTC + $deliveryCostTTC);
     }
 
+    public function adjustPreparation(&$order)
+    {
+        $user = $order->getUser();
+        $userGroup = $this->userGroupDefiner->getUserGroup($user);
+        $isPaidOnline = $userGroup->getOnlinePayment();
+
+        if ($this->remainsCreator->hasRemains($order->getItems()))
+            $this->createRemains($order, $isPaidOnline);
+
+        $totalHT  = $this->getItemsCostHT($order->getItems(),  ($isPaidOnline ? 'ORDERED' : 'PREPARED'));
+        $totalTTC = $this->getItemsCostTTC($order->getItems(), ($isPaidOnline ? 'ORDERED' : 'PREPARED'));
+
+        $order->setTotalHT($totalHT)
+              ->setTotalTTC($totalTTC);
+    }
+
+    private function createRemains($originalOrder, $isPaidOnline)
+    {
+        $remains = $this->remainsCreator->createRemains($originalOrder, $isPaidOnline);
+        $totalHT = $this->getItemsCostHT($remains->getItems(), 'ORDERED');
+        $totalTTC = $this->getItemsCostTTC($remains->getItems(), 'ORDERED');
+        $remains->setTotalHT($totalHT)
+                ->setTotalTTC($totalTTC);
+    }
+
     private function updateItems($items, $catalog, $userGroup)
     {
         foreach ($items as $item) {
@@ -68,6 +95,7 @@ class Constructor
         $tax = $this->tax->getTaxRate($product, $catalog);
         $item->setPrice($price)
              ->setTaxRate($tax)
+             ->setUnit($product->getUnit())
              ->setIsAdjourned(false)
              ->setIsPrepared(false);
     }
@@ -95,7 +123,7 @@ class Constructor
     {
         if ($condition == null)
             return 0;
-        
+
         $tax = $this->tax->getTaxRate($condition, $catalog);
         return round($deliveryCostHT * (1 + $tax) * 100) / 100;
     }

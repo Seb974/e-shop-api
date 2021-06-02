@@ -40,13 +40,13 @@ class Product
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"products_read", "orders_read"})
+     * @Groups({"products_read", "orders_read", "tourings_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=120, nullable=true)
-     * @Groups({"products_read", "product_write", "orders_read"})
+     * @Groups({"products_read", "product_write", "orders_read", "tourings_read"})
      * @Assert\NotBlank(message="Un nom est obligatoire.")
      */
     private $name;
@@ -61,15 +61,9 @@ class Product
      * @var Picture|null
      * 
      * @ORM\OneToOne(targetEntity=Picture::class, cascade={"persist", "remove"})
-     * @Groups({"products_read", "product_write", "orders_read"})
+     * @Groups({"products_read", "product_write", "orders_read", "tourings_read"})
      */
     private $image;
-
-    /*
-     * @ORM\Column(type="array", nullable=true)
-     * @Groups({"products_read", "product_write"})
-     */
-    // private $prices = [];
 
     /**
      * @ORM\Column(type="float", nullable=true)
@@ -121,7 +115,7 @@ class Product
 
     /**
      * @ORM\Column(type="string", length=12, nullable=true)
-     * @Groups({"products_read", "product_write"})
+     * @Groups({"products_read", "product_write", "orders_read", "tourings_read"})
      */
     private $unit;
 

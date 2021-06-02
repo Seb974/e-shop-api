@@ -14,16 +14,20 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass=ItemRepository::class)
  * @ApiResource(
+ *     denormalizationContext={
+ *          "disable_type_enforcement"=true,
+ *          "groups"={"order_write", "touring_write"}
+ *     },
  *     normalizationContext={"groups"={"items_read"}},
  *     collectionOperations={
- *          "GET"={"security"="is_granted('ROLE_ADMIN') or object.orderEntity.getUser() == user"},
+ *          "GET"={"security"="is_granted('ROLE_TEAM') or object.orderEntity.getUser() == user"},
  *          "POST"
  *     },
  *     itemOperations={
- *          "GET"={"security"="is_granted('ROLE_ADMIN') or object.orderEntity.getUser() == user"},
- *          "PUT"={"security"="is_granted('ROLE_ADMIN')"},
- *          "PATCH"={"security"="is_granted('ROLE_ADMIN')"},
- *          "DELETE"={"security"="is_granted('ROLE_ADMIN')"}
+ *          "GET"={"security"="is_granted('ROLE_TEAM') or object.orderEntity.getUser() == user"},
+ *          "PUT"={"security"="is_granted('ROLE_TEAM')"},
+ *          "PATCH"={"security"="is_granted('ROLE_TEAM')"},
+ *          "DELETE"={"security"="is_granted('ROLE_TEAM')"}
  *     },
  * )
  */
@@ -33,49 +37,49 @@ class Item
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"items_read", "orders_read", "order_write"})
+     * @Groups({"items_read", "orders_read", "tourings_read", "order_write", "touring_write"})
      */
     private $id;
 
     /**
      * @ORM\ManyToOne(targetEntity=Product::class)
-     * @Groups({"items_read", "orders_read", "order_write"})
+     * @Groups({"items_read", "orders_read", "order_write", "tourings_read"})
      */
     private $product;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"items_read", "orders_read", "order_write"})
+     * @Groups({"items_read", "orders_read", "order_write", "tourings_read"})
      */
     private $orderedQty;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"items_read", "orders_read", "admin:order_write"})
+     * @Groups({"items_read", "orders_read", "admin:order_write", "tourings_read"})
      */
     private $preparedQty;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"items_read", "orders_read", "admin:order_write"})
+     * @Groups({"items_read", "orders_read", "admin:order_write", "tourings_read", "touring_write"})
      */
     private $deliveredQty;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"items_read", "orders_read", "admin:order_write"})
+     * @Groups({"items_read", "orders_read", "admin:order_write", "tourings_read"})
      */
     private $price;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"items_read", "orders_read", "admin:order_write"})
+     * @Groups({"items_read", "orders_read", "admin:order_write", "tourings_read"})
      */
     private $taxRate;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"admin:items_read", "admin:orders_read", "admin:order_write"})
+     * @Groups({"admin:items_read", "admin:orders_read", "admin:order_write", "tourings_read"})
      */
     private $isAdjourned;
 
@@ -87,21 +91,27 @@ class Item
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"items_read", "orders_read", "order_write"})
+     * @Groups({"items_read", "orders_read", "order_write", "tourings_read"})
      */
     private $isPrepared;
 
     /**
      * @ORM\ManyToOne(targetEntity=Variation::class)
-     * @Groups({"items_read", "orders_read", "order_write"})
+     * @Groups({"items_read", "orders_read", "order_write", "tourings_read"})
      */
     private $variation;
 
     /**
      * @ORM\ManyToOne(targetEntity=Size::class)
-     * @Groups({"items_read", "orders_read", "order_write"})
+     * @Groups({"items_read", "orders_read", "order_write", "tourings_read"})
      */
     private $size;
+
+    /**
+     * @ORM\Column(type="string", length=10, nullable=true)
+     * @Groups({"items_read", "orders_read", "order_write", "tourings_read"})
+     */
+    private $unit;
 
     public function getId(): ?int
     {
@@ -236,6 +246,18 @@ class Item
     public function setSize(?Size $size): self
     {
         $this->size = $size;
+
+        return $this;
+    }
+
+    public function getUnit(): ?string
+    {
+        return $this->unit;
+    }
+
+    public function setUnit(?string $unit): self
+    {
+        $this->unit = $unit;
 
         return $this;
     }

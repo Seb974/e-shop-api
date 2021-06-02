@@ -13,6 +13,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use App\Entity\Group;
+use App\Entity\Touring;
 
 class CurrentAdminExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
@@ -48,7 +49,6 @@ class CurrentAdminExtension implements QueryCollectionExtensionInterface, QueryI
         $request = $this->requestStack->getCurrentRequest();
         $origin = $request->headers->get('origin');
 
-        // if ($origin === $this->adminDomain && !$this->auth->isGranted('ROLE_ADMIN') && ($user instanceof User || $user == null))
         if ($origin === $this->adminDomain && !$this->auth->isGranted('ROLE_ADMIN') && $user instanceof User)
         {
             $rootAlias = $queryBuilder->getRootAliases()[0];
@@ -64,6 +64,13 @@ class CurrentAdminExtension implements QueryCollectionExtensionInterface, QueryI
 
             if ( $resourceClass == Seller::class ) {
                 $queryBuilder->andWhere(":user MEMBER OF $rootAlias.users")
+                             ->setParameter("user", $user);
+            }
+
+            if ( $resourceClass == Touring::class ) {
+                $queryBuilder->leftJoin("$rootAlias.deliverer","u")
+                             ->andWhere("u IS NOT NULL")
+                             ->andWhere("u.id = :user")
                              ->setParameter("user", $user);
             }
         }

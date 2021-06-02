@@ -32,7 +32,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *          "DELETE"={"security"="is_granted('ROLE_ADMIN') or object.isOwner(request, object)"}
  *     },
  * )
- * @ApiFilter(SearchFilter::class, properties={"status"="exact"})
+ * @ApiFilter(SearchFilter::class, properties={"status"="partial"})
  * @ApiFilter(DateFilter::class, properties={"deliveryDate"})
  */
 class OrderEntity
@@ -41,73 +41,73 @@ class OrderEntity
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"orders_read", "order_write"})
+     * @Groups({"orders_read", "order_write", "tourings_read", "touring_write"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=120, nullable=true)
-     * @Groups({"orders_read", "order_write"})
+     * @Groups({"orders_read", "order_write", "tourings_read"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=120, nullable=true)
-     * @Groups({"orders_read", "order_write"})
+     * @Groups({"orders_read", "order_write", "tourings_read"})
      */
     private $email;
 
     /**
      * @ORM\ManyToOne(targetEntity=Meta::class, cascade={"persist", "remove"})
-     * @Groups({"admin:orders_read", "order_write"})
+     * @Groups({"admin:orders_read", "order_write", "tourings_read"})
      */
     private $metas;
 
     /**
      * @ORM\OneToMany(targetEntity=Item::class, mappedBy="orderEntity", cascade={"persist", "remove"})
-     * @Groups({"orders_read", "order_write"})
+     * @Groups({"orders_read", "order_write", "tourings_read", "touring_write"})
      */
     private $items;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
-     * @Groups({"orders_read", "order_write"})
+     * @Groups({"orders_read", "order_write", "tourings_read"})
      */
     private $deliveryDate;
 
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
-     * @Groups({"orders_read", "order_write"})
+     * @Groups({"orders_read", "order_write", "tourings_read", "touring_write"})
      */
     private $status;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"admin:orders_read", "order_write"})
+     * @Groups({"admin:orders_read", "order_write", "tourings_read"})
      */
     private $isRemains;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"orders_read", "order_write"})
+     * @Groups({"orders_read", "order_write", "tourings_read"})
      */
     private $totalHT;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"orders_read", "order_write"})
+     * @Groups({"orders_read", "order_write", "tourings_read"})
      */
     private $totalTTC;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class)
-     * @Groups({"admin:orders_read", "order_write"})
+     * @Groups({"admin:orders_read", "order_write", "tourings_read"})
      */
     private $user;
 
     /**
      * @ORM\Column(type="text", nullable=true)
-     * @Groups({"orders_read", "order_write"})
+     * @Groups({"orders_read", "order_write", "tourings_read"})
      */
     private $message;
 
@@ -140,6 +140,18 @@ class OrderEntity
      * @Groups({"admin:orders_read", "order_write"})
      */
     private $appliedCondition;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"admin:orders_read", "order_write", "tourings_read", "touring_write"})
+     */
+    private $deliveryPriority;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Touring::class, inversedBy="orderEntities")
+     * @Groups({"admin:orders_read"})
+     */
+    private $touring;
 
     public function __construct()
     {
@@ -363,6 +375,30 @@ class OrderEntity
     public function setAppliedCondition(?Condition $appliedCondition): self
     {
         $this->appliedCondition = $appliedCondition;
+
+        return $this;
+    }
+
+    public function getDeliveryPriority(): ?int
+    {
+        return $this->deliveryPriority;
+    }
+
+    public function setDeliveryPriority(?int $deliveryPriority): self
+    {
+        $this->deliveryPriority = $deliveryPriority;
+
+        return $this;
+    }
+
+    public function getTouring(): ?Touring
+    {
+        return $this->touring;
+    }
+
+    public function setTouring(?Touring $touring): self
+    {
+        $this->touring = $touring;
 
         return $this;
     }

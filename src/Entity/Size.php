@@ -33,19 +33,19 @@ class Size
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"sizes_read", "variations_read", "variation_write", "products_read"})
+     * @Groups({"sizes_read", "variations_read", "variation_write", "products_read", "orders_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"sizes_read", "variations_read", "variation_write", "products_read"})
+     * @Groups({"sizes_read", "variations_read", "variation_write", "products_read", "orders_read"})
      */
     private $name;
 
     /**
      * @ORM\OneToOne(targetEntity=Stock::class, cascade={"persist", "remove"})
-     * @Groups({"sizes_read", "variations_read", "variation_write", "products_read"})
+     * @Groups({"sizes_read", "variations_read", "variation_write", "products_read", "orders_read"})
      */
     private $stock;
 
