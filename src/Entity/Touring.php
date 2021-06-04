@@ -11,11 +11,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ExistsFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 
 /**
  * @ORM\Entity(repositoryClass=TouringRepository::class)
  * @ApiResource(
+ *     mercure={"private": false},
  *     denormalizationContext={
  *          "disable_type_enforcement"=true,
  *          "groups"={"touring_write"}
@@ -34,6 +36,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
  * )
  * @ApiFilter(DateFilter::class, properties={"start"})
  * @ApiFilter(BooleanFilter::class, properties={"isOpen"})
+ * @ApiFilter(ExistsFilter::class, properties={"position"})
  */
 class Touring
 {
@@ -53,7 +56,7 @@ class Touring
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
-     * @Groups({"tourings_read", "touring_write", "admin:orders_read"})
+     * @Groups({"tourings_read", "touring_write", "orders_read"})
      */
     private $start;
 
@@ -71,9 +74,15 @@ class Touring
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"tourings_read", "touring_write", "admin:orders_read"})
+     * @Groups({"tourings_read", "touring_write", "orders_read"})
      */
     private $isOpen;
+
+    /**
+     * @ORM\Column(type="array", nullable=true)
+     * @Groups({"tourings_read", "touring_write", "orders_read"})
+     */
+    private $position = [];
 
     public function __construct()
     {
@@ -159,6 +168,18 @@ class Touring
     public function setIsOpen(?bool $isOpen): self
     {
         $this->isOpen = $isOpen;
+
+        return $this;
+    }
+
+    public function getPosition(): ?array
+    {
+        return $this->position;
+    }
+
+    public function setPosition(?array $position): self
+    {
+        $this->position = $position;
 
         return $this;
     }
