@@ -149,7 +149,7 @@ class OrderEntity
 
     /**
      * @ORM\ManyToOne(targetEntity=Touring::class, inversedBy="orderEntities")
-     * @Groups({"admin:orders_read"})
+     * @Groups({"orders_read"})
      */
     private $touring;
 

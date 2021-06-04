@@ -15,6 +15,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
+use App\Entity\Touring;
 
 class CurrentUserExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
@@ -73,6 +74,16 @@ class CurrentUserExtension implements QueryCollectionExtensionInterface, QueryIt
                 $queryBuilder->andWhere("$rootAlias.used is NULL OR $rootAlias.used < $rootAlias.maxUsage")
                              ->andWhere("$rootAlias.endsAt is NULL OR $rootAlias.endsAt >= :today")
                              ->setParameter("today", new \DateTime());
+            }
+
+            if ($resourceClass == Touring::class) {
+                $queryBuilder->leftJoin("$rootAlias.orderEntities","o")
+                             ->leftJoin("o.user", "u")
+                             ->andWhere("u IS NOT NULL")
+                             ->andWhere(":userId = u.id")
+                             ->setParameter("userId", $user->getId())
+                             ->andWhere("$rootAlias.isOpen = :open")
+                             ->setParameter("open", true);
             }
         }
     }
