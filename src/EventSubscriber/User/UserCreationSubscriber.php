@@ -55,8 +55,6 @@ class UserCreationSubscriber implements EventSubscriberInterface
                     $this->em->persist($meta);
                     $result->setMetas($meta);
                 }
-                $result->setIsSeller($result->getIsSeller() == null ? false : $result->getIsSeller());
-                $result->setIsDeliverer($result->getIsDeliverer() == null ? false : $result->getIsDeliverer());
             }
         }
     }

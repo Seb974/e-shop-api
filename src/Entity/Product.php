@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Seller;
 use App\Entity\Picture;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ProductRepository;
