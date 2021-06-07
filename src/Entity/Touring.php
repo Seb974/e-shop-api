@@ -61,12 +61,6 @@ class Touring
     private $start;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class)
-     * @Groups({"tourings_read", "touring_write", "admin:orders_read"})
-     */
-    private $deliverer;
-
-    /**
      * @ORM\Column(type="datetime", nullable=true)
      * @Groups({"tourings_read", "touring_write", "admin:orders_read"})
      */
@@ -83,6 +77,12 @@ class Touring
      * @Groups({"tourings_read", "touring_write", "orders_read"})
      */
     private $position = [];
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Deliverer::class)
+     * @Groups({"tourings_read", "touring_write", "admin:orders_read"})
+     */
+    private $deliverer;
 
     public function __construct()
     {
@@ -136,18 +136,6 @@ class Touring
         return $this;
     }
 
-    public function getDeliverer(): ?User
-    {
-        return $this->deliverer;
-    }
-
-    public function setDeliverer(?User $deliverer): self
-    {
-        $this->deliverer = $deliverer;
-
-        return $this;
-    }
-
     public function getEnd(): ?\DateTimeInterface
     {
         return $this->end;
@@ -180,6 +168,18 @@ class Touring
     public function setPosition(?array $position): self
     {
         $this->position = $position;
+
+        return $this;
+    }
+
+    public function getDeliverer(): ?Deliverer
+    {
+        return $this->deliverer;
+    }
+
+    public function setDeliverer(?Deliverer $deliverer): self
+    {
+        $this->deliverer = $deliverer;
 
         return $this;
     }

@@ -32,13 +32,13 @@ class Deliverer
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"deliverers_read", "admin:orders_read"})
+     * @Groups({"deliverers_read", "admin:orders_read", "tourings_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=120, nullable=true)
-     * @Groups({"deliverers_read", "admin:orders_read"})
+     * @Groups({"deliverers_read", "admin:orders_read", "tourings_read"})
      */
     private $name;
 
@@ -68,7 +68,7 @@ class Deliverer
 
     /**
      * @ORM\ManyToMany(targetEntity=User::class)
-     * @Groups({"deliverers_read", "admin:orders_read"})
+     * @Groups({"deliverers_read", "admin:orders_read", "tourings_read"})
      */
     private $users;
 
