@@ -13,6 +13,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use App\Entity\Group;
+use App\Entity\OrderEntity;
 use App\Entity\Touring;
 
 class CurrentAdminExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
@@ -49,7 +50,7 @@ class CurrentAdminExtension implements QueryCollectionExtensionInterface, QueryI
         $request = $this->requestStack->getCurrentRequest();
         $origin = $request->headers->get('origin');
 
-        if ($origin === $this->adminDomain && !$this->auth->isGranted('ROLE_ADMIN') && $user instanceof User)
+        if ($origin === $this->adminDomain && !$this->auth->isGranted('ROLE_PICKER') && $user instanceof User)
         {
             $rootAlias = $queryBuilder->getRootAliases()[0];
             $userGroup = $this->userGroupDefiner->getUserGroup($user);

@@ -52,11 +52,16 @@ class OrderCreationSubscriber implements EventSubscriberInterface
                     $result->setStatus("WAITING");
                 }
             } else if ($origin === $this->adminDomain) {
-                if (($method === "POST" || $method === "PUT") && $result->getStatus() === "WAITING") {
+                if ($method === "POST" && $result->getStatus() === "WAITING")
                     $this->constructor->adjustAdminOrder($result);
-                } else if ($method === "PUT" && $result->getStatus() === "PREPARED") {
+                else if ($method === "PUT" && ($result->getStatus() == "WAITING" || $result->getStatus() == "PREPARED"))
                     $this->constructor->adjustPreparation($result);
-                }
+
+                // if (($method === "POST" || $method === "PUT") && $result->getStatus() === "WAITING") {
+                //     $this->constructor->adjustAdminOrder($result);
+                // } else if ($method === "PUT" && $result->getStatus() === "PREPARED") {
+                //     $this->constructor->adjustPreparation($result);
+                // }
             }
         }
     }

@@ -64,11 +64,46 @@ class Constructor
         if ($this->remainsCreator->hasRemains($order->getItems()))
             $this->createRemains($order, $isPaidOnline);
 
-        $totalHT  = $this->getItemsCostHT($order->getItems(),  ($isPaidOnline ? 'ORDERED' : 'PREPARED'));
-        $totalTTC = $this->getItemsCostTTC($order->getItems(), ($isPaidOnline ? 'ORDERED' : 'PREPARED'));
+        if ($order->getStatus() == 'PREPARED') {
+            $totalHT  = $this->getItemsCostHT($order->getItems(),  ($isPaidOnline ? 'ORDERED' : 'PREPARED'));
+            $totalTTC = $this->getItemsCostTTC($order->getItems(), ($isPaidOnline ? 'ORDERED' : 'PREPARED'));
+            $order->setTotalHT($totalHT)
+                  ->setTotalTTC($totalTTC);
+        }
 
-        $order->setTotalHT($totalHT)
-              ->setTotalTTC($totalTTC);
+        if ($order->getStatus() == "WAITING" && $this->needsStatusUpdate($order)) {
+            $status = $this->getAdaptedStatus($order);
+            $order->setStatus($status);
+        }
+    }
+
+    private function needsStatusUpdate(&$order)
+    {
+        $isComplete = true;
+        foreach ($order->getItems() as $item) {
+            if (!$item->getIsPrepared()) {
+                $isComplete = false;
+                break;
+            }
+        }
+        return $isComplete;
+    }
+
+    private function getAdaptedStatus(&$order)
+    { 
+        return !$this->security->isGranted('ROLE_PICKER') && $this->needsRecovery($order) ? "PRE-PREPARED" : "PREPARED";
+    }
+
+    private function needsRecovery(&$order)
+    {
+        $needsRecovery = false;
+        foreach ($order->getItems() as $item) {
+            if ($item->getProduct()->getSeller()->getNeedsRecovery()) {
+                $needsRecovery = true;
+                break;
+            }
+        }
+        return $needsRecovery;
     }
 
     private function createRemains($originalOrder, $isPaidOnline)

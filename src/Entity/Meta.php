@@ -33,7 +33,7 @@ class Meta
     /**
      * server domain, used to configure the Mercure hub topics
      */
-    private static $domain = 'https://api.clikeat.re';
+    private static $domain = 'https://localhost:8000';
 
     /**
      * @ORM\Id

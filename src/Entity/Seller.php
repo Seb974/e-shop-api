@@ -74,6 +74,24 @@ class Seller
      */
     private $users;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"sellers_read", "seller:products_read", "admin:orders_read"})
+     */
+    private $needsRecovery;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"sellers_read", "seller:products_read", "admin:orders_read"})
+     */
+    private $delayInDays;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"sellers_read", "seller:products_read", "admin:orders_read"})
+     */
+    private $recoveryDelay;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -164,6 +182,42 @@ class Seller
     public function removeUser(User $user): self
     {
         $this->users->removeElement($user);
+
+        return $this;
+    }
+
+    public function getNeedsRecovery(): ?bool
+    {
+        return $this->needsRecovery;
+    }
+
+    public function setNeedsRecovery(?bool $needsRecovery): self
+    {
+        $this->needsRecovery = $needsRecovery;
+
+        return $this;
+    }
+
+    public function getDelayInDays(): ?bool
+    {
+        return $this->delayInDays;
+    }
+
+    public function setDelayInDays(?bool $delayInDays): self
+    {
+        $this->delayInDays = $delayInDays;
+
+        return $this;
+    }
+
+    public function getRecoveryDelay(): ?int
+    {
+        return $this->recoveryDelay;
+    }
+
+    public function setRecoveryDelay(?int $recoveryDelay): self
+    {
+        $this->recoveryDelay = $recoveryDelay;
 
         return $this;
     }
