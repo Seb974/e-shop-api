@@ -3,8 +3,11 @@
 namespace App\Doctrine;
 
 use App\Entity\User;
+use App\Entity\Group;
 use App\Entity\Seller;
+use App\Entity\Touring;
 use App\Entity\Product;
+use App\Entity\OrderEntity;
 use Doctrine\ORM\QueryBuilder;
 use App\Service\User\UserGroupDefiner;
 use Symfony\Component\Security\Core\Security;
@@ -12,9 +15,6 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
-use App\Entity\Group;
-use App\Entity\OrderEntity;
-use App\Entity\Touring;
 
 class CurrentAdminExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {

@@ -38,10 +38,14 @@ class UsersUpdateSubscriber implements EventSubscriberInterface
 
     private function deleteRightsIfUnique(User $user)
     {
+        $finalRoles = [];
         $deliverersList = $this->delivererRepository->findUserDeliverers($user);
         if (count($deliverersList) <= 1) {
             $restrictedRoles = array_diff($user->getRoles(), ["ROLE_DELIVERER"]);
-            $user->setRoles(array_unique($restrictedRoles));
+            foreach (array_unique($restrictedRoles) as $role) {
+                $finalRoles[] = $role;
+            }
+            $user->setRoles($finalRoles);
         }
     }
 }

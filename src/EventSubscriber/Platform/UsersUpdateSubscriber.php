@@ -1,10 +1,10 @@
 <?php
 
-namespace App\EventSubscriber\Seller;
+namespace App\EventSubscriber\Platform;
 
 use App\Entity\User;
-use App\Entity\Seller;
-use App\Repository\SellerRepository;
+use App\Entity\Platform;
+use App\Repository\PlatformRepository;
 use Symfony\Component\HttpKernel\KernelEvents;
 use ApiPlatform\Core\EventListener\EventPriorities;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -12,11 +12,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class UsersUpdateSubscriber implements EventSubscriberInterface
 {
-    private $sellerRepository;
+    private $platformRepository;
 
-    public function __construct(SellerRepository $sellerRepository)
+    public function __construct(PlatformRepository $platformRepository)
     {
-        $this->sellerRepository = $sellerRepository;
+        $this->platformRepository = $platformRepository;
     }
 
     public static function getSubscribedEvents()
@@ -29,8 +29,8 @@ class UsersUpdateSubscriber implements EventSubscriberInterface
         $method = $event->getRequest()->getMethod();
         $previous = $event->getRequest()->attributes->get('previous_data');
 
-        if ($previous instanceof Seller && $method === "PUT") {
-            foreach ($previous->getUsers() as $user) {
+        if ($previous instanceof Platform && $method === "PUT") {
+            foreach ($previous->getPickers() as $user) {
                 $this->deleteRightsIfUnique($user);
             }
         }
@@ -39,9 +39,9 @@ class UsersUpdateSubscriber implements EventSubscriberInterface
     private function deleteRightsIfUnique(User $user)
     {
         $finalRoles = [];
-        $sellersList = $this->sellerRepository->findUserSellers($user);
-        if (count($sellersList) <= 1) {
-            $restrictedRoles = array_diff($user->getRoles(), ["ROLE_SELLER"]);
+        $platformsList = $this->platformRepository->findUserPlatforms($user);
+        if (count($platformsList) <= 1) {
+            $restrictedRoles = array_diff($user->getRoles(), ["ROLE_PICKER"]);
             foreach (array_unique($restrictedRoles) as $role) {
                 $finalRoles[] = $role;
             }
