@@ -14,13 +14,13 @@ use Symfony\Component\Validator\Constraints as Assert;
  *      normalizationContext={"groups"={"catalogs_read"}},
  *      collectionOperations={
  *          "GET",
- *          "POST"={"security"="is_granted('ROLE_ADMIN')"},
+ *          "POST"={"security"="is_granted('ROLE_PICKER')"},
  *     },
  *     itemOperations={
  *          "GET",
- *          "PUT"={"security"="is_granted('ROLE_ADMIN')"},
- *          "PATCH"={"security"="is_granted('ROLE_ADMIN')"},
- *          "DELETE"={"security"="is_granted('ROLE_ADMIN')"}
+ *          "PUT"={"security"="is_granted('ROLE_PICKER')"},
+ *          "PATCH"={"security"="is_granted('ROLE_PICKER')"},
+ *          "DELETE"={"security"="is_granted('ROLE_PICKER')"}
  *     }
  * )
  */

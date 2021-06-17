@@ -96,6 +96,12 @@ class Meta
      */
     private $user;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"metas_read", "users_read", "user_write", "relaypoints_read", "relaypoint_write", "orders_read", "order_write", "tourings_read", "platform_write", "platforms_read"})
+     */
+    private $isRelaypoint;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -201,5 +207,17 @@ class Meta
                 "topics" => self::$domain . "/api/users/" . $user->getId() . "/metas",
                 "normalization_context" => [ "group" => "users_read"]
         ];
+    }
+
+    public function getIsRelaypoint(): ?bool
+    {
+        return $this->isRelaypoint;
+    }
+
+    public function setIsRelaypoint(?bool $isRelaypoint): self
+    {
+        $this->isRelaypoint = $isRelaypoint;
+
+        return $this;
     }
 }

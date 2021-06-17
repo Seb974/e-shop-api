@@ -126,3 +126,9 @@ services:
         decorates: 'api_platform.serializer.context_builder'
         arguments: [ '@App\Serializer\ItemContextBuilder.inner' ]
         autoconfigure: false
+
+    App\Service\Sms\Sms:
+        arguments:
+            $url: '%env(SMS_URL)%'
+            $user: '%env(SMS_USER)%'
+            $pass: '%env(SMS_PASS)%'

@@ -4,9 +4,13 @@ namespace App\EventSubscriber\Order;
 
 use App\Entity\OrderEntity;
 use App\Service\Order\Constructor;
+use App\Service\Stock\StockManager;
 use App\Service\User\UserGroupDefiner;
+use App\Service\User\UserOrderCounter;
+use App\Service\Product\ProductSalesCounter;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpKernel\KernelEvents;
+use App\Service\Promotion\PromotionUseCounter;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use ApiPlatform\Core\EventListener\EventPriorities;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -18,14 +22,22 @@ class OrderCreationSubscriber implements EventSubscriberInterface
     private $userGroupDefiner;
     private $adminDomain;
     private $publicDomain;
+    private $stockManager;
+    private $userOrderCounter;
+    private $productSalesCounter;
+    private $promotionUseCounter;
 
-    public function __construct($admin, $public, Constructor $constructor, Security $security, UserGroupDefiner $userGroupDefiner)
+    public function __construct($admin, $public, Constructor $constructor, Security $security, UserGroupDefiner $userGroupDefiner, UserOrderCounter $userOrderCounter, ProductSalesCounter $productSalesCounter, StockManager $stockManager, PromotionUseCounter $promotionUseCounter)
     {
         $this->adminDomain = $admin;
         $this->security = $security;
         $this->publicDomain = $public;
         $this->constructor = $constructor;
+        $this->stockManager = $stockManager;
+        $this->userOrderCounter = $userOrderCounter;
         $this->userGroupDefiner = $userGroupDefiner;
+        $this->productSalesCounter = $productSalesCounter;
+        $this->promotionUseCounter = $promotionUseCounter;
     }
 
     public static function getSubscribedEvents()
@@ -40,31 +52,54 @@ class OrderCreationSubscriber implements EventSubscriberInterface
         $method = $request->getMethod();
         $origin = $request->headers->get('origin');
         $user = $this->security->getUser();
-        $userGroup = $this->userGroupDefiner->getUserGroup($user);
+        $userGroup = $this->userGroupDefiner->getShopGroup($user);
 
-        if ($result instanceof OrderEntity) {
-            if ($origin === $this->publicDomain) {
-                if ($method === "POST")
-                    $this->constructor->adjustOrder($result);
-                else if ($method === "PUT") {
-                    if (!$userGroup->getOnlinePayment() || ($userGroup->getOnlinePayment() && $this->isCurrentUser($result->getPaymentId(), $request)) )
-                        throw new \Exception();
-                    $result->setStatus("WAITING");
-                }
-            } else if ($origin === $this->adminDomain) {
-                if ($method === "POST" && $result->getStatus() === "WAITING")
-                    $this->constructor->adjustAdminOrder($result);
-                else if ($method === "PUT" && ($result->getStatus() == "WAITING" || $result->getStatus() == "PREPARED"))
-                    $this->constructor->adjustPreparation($result);
-
-                // if (($method === "POST" || $method === "PUT") && $result->getStatus() === "WAITING") {
-                //     $this->constructor->adjustAdminOrder($result);
-                // } else if ($method === "PUT" && $result->getStatus() === "PREPARED") {
-                //     $this->constructor->adjustPreparation($result);
-                // }
-            }
+        if ( $result instanceof OrderEntity ) {
+            if ( $origin === $this->publicDomain )
+                $this->publicActions($request, $method, $userGroup, $result);
+            else if ( $origin === $this->adminDomain )
+                $this->adminActions($method, $result);
         }
     }
+
+    private function publicActions($request, $method, $userGroup, $order)
+    {
+        if ( $method === "POST" ) {
+            $this->constructor->adjustOrder($order);
+            if ($order->getStatus() === "WAITING")
+                $this->updateEntitiesCounters($order);
+        } else if ( $method === "PUT" ) {
+            if (!$userGroup->getOnlinePayment() || ($userGroup->getOnlinePayment() && $this->isCurrentUser($order->getPaymentId(), $request)) )
+                throw new \Exception();
+
+            $order->setStatus("WAITING");
+            $this->updateEntitiesCounters($order);
+        }
+    }
+
+    private function adminActions($method, $order)
+    {
+        if ( $method === "POST" && $order->getStatus() === "WAITING" ) {
+            $this->constructor->adjustAdminOrder($order);
+            $this->updateEntitiesCounters($order);
+        } else if ( $method === "PUT" && in_array($order->getStatus(), ["WAITING", "PRE-PREPARED"]) ) {
+            $this->constructor->adjustPreparation($order);
+            // if ($order->getStatus() === "PREPARED")
+            //     $this->updateEntitiesCounters($order);
+        }
+    }
+
+    private function updateEntitiesCounters($order)
+    {
+        $this->userOrderCounter->increase($order);
+        $this->productSalesCounter->increaseAll($order);
+        $this->promotionUseCounter->increase($order);
+        $this->stockManager->decreaseOrder($order);
+    }
+
+    // $this->stockManager->decreaseOrder($order);
+    // $this->stockManager->adjustPreparation($order);
+    // $this->stockManager->adjustDeliveries($order);
 
     private function isCurrentUser($uuid, $request)
     {

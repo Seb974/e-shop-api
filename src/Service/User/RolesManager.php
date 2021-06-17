@@ -4,14 +4,28 @@ namespace App\Service\User;
 
 use App\Entity\User;
 use App\Repository\GroupRepository;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 
 class RolesManager
 {
     private $groupRepository;
+    private $accessDecisionManager;
 
-    public function __construct(GroupRepository $groupRepository)
+    public function __construct(GroupRepository $groupRepository, AccessDecisionManagerInterface $accessDecisionManager)
     {
         $this->groupRepository = $groupRepository;
+        $this->accessDecisionManager = $accessDecisionManager;
+    }
+
+    public function isUserGranted(User $user, $attributes, $object = null)
+    {
+        if (!is_array($attributes))
+            $attributes = [$attributes];
+
+        $token = new UsernamePasswordToken($user, 'none', 'none', $user->getRoles());
+
+        return ($this->accessDecisionManager->decide($token, $attributes, $object));
     }
 
     public function hasAdminAccess($roles)
@@ -30,19 +44,12 @@ class RolesManager
 
     public function getShopRoles(User $user)
     {
-        $shopGroups = $this->groupRepository->findBy(["hasShopAccess" => true]);
-        $shopRoles = $this->getArrayRoles($shopGroups);
-        $filteredShopRoles = array_diff($shopRoles, ["ROLE_USER"]);
-        $userShopRoles = array_intersect($user->getRoles(), $filteredShopRoles);
-        return count($userShopRoles) > 0 ? array_values(array_filter($userShopRoles)) : ["ROLE_USER"];
+        return $this->filterShopRoles($user->getRoles());
     }
 
     public function getAdminRoles(User $user)
     {
-        $adminGroups = $this->groupRepository->findBy(["hasAdminAccess" => true]);
-        $adminRoles = $this->getArrayRoles($adminGroups);
-        $userAdminRoles = array_intersect($user->getRoles(), $adminRoles);
-        return count($userAdminRoles) > 0 ? array_values(array_filter($userAdminRoles)) : ["ROLE_USER"];
+        return $this->filterAdminRoles($user->getRoles());
     }
 
     public function filterShopRoles($roles)

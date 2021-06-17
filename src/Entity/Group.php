@@ -105,6 +105,12 @@ class Group
      */
     private $hasShopAccess;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"admin:groups_read"})
+     */
+    private $soldOutNotification;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -226,6 +232,18 @@ class Group
     public function setHasShopAccess(?bool $hasShopAccess): self
     {
         $this->hasShopAccess = $hasShopAccess;
+
+        return $this;
+    }
+
+    public function getSoldOutNotification(): ?bool
+    {
+        return $this->soldOutNotification;
+    }
+
+    public function setSoldOutNotification(?bool $soldOutNotification): self
+    {
+        $this->soldOutNotification = $soldOutNotification;
 
         return $this;
     }

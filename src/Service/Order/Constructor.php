@@ -5,6 +5,8 @@ namespace App\Service\Order;
 use App\Entity\Group;
 use App\Entity\Product;
 use App\Service\Tax\Tax;
+use App\Service\Sms\OrdersNotifier;
+use App\Service\Stock\StockManager;
 use App\Service\User\UserGroupDefiner;
 use Symfony\Component\Security\Core\Security;
 
@@ -12,13 +14,17 @@ class Constructor
 {
     private $tax;
     private $security;
+    private $stockManager;
+    private $orderNotifier;
     private $remainsCreator;
     private $userGroupDefiner;
 
-    public function __construct(UserGroupDefiner $userGroupDefiner, Tax $tax, Security $security, RemainsCreator $remainsCreator)
+    public function __construct(UserGroupDefiner $userGroupDefiner, Tax $tax, OrdersNotifier $orderNotifier, Security $security, RemainsCreator $remainsCreator, StockManager $stockManager)
     {
         $this->tax = $tax;
         $this->security = $security;
+        $this->stockManager = $stockManager;
+        $this->orderNotifier = $orderNotifier;
         $this->remainsCreator = $remainsCreator;
         $this->userGroupDefiner = $userGroupDefiner;
     }
@@ -30,7 +36,7 @@ class Constructor
             throw new \Exception();
         }
         $user = $this->security->getUser();
-        $userGroup = $this->userGroupDefiner->getUserGroup($user);
+        $userGroup = $this->userGroupDefiner->getShopGroup($user);
         $status = $userGroup->getOnlinePayment() ? "ON_PAYMENT" : "WAITING";
         $items = $this->updateItems($order->getItems(), $catalog, $userGroup);
         $totalHT = $this->getItemsCostHT($items, 'ORDERED');
@@ -58,23 +64,36 @@ class Constructor
     public function adjustPreparation(&$order)
     {
         $user = $order->getUser();
-        $userGroup = $this->userGroupDefiner->getUserGroup($user);
+        $userGroup = $this->userGroupDefiner->getShopGroup($user);
         $isPaidOnline = $userGroup->getOnlinePayment();
 
         if ($this->remainsCreator->hasRemains($order->getItems()))
             $this->createRemains($order, $isPaidOnline);
 
-        if ($order->getStatus() == 'PREPARED') {
-            $totalHT  = $this->getItemsCostHT($order->getItems(),  ($isPaidOnline ? 'ORDERED' : 'PREPARED'));
-            $totalTTC = $this->getItemsCostTTC($order->getItems(), ($isPaidOnline ? 'ORDERED' : 'PREPARED'));
-            $order->setTotalHT($totalHT)
-                  ->setTotalTTC($totalTTC);
-        }
+        $this->updateFulfilledItems($order, $isPaidOnline);
 
-        if ($order->getStatus() == "WAITING" && $this->needsStatusUpdate($order)) {
+        if ( in_array($order->getStatus(), ["WAITING", "PRE-PREPARED"]) && $this->needsStatusUpdate($order) ) {
             $status = $this->getAdaptedStatus($order);
             $order->setStatus($status);
+            if ( $status == 'PREPARED' && !$order->getIsRemains() && $userGroup->getSoldOutNotification()) 
+                $this->orderNotifier->notify($order);
         }
+    }
+
+    private function updateFulfilledItems(&$order, $isPaidOnline)
+    {
+        foreach ($order->getItems() as $item) {
+            if (!is_null($item->getPreparedQty()) && !$item->getIsPrepared()) {
+                $this->stockManager->adjustItemPreparation($item);
+                $item->setIsPrepared(true);
+            }
+        }
+
+        $totalHT  = $this->getItemsCostHT($order->getItems(),  ($isPaidOnline ? 'ORDERED' : 'PREPARED'));
+        $totalTTC = $this->getItemsCostTTC($order->getItems(), ($isPaidOnline ? 'ORDERED' : 'PREPARED'));
+        $order->setTotalHT($totalHT)
+              ->setTotalTTC($totalTTC);
+        
     }
 
     private function needsStatusUpdate(&$order)
