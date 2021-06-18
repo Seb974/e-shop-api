@@ -82,10 +82,11 @@ class OrderCreationSubscriber implements EventSubscriberInterface
         if ( $method === "POST" && $order->getStatus() === "WAITING" ) {
             $this->constructor->adjustAdminOrder($order);
             $this->updateEntitiesCounters($order);
-        } else if ( $method === "PUT" && in_array($order->getStatus(), ["WAITING", "PRE-PREPARED"]) ) {
-            $this->constructor->adjustPreparation($order);
-            // if ($order->getStatus() === "PREPARED")
-            //     $this->updateEntitiesCounters($order);
+        } else if ( $method === "PUT" ) {
+            if ( in_array($order->getStatus(), ["WAITING", "PRE-PREPARED"]) )
+                $this->constructor->adjustPreparation($order);
+            else if ( in_array($order->getStatus(), ["COLLECTABLE", "DELIVERED"]) )
+                $this->constructor->adjustDelivery($order);
         }
     }
 
@@ -96,10 +97,6 @@ class OrderCreationSubscriber implements EventSubscriberInterface
         $this->promotionUseCounter->increase($order);
         $this->stockManager->decreaseOrder($order);
     }
-
-    // $this->stockManager->decreaseOrder($order);
-    // $this->stockManager->adjustPreparation($order);
-    // $this->stockManager->adjustDeliveries($order);
 
     private function isCurrentUser($uuid, $request)
     {

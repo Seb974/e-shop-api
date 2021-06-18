@@ -11,19 +11,20 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass=MetaRepository::class)
  * @ApiResource(
+ *     attributes={"force_eager"=false},
  *     denormalizationContext={"disable_type_enforcement"=true},
  *     normalizationContext={
  *          "groups"={"metas_read", "users_read"}
  *     },
  *     collectionOperations={
- *          "GET"={"security"="is_granted('ROLE_ADMIN')"},
+ *          "GET"={"security"="is_granted('ROLE_PICKER')"},
  *          "POST"
  *     },
  *     itemOperations={
- *          "GET"={"security"="is_granted('ROLE_ADMIN') or object.getUser() == user"},
- *          "PUT"={"security"="is_granted('ROLE_ADMIN') or object.getUser() == user"},
- *          "PATCH"={"security"="is_granted('ROLE_ADMIN') or object.getUser() == user"},
- *          "DELETE"={"security"="is_granted('ROLE_ADMIN') or object.getUser() == user"}
+ *          "GET"={"security"="is_granted('ROLE_PICKER') or object.getUser() == user"},
+ *          "PUT"={"security"="is_granted('ROLE_PICKER') or object.getUser() == user"},
+ *          "PATCH"={"security"="is_granted('ROLE_PICKER') or object.getUser() == user"},
+ *          "DELETE"={"security"="is_granted('ROLE_PICKER') or object.getUser() == user"}
  *     },
  *     mercure="object.getMercureOptions(object.getUser())"
  * )
@@ -90,8 +91,9 @@ class Meta
      */
     private $phone;
 
+    // cascade={"persist"}
     /**
-     * @ORM\OneToOne(targetEntity=User::class, mappedBy="metas", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity=User::class, mappedBy="metas")
      * @Groups({"metas_read"})
      */
     private $user;

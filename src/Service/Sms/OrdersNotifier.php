@@ -2,23 +2,33 @@
 
 namespace App\Service\Sms;
 
+use App\Repository\RelaypointRepository;
+
 class OrdersNotifier
 {
     private $sms;
+    private $relaypointRepository;
 
-    public function __construct(Sms $sms)
+    public function __construct(Sms $sms, RelaypointRepository $relaypointRepository)
     {
         $this->sms = $sms;
+        $this->relaypointRepository = $relaypointRepository;
     }
 
-    public function notify($order)
+    public function notifySoldOut($order)
     {
-        $message = $this->getMessage($order);
+        $message = $this->getSoldOutMessage($order);
         if (strlen($message) > 0)
             $this->sms->sendTo($order->getMetas()->getPhone(), $message);
     }
 
-    private function getMessage($order)
+    public function notifyRelaypointArrivals($order)
+    {
+        $message = $this->getAvailabilityMessage($order);
+        $this->sms->sendTo($order->getMetas()->getPhone(), $message);
+    }
+
+    private function getSoldOutMessage($order)
     {
         $message = "";
         $items = $this->getSoldsOut($order);
@@ -28,6 +38,17 @@ class OrdersNotifier
                 $message .= $this->getFormattedRow($item);
             }
         }
+        return $message;
+    }
+
+    private function getAvailabilityMessage($order)
+    {
+        $relaypoint = $this->relaypointRepository->findOneBy(["metas" => $order->getMetas()]);
+
+        $message = "Bonjour " . $order->getName() . "\n";
+        $message .= "Votre commande N°" . str_pad($order->getId(), 10, "0", STR_PAD_LEFT) . 
+                    " est disponible au point relais \"" . $relaypoint->getName() . "\"\n" .
+                    "Bonne dégustation et à très bientôt sur fraispei.re.";
         return $message;
     }
 

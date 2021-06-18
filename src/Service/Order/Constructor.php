@@ -76,7 +76,23 @@ class Constructor
             $status = $this->getAdaptedStatus($order);
             $order->setStatus($status);
             if ( $status == 'PREPARED' && !$order->getIsRemains() && $userGroup->getSoldOutNotification()) 
-                $this->orderNotifier->notify($order);
+                $this->orderNotifier->notifySoldOut($order);
+        }
+    }
+
+    public function adjustDelivery(&$order)
+    {
+        $user = $order->getUser();
+        $userGroup = $this->userGroupDefiner->getShopGroup($user);
+        $isPaidOnline = $userGroup->getOnlinePayment();
+        $isRelayPoint = $order->getMetas()->getIsRelaypoint();
+        $status = $order->getStatus();
+
+        if ($status === "COLLECTABLE" || ($status === "DELIVERED" && (is_null($isRelayPoint) || !$isRelayPoint)))
+            $this->updateDeliveredOrder($order, $isPaidOnline);
+
+        if ($status === "COLLECTABLE" && !is_null($isRelayPoint) && $isRelayPoint ) {
+            $this->orderNotifier->notifyRelaypointArrivals($order);
         }
     }
 
@@ -93,7 +109,15 @@ class Constructor
         $totalTTC = $this->getItemsCostTTC($order->getItems(), ($isPaidOnline ? 'ORDERED' : 'PREPARED'));
         $order->setTotalHT($totalHT)
               ->setTotalTTC($totalTTC);
-        
+    }
+
+    private function updateDeliveredOrder(&$order, $isPaidOnline)
+    {
+        $this->stockManager->adjustDeliveries($order);
+        $totalHT  = $this->getItemsCostHT($order->getItems(),  ($isPaidOnline ? 'ORDERED' : 'DELIVERED'));
+        $totalTTC = $this->getItemsCostTTC($order->getItems(), ($isPaidOnline ? 'ORDERED' : 'DELIVERED'));
+        $order->setTotalHT($totalHT)
+              ->setTotalTTC($totalTTC);
     }
 
     private function needsStatusUpdate(&$order)

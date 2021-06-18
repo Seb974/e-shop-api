@@ -28,8 +28,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *     itemOperations={
  *          "GET"={"security"="is_granted('ROLE_TEAM') or object.getUser() == user"},
  *          "PUT"={"security"="is_granted('ROLE_TEAM') or object.isOwner(request, object)"},
- *          "PATCH"={"security"="is_granted('ROLE_ADMIN')"},
- *          "DELETE"={"security"="is_granted('ROLE_ADMIN') or object.isOwner(request, object)"}
+ *          "PATCH"={"security"="is_granted('ROLE_PICKER')"},
+ *          "DELETE"={"security"="is_granted('ROLE_PICKER') or object.isOwner(request, object)"}
  *     },
  * )
  * @ApiFilter(SearchFilter::class, properties={"status"="partial"})
@@ -58,7 +58,7 @@ class OrderEntity
     private $email;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Meta::class, cascade={"persist", "remove"})
+     * @ORM\ManyToOne(targetEntity=Meta::class, cascade={"persist"})
      * @Groups({"admin:orders_read", "order_write", "tourings_read"})
      */
     private $metas;
