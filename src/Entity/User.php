@@ -49,13 +49,13 @@ class User implements UserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"users_read", "user_write", "orders_read", "sellers_read", "deliverers_read", "seller:products_read", "tourings_read", "platforms_read"})
+     * @Groups({"users_read", "user_write", "orders_read", "sellers_read", "deliverers_read", "seller:products_read", "tourings_read", "platforms_read", "supervisors_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
-     * @Groups({"users_read", "user_write", "orders_read", "sellers_read", "deliverers_read", "tourings_read", "platforms_read"})
+     * @Groups({"users_read", "user_write", "orders_read", "sellers_read", "deliverers_read", "tourings_read", "platforms_read", "supervisors_read"})
      * @Assert\Email(message="L'adresse email saisie n'est pas valide.")
      */
     private $email;
@@ -76,7 +76,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=100, nullable=true)
-     * @Groups({"users_read", "user_write", "orders_read", "sellers_read", "deliverers_read", "tourings_read", "platforms_read"})
+     * @Groups({"users_read", "user_write", "orders_read", "sellers_read", "deliverers_read", "tourings_read", "platforms_read", "supervisors_read"})
      * @Assert\Length(min = 3, minMessage = "Le nom doit contenir au moins {{ limit }} caractères.",
      *                max = 100, maxMessage= "Le nom ne peut dépasser {{ limit }} caractères.")
      */
@@ -99,6 +99,12 @@ class User implements UserInterface
      * @Groups({"users_read", "user_write", "orders_read", "order_write"})
      */
     private $lastOrder;
+
+    /**
+     * @ORM\OneToOne(targetEntity=Supervisor::class, mappedBy="supervisor", cascade={"persist", "remove"})
+     * @Groups({"users_read", "user_write"})
+     */
+    private $supervisorAuthority;
 
     public function getId(): ?int
     {
@@ -225,6 +231,28 @@ class User implements UserInterface
     public function setLastOrder(?\DateTimeInterface $lastOrder): self
     {
         $this->lastOrder = $lastOrder;
+
+        return $this;
+    }
+
+    public function getSupervisorAuthority(): ?Supervisor
+    {
+        return $this->supervisorAuthority;
+    }
+
+    public function setSupervisorAuthority(?Supervisor $supervisorAuthority): self
+    {
+        // unset the owning side of the relation if necessary
+        if ($supervisorAuthority === null && $this->supervisorAuthority !== null) {
+            $this->supervisorAuthority->setSupervisor(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($supervisorAuthority !== null && $supervisorAuthority->getSupervisor() !== $this) {
+            $supervisorAuthority->setSupervisor($this);
+        }
+
+        $this->supervisorAuthority = $supervisorAuthority;
 
         return $this;
     }

@@ -113,6 +113,12 @@ class Constructor
 
     private function updateDeliveredOrder(&$order, $isPaidOnline)
     {
+        foreach ($order->getItems() as $item) {
+            if ( is_null($item->getDeliveredQty()) ) {
+                $item->setDeliveredQty($item->getPreparedQty());
+            }
+        }
+
         $this->stockManager->adjustDeliveries($order);
         $totalHT  = $this->getItemsCostHT($order->getItems(),  ($isPaidOnline ? 'ORDERED' : 'DELIVERED'));
         $totalTTC = $this->getItemsCostTTC($order->getItems(), ($isPaidOnline ? 'ORDERED' : 'DELIVERED'));
