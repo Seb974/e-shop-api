@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -18,7 +19,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          "disable_type_enforcement"=true
  *      },
  *      normalizationContext={
- *          "groups"={"supervisors_read"}
+ *          "groups"={"supervisors_read"},
+ *          "enable_max_depth"=true
  *      },
  *      collectionOperations={
  *          "GET",
@@ -42,15 +44,19 @@ class Supervisor
      */
     private $id;
 
+    // @MaxDepth(1)
     /**
      * @ORM\OneToOne(targetEntity=User::class, inversedBy="supervisorAuthority", cascade={"persist"})
      * @Groups({"supervisors_read", "supervisor_write"})
+     * 
      */
     private $supervisor;
 
+    // @MaxDepth(1)
     /**
      * @ORM\ManyToMany(targetEntity=User::class)
      * @Groups({"supervisors_read", "supervisor_write", "users_read"})
+     * 
      */
     private $users;
 

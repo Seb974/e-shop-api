@@ -88,9 +88,16 @@ class Relaypoint
      */
     private $promotion;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=User::class)
+     * @Groups({"relaypoints_read", "relaypoint_write"})
+     */
+    private $managers;
+
     public function __construct()
     {
         $this->conditions = new ArrayCollection();
+        $this->managers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -202,6 +209,30 @@ class Relaypoint
     public function setPromotion(?Promotion $promotion): self
     {
         $this->promotion = $promotion;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|User[]
+     */
+    public function getManagers(): Collection
+    {
+        return $this->managers;
+    }
+
+    public function addManager(User $manager): self
+    {
+        if (!$this->managers->contains($manager)) {
+            $this->managers[] = $manager;
+        }
+
+        return $this;
+    }
+
+    public function removeManager(User $manager): self
+    {
+        $this->managers->removeElement($manager);
 
         return $this;
     }

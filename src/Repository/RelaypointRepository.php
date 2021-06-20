@@ -19,6 +19,19 @@ class RelaypointRepository extends ServiceEntityRepository
         parent::__construct($registry, Relaypoint::class);
     }
 
+    /**
+     * @return Relaypoint[] Returns an array of Seller objects
+     */
+    public function findUserRelaypoints($user)
+    {
+        return $this->createQueryBuilder('r')
+            ->andWhere(':user MEMBER OF r.managers')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     // /**
     //  * @return Relaypoint[] Returns an array of Relaypoint objects
     //  */

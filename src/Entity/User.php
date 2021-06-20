@@ -4,14 +4,15 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
+use App\Filter\UserFilterByRolesFilter;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
+use App\Filter\UserFilterByNameAndEmailFilter;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
-use App\Filter\UserFilterByNameAndEmailFilter;
-use App\Filter\UserFilterByRolesFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 /**
@@ -26,7 +27,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *          "groups"={"user_write"}
  *     },
  *     normalizationContext={
- *          "groups"={"users_read"}
+ *          "groups"={"users_read"},
+ *          "enable_max_depth"=true
  *     },
  *     collectionOperations={
  *          "GET"={"security"="is_granted('ROLE_TEAM')"},
@@ -49,13 +51,13 @@ class User implements UserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"users_read", "user_write", "orders_read", "sellers_read", "deliverers_read", "seller:products_read", "tourings_read", "platforms_read", "supervisors_read"})
+     * @Groups({"users_read", "user_write", "orders_read", "sellers_read", "deliverers_read", "seller:products_read", "tourings_read", "platforms_read", "supervisors_read", "relaypoints_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
-     * @Groups({"users_read", "user_write", "orders_read", "sellers_read", "deliverers_read", "tourings_read", "platforms_read", "supervisors_read"})
+     * @Groups({"users_read", "user_write", "orders_read", "sellers_read", "deliverers_read", "tourings_read", "platforms_read", "supervisors_read", "relaypoints_read"})
      * @Assert\Email(message="L'adresse email saisie n'est pas valide.")
      */
     private $email;
@@ -76,7 +78,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=100, nullable=true)
-     * @Groups({"users_read", "user_write", "orders_read", "sellers_read", "deliverers_read", "tourings_read", "platforms_read", "supervisors_read"})
+     * @Groups({"users_read", "user_write", "orders_read", "sellers_read", "deliverers_read", "tourings_read", "platforms_read", "supervisors_read", "relaypoints_read"})
      * @Assert\Length(min = 3, minMessage = "Le nom doit contenir au moins {{ limit }} caractères.",
      *                max = 100, maxMessage= "Le nom ne peut dépasser {{ limit }} caractères.")
      */
@@ -103,6 +105,7 @@ class User implements UserInterface
     /**
      * @ORM\OneToOne(targetEntity=Supervisor::class, mappedBy="supervisor", cascade={"persist", "remove"})
      * @Groups({"users_read", "user_write"})
+     * @MaxDepth(2)
      */
     private $supervisorAuthority;
 

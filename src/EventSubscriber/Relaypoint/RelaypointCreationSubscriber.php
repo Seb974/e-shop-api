@@ -1,22 +1,22 @@
 <?php
 
-namespace App\EventSubscriber\Seller;
+namespace App\EventSubscriber\Relaypoint;
 
-use App\Entity\Seller;
+use App\Entity\Relaypoint;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use ApiPlatform\Core\EventListener\EventPriorities;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * SellerCreationSubscriber
+ * RelaypointCreationSubscriber
  *
  * Informations :
- * When a seller is created with POST method, this eventSusbcriber initialize its turnover and its total to pay to 0. 
+ * When a Relaypoint is created with POST method, this eventSusbcriber initialize its turnover and its total to pay to 0. 
  *
  * @author Sébastien : sebastien.maillot@coding-academy.fr
  */
-class SellerCreationSubscriber implements EventSubscriberInterface 
+class RelaypointCreationSubscriber implements EventSubscriberInterface 
 {
     public static function getSubscribedEvents()
     {
@@ -28,20 +28,16 @@ class SellerCreationSubscriber implements EventSubscriberInterface
         $result = $event->getControllerResult();
         $method = $event->getRequest()->getMethod();
 
-        if ($result instanceof Seller && ($method === "POST" || $method === "PUT")) {
-            if ($method === "POST") {
-                $result->setTurnover(0)
-                        ->setTotalToPay(0);
-            }
-            $this->addSellersRights($result->getUsers());
+        if ($result instanceof Relaypoint && ($method === "POST" || $method === "PUT")) {
+            $this->addRelaypointsRights($result->getManagers());
         }
     }
 
-    private function addSellersRights($users)
+    private function addRelaypointsRights($users)
     {
         foreach ($users as $user) {
             $originalRoles = $user->getRoles();
-            $originalRoles[] = "ROLE_SELLER";
+            $originalRoles[] = "ROLE_RELAYPOINT";
             $user->setRoles(array_unique($originalRoles));
         }
     }
