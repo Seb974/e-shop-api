@@ -16,8 +16,10 @@ security:
         ROLE_TEAM: [ROLE_USER]
         ROLE_SELLER: [ROLE_TEAM]
         ROLE_DELIVERER: [ROLE_TEAM]
+        ROLE_RELAYPOINT: [ROLE_TEAM]
+        ROLE_SUPERVISOR: [ROLE_TEAM]
         ROLE_PICKER: [ROLE_SELLER, ROLE_DELIVERER]
-        ROLE_ADMIN: [ROLE_PICKER]
+        ROLE_ADMIN: [ROLE_PICKER, ROLE_RELAYPOINT, ROLE_SUPERVISOR]
         ROLE_SUPER_ADMIN : [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
 
     firewalls:
@@ -71,7 +73,7 @@ security:
         - { path: ^/api/products, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/categories, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/create-payment, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/api/users, roles: ROLE_ADMIN, methods: ['GET'] }
+        - { path: ^/api/users, roles: ROLE_TEAM, methods: ['GET'] }
         - { path: ^/api/units, roles: ROLE_ADMIN, methods: ['POST', 'PUT', 'PATCH', 'DELETE'] }
         - { path: ^/api/suppliers, roles: ROLE_ADMIN, methods: ['POST', 'PUT', 'PATCH', 'DELETE'] }
         - { path: ^/api,       roles: IS_AUTHENTICATED_ANONYMOUSLY }

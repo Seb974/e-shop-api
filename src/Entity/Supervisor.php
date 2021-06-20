@@ -24,13 +24,13 @@ use Symfony\Component\Validator\Constraints as Assert;
  *      },
  *      collectionOperations={
  *          "GET",
- *          "POST"={"security"="is_granted('ROLE_ADMIN')"},
+ *          "POST"={"security"="is_granted('ROLE_SUPERVISOR')"},
  *     },
  *     itemOperations={
  *          "GET",
- *          "PUT"={"security"="is_granted('ROLE_ADMIN')"},
- *          "PATCH"={"security"="is_granted('ROLE_ADMIN')"},
- *          "DELETE"={"security"="is_granted('ROLE_ADMIN')"}
+ *          "PUT"={"security"="is_granted('ROLE_SUPERVISOR')"},
+ *          "PATCH"={"security"="is_granted('ROLE_SUPERVISOR')"},
+ *          "DELETE"={"security"="is_granted('ROLE_SUPERVISOR')"}
  *     },
  * )
  */

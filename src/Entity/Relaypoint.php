@@ -20,13 +20,13 @@ use Symfony\Component\Validator\Constraints as Assert;
  *      normalizationContext={"groups"={"relaypoints_read"}},
  *      collectionOperations={
  *          "GET",
- *          "POST"={"security"="is_granted('ROLE_ADMIN')"},
+ *          "POST"={"security"="is_granted('ROLE_RELAYPOINT')"},
  *     },
  *     itemOperations={
  *          "GET",
- *          "PUT"={"security"="is_granted('ROLE_ADMIN')"},
- *          "PATCH"={"security"="is_granted('ROLE_ADMIN')"},
- *          "DELETE"={"security"="is_granted('ROLE_ADMIN')"}
+ *          "PUT"={"security"="is_granted('ROLE_RELAYPOINT')"},
+ *          "PATCH"={"security"="is_granted('ROLE_RELAYPOINT')"},
+ *          "DELETE"={"security"="is_granted('ROLE_RELAYPOINT')"}
  *     }
  * )
  */

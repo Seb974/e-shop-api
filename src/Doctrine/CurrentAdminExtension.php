@@ -15,16 +15,19 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
+use App\Entity\Relaypoint;
+use App\Repository\SupervisorRepository;
 
 class CurrentAdminExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
-    private $security;
     private $auth;
-    private $userGroupDefiner;
+    private $security;
     private $adminDomain;
     private $requestStack;
+    private $userGroupDefiner;
+    private $supervisorRepository;
 
-    public function __construct($requestStack, $admin, $public, Security $security, AuthorizationCheckerInterface $auth, UserGroupDefiner $userGroupDefiner)
+    public function __construct($requestStack, $admin, $public, Security $security, AuthorizationCheckerInterface $auth, UserGroupDefiner $userGroupDefiner, SupervisorRepository $supervisorRepository)
     {
         $this->auth = $auth;
         $this->adminDomain = $admin;
@@ -32,6 +35,7 @@ class CurrentAdminExtension implements QueryCollectionExtensionInterface, QueryI
         $this->publicDomain = $public;
         $this->requestStack = $requestStack;
         $this->userGroupDefiner = $userGroupDefiner;
+        $this->supervisorRepository = $supervisorRepository;
     }
 
     public function applyToCollection(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?string $operationName = null)
@@ -50,7 +54,7 @@ class CurrentAdminExtension implements QueryCollectionExtensionInterface, QueryI
         $request = $this->requestStack->getCurrentRequest();
         $origin = $request->headers->get('origin');
 
-        if ($origin === $this->adminDomain && !$this->auth->isGranted('ROLE_PICKER') && $user instanceof User)
+        if ($origin === $this->adminDomain && !$this->auth->isGranted('ROLE_PICKER') && !$this->auth->isGranted('ROLE_SUPERVISOR') && $user instanceof User)
         {
             $rootAlias = $queryBuilder->getRootAliases()[0];
             $userGroup = $this->userGroupDefiner->getUserGroup($user);
@@ -73,6 +77,34 @@ class CurrentAdminExtension implements QueryCollectionExtensionInterface, QueryI
                              ->andWhere("u IS NOT NULL")
                              ->andWhere("u.id = :user")
                              ->setParameter("user", $user);
+            }
+
+            if ( $resourceClass == Relaypoint::class ) {
+                $queryBuilder->andWhere(":user MEMBER OF $rootAlias.managers")
+                             ->setParameter("user", $user);
+            }
+        }
+
+        if ($origin === $this->adminDomain && $this->auth->isGranted('ROLE_SUPERVISOR') && !$this->auth->isGranted('ROLE_ADMIN') && $user instanceof User)
+        {
+            $arrayId = [];
+            $rootAlias = $queryBuilder->getRootAliases()[0];
+            $supervisor = $this->supervisorRepository->findByUser($user);
+
+            foreach ($supervisor->getUsers() as $user) {
+                $arrayId[] = $user->getId();
+            }
+
+            if ( $resourceClass == User::class && !is_null($supervisor) ) {
+                $queryBuilder->andWhere("$rootAlias.id IN (:ids)")
+                             ->setParameter("ids", $arrayId);
+            }
+
+            if ($resourceClass == OrderEntity::class && !is_null($supervisor)) {
+                $queryBuilder->leftJoin("$rootAlias.user","u")
+                             ->andWhere("u IS NOT NULL")
+                             ->andWhere("u.id IN (:ids)")
+                             ->setParameter("ids", $arrayId);
             }
         }
     }
