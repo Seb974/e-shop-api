@@ -45,9 +45,9 @@ class OrdersNotifier
     {
         $relaypoint = $this->relaypointRepository->findOneBy(["metas" => $order->getMetas()]);
 
-        $message = "Bonjour " . $order->getName() . "\n";
-        $message .= "Votre commande N°" . str_pad($order->getId(), 10, "0", STR_PAD_LEFT) . 
-                    " est disponible au point relais \"" . $relaypoint->getName() . "\"\n" .
+        $message = "Bonjour " . $order->getName() . ",\n";
+        $message .= "Votre commande No." . str_pad($order->getId(), 10, "0", STR_PAD_LEFT) . 
+                    " est disponible au point relais \"" . $relaypoint->getName() . "\".\n" .
                     "Bonne dégustation et à très bientôt sur fraispei.re.";
         return $message;
     }

@@ -64,7 +64,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="json")
-     * @Groups({"users_read", "user_write"})
+     * @Groups({"users_read", "user_write", "supervisors_read"})
      */
     private $roles = [];
 
@@ -86,7 +86,7 @@ class User implements UserInterface
 
     /**
      * @ORM\OneToOne(targetEntity=Meta::class, inversedBy="user", cascade={"persist", "remove"})
-     * @Groups({"users_read", "user_write"})
+     * @Groups({"users_read", "user_write", "supervisors_read"})
      */
     private $metas;
 
