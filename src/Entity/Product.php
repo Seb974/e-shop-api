@@ -198,6 +198,18 @@ class Product
      */
     private $seller;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"products_read", "product_write"})
+     */
+    private $isFabricated;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"products_read", "product_write"})
+     */
+    private $isSold;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
@@ -599,6 +611,30 @@ class Product
     public function setSeller(?Seller $seller): self
     {
         $this->seller = $seller;
+
+        return $this;
+    }
+
+    public function getIsFabricated(): ?bool
+    {
+        return $this->isFabricated;
+    }
+
+    public function setIsFabricated(?bool $isFabricated): self
+    {
+        $this->isFabricated = $isFabricated;
+
+        return $this;
+    }
+
+    public function getIsSold(): ?bool
+    {
+        return $this->isSold;
+    }
+
+    public function setIsSold(?bool $isSold): self
+    {
+        $this->isSold = $isSold;
 
         return $this;
     }

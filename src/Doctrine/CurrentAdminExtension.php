@@ -16,6 +16,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use App\Entity\Relaypoint;
+use App\Entity\Supplier;
 use App\Repository\SupervisorRepository;
 
 class CurrentAdminExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
@@ -69,6 +70,12 @@ class CurrentAdminExtension implements QueryCollectionExtensionInterface, QueryI
 
             if ( $resourceClass == Seller::class ) {
                 $queryBuilder->andWhere(":user MEMBER OF $rootAlias.users")
+                             ->setParameter("user", $user);
+            }
+
+            if ( $resourceClass == Supplier::class ) {
+                $queryBuilder->leftJoin("$rootAlias.seller","s")
+                             ->andWhere(":user MEMBER OF s.users")
                              ->setParameter("user", $user);
             }
 
