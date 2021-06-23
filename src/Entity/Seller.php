@@ -32,7 +32,7 @@ class Seller
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"sellers_read", "products_read", "admin:orders_read", "suppliers_read"})
+     * @Groups({"sellers_read", "products_read", "admin:orders_read", "suppliers_read", "provisions_read"})
      */
     private $id;
 
@@ -40,7 +40,7 @@ class Seller
      * @ORM\Column(type="string", length=120, nullable=true)
      * @Assert\Length(min = 3, minMessage = "Le nom doit contenir au moins {{ limit }} caractères.",
      *                max = 120, maxMessage = "Le nom ne peut contenir plus de {{ limit }} caractères.")
-     * @Groups({"sellers_read", "products_read", "admin:orders_read", "suppliers_read"})
+     * @Groups({"sellers_read", "products_read", "admin:orders_read", "suppliers_read", "provisions_read"})
      */
     private $name;
 
@@ -70,7 +70,7 @@ class Seller
 
     /**
      * @ORM\ManyToMany(targetEntity=User::class)
-     * @Groups({"sellers_read", "seller:products_read", "admin:orders_read"})
+     * @Groups({"sellers_read", "seller:products_read", "admin:orders_read", "provisions_read"})
      */
     private $users;
 

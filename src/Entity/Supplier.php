@@ -30,19 +30,19 @@ class Supplier
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"suppliers_read"})
+     * @Groups({"suppliers_read", "provisions_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=120, nullable=true)
-     * @Groups({"suppliers_read"})
+     * @Groups({"suppliers_read", "provisions_read"})
      */
     private $name;
 
     /**
      * @ORM\ManyToOne(targetEntity=Seller::class)
-     * @Groups({"suppliers_read"})
+     * @Groups({"suppliers_read", "provisions_read"})
      */
     private $seller;
 

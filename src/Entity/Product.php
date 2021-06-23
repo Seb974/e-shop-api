@@ -41,13 +41,13 @@ class Product
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"products_read", "orders_read", "tourings_read"})
+     * @Groups({"products_read", "orders_read", "tourings_read", "provisions_read", "goods_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=120, nullable=true)
-     * @Groups({"products_read", "product_write", "orders_read", "tourings_read"})
+     * @Groups({"products_read", "product_write", "orders_read", "tourings_read", "provisions_read", "goods_read"})
      * @Assert\NotBlank(message="Un nom est obligatoire.")
      */
     private $name;
@@ -116,7 +116,7 @@ class Product
 
     /**
      * @ORM\Column(type="string", length=12, nullable=true)
-     * @Groups({"products_read", "product_write", "orders_read", "tourings_read"})
+     * @Groups({"products_read", "product_write", "orders_read", "tourings_read", "provisions_read", "goods_read"})
      */
     private $unit;
 
@@ -200,13 +200,13 @@ class Product
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"products_read", "product_write"})
+     * @Groups({"products_read", "product_write", "provisions_read", "goods_read"})
      */
     private $isFabricated;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"products_read", "product_write"})
+     * @Groups({"products_read", "product_write", "provisions_read", "goods_read"})
      */
     private $isSold;
 

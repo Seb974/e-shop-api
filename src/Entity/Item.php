@@ -8,9 +8,6 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-// 'admin:items_read';
-// 'admin:item_write';
-
 /**
  * @ORM\Entity(repositoryClass=ItemRepository::class)
  * @ApiResource(
