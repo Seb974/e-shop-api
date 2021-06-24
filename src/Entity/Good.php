@@ -80,6 +80,12 @@ class Good
      */
     private $size;
 
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     * @Groups({"provisions_read", "provision_write", "goods_read"})
+     */
+    private $received;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -165,6 +171,18 @@ class Good
     public function setSize(?Size $size): self
     {
         $this->size = $size;
+
+        return $this;
+    }
+
+    public function getReceived(): ?float
+    {
+        return $this->received;
+    }
+
+    public function setReceived(?float $received): self
+    {
+        $this->received = $received;
 
         return $this;
     }

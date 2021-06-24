@@ -200,15 +200,21 @@ class Product
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"products_read", "product_write", "provisions_read", "goods_read"})
+     * @Groups({"seller:products_read", "product_write", "provisions_read", "goods_read"})
      */
     private $isFabricated;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"products_read", "product_write", "provisions_read", "goods_read"})
+     * @Groups({"seller:products_read", "product_write", "provisions_read", "goods_read"})
      */
     private $isSold;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     * @Groups({"seller:products_read", "provisions_read", "goods_read"})
+     */
+    private $lastCost;
 
     public function __construct()
     {
@@ -635,6 +641,18 @@ class Product
     public function setIsSold(?bool $isSold): self
     {
         $this->isSold = $isSold;
+
+        return $this;
+    }
+
+    public function getLastCost(): ?float
+    {
+        return $this->lastCost;
+    }
+
+    public function setLastCost(?float $lastCost): self
+    {
+        $this->lastCost = $lastCost;
 
         return $this;
     }

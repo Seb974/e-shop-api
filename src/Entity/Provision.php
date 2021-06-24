@@ -67,6 +67,12 @@ class Provision
      */
     private $seller;
 
+    /**
+     * @ORM\Column(type="string", length=120, nullable=true)
+     * @Groups({"provisions_read", "provision_write"})
+     */
+    private $status;
+
     public function __construct()
     {
         $this->goods = new ArrayCollection();
@@ -139,6 +145,18 @@ class Provision
     public function setSeller(?Seller $seller): self
     {
         $this->seller = $seller;
+
+        return $this;
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(?string $status): self
+    {
+        $this->status = $status;
 
         return $this;
     }

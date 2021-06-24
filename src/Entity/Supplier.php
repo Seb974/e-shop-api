@@ -46,6 +46,24 @@ class Supplier
      */
     private $seller;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"suppliers_read", "provisions_read"})
+     * @Assert\Email(message="L'adresse email saisie n'est pas valide.")
+     */
+    private $email;
+
+    /**
+     * @ORM\Column(type="string", length=15, nullable=true)
+     * @Groups({"suppliers_read", "provisions_read"})
+     * @Assert\Regex(
+     *     pattern="/^(?:(?:\+|00)262|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/",
+     *     match=true,
+     *     message="Le numéro de téléphone saisi n'est pas valide."
+     * )
+     */
+    private $phone;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -71,6 +89,30 @@ class Supplier
     public function setSeller(?Seller $seller): self
     {
         $this->seller = $seller;
+
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(?string $email): self
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): self
+    {
+        $this->phone = $phone;
 
         return $this;
     }
