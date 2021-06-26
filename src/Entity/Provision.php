@@ -75,6 +75,12 @@ class Provision
      */
     private $status;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"provisions_read", "provision_write"})
+     */
+    private $integrated;
+
     public function __construct()
     {
         $this->goods = new ArrayCollection();
@@ -159,6 +165,18 @@ class Provision
     public function setStatus(?string $status): self
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getIntegrated(): ?bool
+    {
+        return $this->integrated;
+    }
+
+    public function setIntegrated(?bool $integrated): self
+    {
+        $this->integrated = $integrated;
 
         return $this;
     }

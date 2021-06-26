@@ -42,6 +42,13 @@ class StockManager
         $stock->setQuantity($newQty);
     }
 
+    public function addToStock($item)
+    {
+        $stock = $this->getStockEntity($item);
+        $newQty = $stock->getQuantity() + $item->getReceived();
+        $stock->setQuantity($newQty);
+    }
+
     private function getStockEntity($item)
     {
         return !is_null($item->getSize()) ? $item->getSize()->getStock() : $item->getProduct()->getStock();

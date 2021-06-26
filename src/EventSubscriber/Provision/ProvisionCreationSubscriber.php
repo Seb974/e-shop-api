@@ -7,15 +7,17 @@ use App\Service\Sms\ProvisionNotifier;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use ApiPlatform\Core\EventListener\EventPriorities;
+use App\Service\Stock\StockManager;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ProvisionCreationSubscriber implements EventSubscriberInterface 
 {
-
+    private $stockManager;
     private $provisionNotifier;
 
-    public function __construct(ProvisionNotifier $provisionNotifier)
+    public function __construct(ProvisionNotifier $provisionNotifier, StockManager $stockManager)
     {
+        $this->stockManager = $stockManager;
         $this->provisionNotifier = $provisionNotifier;
     }
 
@@ -30,16 +32,29 @@ class ProvisionCreationSubscriber implements EventSubscriberInterface
         $request = $event->getRequest();
         $method = $request->getMethod();
 
-        if ( $result instanceof Provision && $method === "PUT" && $result->getStatus() === "RECEIVED" ) {
-            foreach ($result->getGoods() as $good) {
-                $product = $good->getProduct();
-                $product->setLastCost($good->getPrice());
+        if ( $result instanceof Provision ) {
+            if ( $method === "POST" ) {
+                $status = !is_null($result->getStatus()) ? $result->getStatus() : "ORDERED";
+                if ($status === "ORDERED")
+                    $this->provisionNotifier->notifyOrder($result);
+
+                $result->setStatus($status)
+                       ->setIntegrated(false);
+            }
+            else if ( $method === "PUT" && $result->getStatus() === "ORDERED" && !$result->getIntegrated() ) {
+                $this->integrateProvision($result);
+                $result->setStatus("RECEIVED")
+                       ->setIntegrated(true);
             }
         }
+    }
 
-        if ( $result instanceof Provision && $method === "POST" ) {
-            $result->setStatus("ORDERED");
-            $this->provisionNotifier->notifyOrder($result);
+    private function integrateProvision($provision)
+    {
+        foreach ($provision->getGoods() as $good) {
+            $product = $good->getProduct();
+            $product->setLastCost($good->getPrice());
+            $this->stockManager->addToStock($good);
         }
     }
 }
