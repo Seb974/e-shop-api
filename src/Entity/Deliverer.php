@@ -72,6 +72,42 @@ class Deliverer
      */
     private $users;
 
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     * @Groups({"deliverers_read"})
+     */
+    private $totalToPayTTC;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     * @Groups({"deliverers_read"})
+     */
+    private $turnover;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     * @Groups({"deliverers_read"})
+     */
+    private $turnoverTTC;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Tax::class)
+     * @Groups({"deliverers_read"})
+     */
+    private $tax;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Catalog::class)
+     * @Groups({"deliverers_read"})
+     */
+    private $catalog;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     * @Groups({"deliverers_read"})
+     */
+    private $ownerRate;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -162,6 +198,78 @@ class Deliverer
     public function removeUser(User $user): self
     {
         $this->users->removeElement($user);
+
+        return $this;
+    }
+
+    public function getTotalToPayTTC(): ?float
+    {
+        return $this->totalToPayTTC;
+    }
+
+    public function setTotalToPayTTC(?float $totalToPayTTC): self
+    {
+        $this->totalToPayTTC = $totalToPayTTC;
+
+        return $this;
+    }
+
+    public function getTurnover(): ?float
+    {
+        return $this->turnover;
+    }
+
+    public function setTurnover(?float $turnover): self
+    {
+        $this->turnover = $turnover;
+
+        return $this;
+    }
+
+    public function getTurnoverTTC(): ?float
+    {
+        return $this->turnoverTTC;
+    }
+
+    public function setTurnoverTTC(?float $turnoverTTC): self
+    {
+        $this->turnoverTTC = $turnoverTTC;
+
+        return $this;
+    }
+
+    public function getTax(): ?Tax
+    {
+        return $this->tax;
+    }
+
+    public function setTax(?Tax $tax): self
+    {
+        $this->tax = $tax;
+
+        return $this;
+    }
+
+    public function getCatalog(): ?Catalog
+    {
+        return $this->catalog;
+    }
+
+    public function setCatalog(?Catalog $catalog): self
+    {
+        $this->catalog = $catalog;
+
+        return $this;
+    }
+
+    public function getOwnerRate(): ?float
+    {
+        return $this->ownerRate;
+    }
+
+    public function setOwnerRate(?float $ownerRate): self
+    {
+        $this->ownerRate = $ownerRate;
 
         return $this;
     }

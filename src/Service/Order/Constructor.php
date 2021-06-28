@@ -4,6 +4,8 @@ namespace App\Service\Order;
 
 use App\Entity\Group;
 use App\Entity\Product;
+use App\Service\Deliverer\DelivererAccount;
+use App\Service\Seller\SellerAccount;
 use App\Service\Tax\Tax;
 use App\Service\Sms\OrdersNotifier;
 use App\Service\Stock\StockManager;
@@ -16,15 +18,17 @@ class Constructor
     private $security;
     private $stockManager;
     private $orderNotifier;
+    private $sellerAccount;
     private $remainsCreator;
     private $userGroupDefiner;
 
-    public function __construct(UserGroupDefiner $userGroupDefiner, Tax $tax, OrdersNotifier $orderNotifier, Security $security, RemainsCreator $remainsCreator, StockManager $stockManager)
+    public function __construct(UserGroupDefiner $userGroupDefiner, Tax $tax, OrdersNotifier $orderNotifier, Security $security, RemainsCreator $remainsCreator, StockManager $stockManager, SellerAccount $sellerAccount)
     {
         $this->tax = $tax;
         $this->security = $security;
         $this->stockManager = $stockManager;
         $this->orderNotifier = $orderNotifier;
+        $this->sellerAccount = $sellerAccount;
         $this->remainsCreator = $remainsCreator;
         $this->userGroupDefiner = $userGroupDefiner;
     }
@@ -113,17 +117,18 @@ class Constructor
 
     private function updateDeliveredOrder(&$order, $isPaidOnline)
     {
+        $this->stockManager->adjustDeliveries($order);
         foreach ($order->getItems() as $item) {
             if ( is_null($item->getDeliveredQty()) ) {
-                $item->setDeliveredQty($item->getPreparedQty());
+                $qtyToPay = $isPaidOnline ? $item->getOrderedQty() : $item->getPreparedQty();
+                $item->setDeliveredQty($qtyToPay);
             }
         }
-
-        $this->stockManager->adjustDeliveries($order);
         $totalHT  = $this->getItemsCostHT($order->getItems(),  ($isPaidOnline ? 'ORDERED' : 'DELIVERED'));
         $totalTTC = $this->getItemsCostTTC($order->getItems(), ($isPaidOnline ? 'ORDERED' : 'DELIVERED'));
         $order->setTotalHT($totalHT)
               ->setTotalTTC($totalTTC);
+        $this->sellerAccount->dispatchTurnover($order);
     }
 
     private function needsStatusUpdate(&$order)

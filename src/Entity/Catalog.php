@@ -30,19 +30,19 @@ class Catalog
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"catalogs_read", "catalogTaxes_read", "catalogPrices_read", "taxes_read", "containers_read", "products_read", "conditions_read", "cities_read", "orders_read"})
+     * @Groups({"catalogs_read", "catalogTaxes_read", "catalogPrices_read", "taxes_read", "containers_read", "products_read", "conditions_read", "cities_read", "orders_read", "deliverers_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"catalogs_read", "catalogTaxes_read", "catalogPrices_read", "taxes_read", "containers_read", "products_read", "conditions_read", "cities_read", "orders_read"})
+     * @Groups({"catalogs_read", "catalogTaxes_read", "catalogPrices_read", "taxes_read", "containers_read", "products_read", "conditions_read", "cities_read", "orders_read", "deliverers_read"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=60, nullable=true)
-     * @Groups({"catalogs_read", "catalogTaxes_read", "catalogPrices_read", "taxes_read", "containers_read", "products_read", "conditions_read", "cities_read", "orders_read"})
+     * @Groups({"catalogs_read", "catalogTaxes_read", "catalogPrices_read", "taxes_read", "containers_read", "products_read", "conditions_read", "cities_read", "orders_read", "deliverers_read"})
      */
     private $code;
 

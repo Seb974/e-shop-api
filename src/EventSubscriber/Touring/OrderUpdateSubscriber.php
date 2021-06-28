@@ -6,16 +6,19 @@ use App\Entity\Touring;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use ApiPlatform\Core\EventListener\EventPriorities;
+use App\Service\Deliverer\DelivererAccount;
 use App\Service\Order\Constructor;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class OrderUpdateSubscriber implements EventSubscriberInterface 
 {
     private $constructor;
+    private $delivererAccount;
 
-    public function __construct(Constructor $constructor)
+    public function __construct(Constructor $constructor, DelivererAccount $delivererAccount)
     {
         $this->constructor = $constructor;
+        $this->delivererAccount = $delivererAccount;
     }
 
     public static function getSubscribedEvents()
@@ -29,9 +32,14 @@ class OrderUpdateSubscriber implements EventSubscriberInterface
         $method = $event->getRequest()->getMethod();
 
         if ($result instanceof Touring && $method === "PUT" ) {
-            foreach ($result->getOrderEntities() as $order) {
-                if ($order->getStatus() === "COLLECTABLE")
+            foreach ($result->getOrderEntities() as $key => $order) {
+                $isRelayPoint = $order->getMetas()->getIsRelaypoint();
+                $status = $order->getStatus();
+                if ($status === "COLLECTABLE" || ($status === "DELIVERED" && (is_null($isRelayPoint) || !$isRelayPoint)) ) {
                     $this->constructor->adjustDelivery($order);
+                    if ($key == count($result->getOrderEntities()) - 1)
+                        $this->delivererAccount->dispatchTurnover($result);
+                }
             }
         }
     }

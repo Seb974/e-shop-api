@@ -85,8 +85,10 @@ class OrderCreationSubscriber implements EventSubscriberInterface
         } else if ( $method === "PUT" ) {
             if ( in_array($order->getStatus(), ["WAITING", "PRE-PREPARED"]) )
                 $this->constructor->adjustPreparation($order);
-            else if ( in_array($order->getStatus(), ["COLLECTABLE", "DELIVERED"]) )
+            else if ( in_array($order->getStatus(), ["COLLECTABLE", "DELIVERED"]) ) {
                 $this->constructor->adjustDelivery($order);
+                
+            }
         }
     }
 

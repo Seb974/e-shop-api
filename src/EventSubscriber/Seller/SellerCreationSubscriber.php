@@ -31,7 +31,9 @@ class SellerCreationSubscriber implements EventSubscriberInterface
         if ($result instanceof Seller && ($method === "POST" || $method === "PUT")) {
             if ($method === "POST") {
                 $result->setTurnover(0)
-                        ->setTotalToPay(0);
+                       ->setTurnoverTTC(0)
+                       ->setTotalToPay(0)
+                       ->setTotalToPayTTC(0);
             }
             $this->addSellersRights($result->getUsers());
         }

@@ -30,7 +30,10 @@ class DelivererCreationSubscriber implements EventSubscriberInterface
 
         if ($result instanceof Deliverer && ($method === "POST" || $method === "PUT")) {
             if ($method === "POST") {
-                $result->setTotalToPay(0);
+                $result->setTurnover(0)
+                       ->setTurnoverTTC(0)
+                       ->setTotalToPay(0)
+                       ->setTotalToPayTTC(0);
             }
             $this->addDeliverersRights($result->getUsers());
         }

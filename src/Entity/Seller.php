@@ -92,6 +92,18 @@ class Seller
      */
     private $recoveryDelay;
 
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     * @Groups({"sellers_read"})
+     */
+    private $turnoverTTC;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     * @Groups({"sellers_read"})
+     */
+    private $totalToPayTTC;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -218,6 +230,30 @@ class Seller
     public function setRecoveryDelay(?int $recoveryDelay): self
     {
         $this->recoveryDelay = $recoveryDelay;
+
+        return $this;
+    }
+
+    public function getTurnoverTTC(): ?float
+    {
+        return $this->turnoverTTC;
+    }
+
+    public function setTurnoverTTC(?float $turnoverTTC): self
+    {
+        $this->turnoverTTC = $turnoverTTC;
+
+        return $this;
+    }
+
+    public function getTotalToPayTTC(): ?float
+    {
+        return $this->totalToPayTTC;
+    }
+
+    public function setTotalToPayTTC(?float $totalToPayTTC): self
+    {
+        $this->totalToPayTTC = $totalToPayTTC;
 
         return $this;
     }
