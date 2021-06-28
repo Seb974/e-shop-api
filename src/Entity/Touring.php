@@ -12,6 +12,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ExistsFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 
 /**
@@ -34,7 +35,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
  *          "DELETE"={"security"="is_granted('ROLE_ADMIN')"}
  *     },
  * )
- * @ApiFilter(DateFilter::class, properties={"start"})
+ * @ApiFilter(SearchFilter::class, properties={"deliverer"="exact"})
+ * @ApiFilter(DateFilter::class, properties={"start"=DateFilter::EXCLUDE_NULL, "end"=DateFilter::EXCLUDE_NULL})
  * @ApiFilter(BooleanFilter::class, properties={"isOpen"})
  * @ApiFilter(ExistsFilter::class, properties={"position"})
  */
