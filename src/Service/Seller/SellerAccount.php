@@ -4,12 +4,12 @@ namespace App\Service\Seller;
 
 class SellerAccount
 {
-    public function dispatchTurnover($order)
+    public function dispatchTurnover($order, $action = "INCREASE")
     {
         $sellers = $this->getSellers($order);
         foreach ($sellers as $seller) {
             $ownerPart = $seller->getOwnerRate() / 100;
-            $totals = $this->getSellerTotals($seller, $order->getItems());
+            $totals = $this->getSellerTotals($seller, $order->getItems(), $action);
             $seller->setTurnover($totals['HT'])
                    ->setTurnoverTTC($totals['TTC'])
                    ->setTotalToPay($totals['HT'] * (1 - $ownerPart))
@@ -17,15 +17,15 @@ class SellerAccount
         }
     }
 
-    public function getSellerTotals($seller, $items)
+    public function getSellerTotals($seller, $items, $action)
     {
         $totalHT = $seller->getTurnover();
         $totalTTC = $seller->getTurnoverTTC();
         foreach ($items as $item) {
             if ($seller->getId() === $item->getProduct()->getSeller()->getId()) {
                 $itemCost = $item->getDeliveredQty() * $item->getPrice();
-                $totalHT += $itemCost;
-                $totalTTC += $itemCost * (1 + $item->getTaxRate());
+                $totalHT = $action === "INCREASE" ? $totalHT + $itemCost : $totalHT - $itemCost;
+                $totalTTC = $action === "INCREASE" ? $totalTTC + $itemCost * (1 + $item->getTaxRate()) : $totalTTC - $itemCost * (1 + $item->getTaxRate());
             }
         }
         return ['HT' => $totalHT, 'TTC' => $totalTTC];

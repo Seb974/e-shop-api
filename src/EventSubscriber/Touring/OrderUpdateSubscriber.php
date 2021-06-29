@@ -31,15 +31,21 @@ class OrderUpdateSubscriber implements EventSubscriberInterface
         $result = $event->getControllerResult();
         $method = $event->getRequest()->getMethod();
 
-        if ($result instanceof Touring && $method === "PUT" ) {
-            foreach ($result->getOrderEntities() as $key => $order) {
-                $isRelayPoint = $order->getMetas()->getIsRelaypoint();
-                $status = $order->getStatus();
-                if ($status === "COLLECTABLE" || ($status === "DELIVERED" && (is_null($isRelayPoint) || !$isRelayPoint)) ) {
-                    $this->constructor->adjustDelivery($order);
-                    if ($key == count($result->getOrderEntities()) - 1)
-                        $this->delivererAccount->dispatchTurnover($result);
+        if ($result instanceof Touring) {
+            if ($method === "PUT" && !$result->getRegulated()) {
+                foreach ($result->getOrderEntities() as $key => $order) {
+                    $isRelayPoint = $order->getMetas()->getIsRelaypoint();
+                    $status = $order->getStatus();
+                    if ($status === "COLLECTABLE" || ($status === "DELIVERED" && (is_null($isRelayPoint) || !$isRelayPoint)) ) {
+                        $this->constructor->adjustDelivery($order);
+                        if ($key == count($result->getOrderEntities()) - 1)
+                            $this->delivererAccount->dispatchTurnover($result, "INCREASE");
+                    }
                 }
+            } else if ($method === "PUT" && $result->getRegulated()) {
+                $this->delivererAccount->dispatchTurnover($result, "DECREASE");
+            } else if ($method === "POST") {
+                $result->setRegulated(false);
             }
         }
     }

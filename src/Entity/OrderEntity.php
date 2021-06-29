@@ -153,6 +153,12 @@ class OrderEntity
      */
     private $touring;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"admin:orders_read", "order_write", "tourings_read", "touring_write"})
+     */
+    private $regulated;
+
     public function __construct()
     {
         $this->items = new ArrayCollection();
@@ -399,6 +405,18 @@ class OrderEntity
     public function setTouring(?Touring $touring): self
     {
         $this->touring = $touring;
+
+        return $this;
+    }
+
+    public function getRegulated(): ?bool
+    {
+        return $this->regulated;
+    }
+
+    public function setRegulated(?bool $regulated): self
+    {
+        $this->regulated = $regulated;
 
         return $this;
     }

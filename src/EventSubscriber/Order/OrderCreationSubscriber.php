@@ -13,6 +13,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use App\Service\Promotion\PromotionUseCounter;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use ApiPlatform\Core\EventListener\EventPriorities;
+use App\Service\Seller\SellerAccount;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class OrderCreationSubscriber implements EventSubscriberInterface 
@@ -23,17 +24,19 @@ class OrderCreationSubscriber implements EventSubscriberInterface
     private $adminDomain;
     private $publicDomain;
     private $stockManager;
+    private $sellerAccount;
     private $userOrderCounter;
     private $productSalesCounter;
     private $promotionUseCounter;
 
-    public function __construct($admin, $public, Constructor $constructor, Security $security, UserGroupDefiner $userGroupDefiner, UserOrderCounter $userOrderCounter, ProductSalesCounter $productSalesCounter, StockManager $stockManager, PromotionUseCounter $promotionUseCounter)
+    public function __construct($admin, $public, Constructor $constructor, Security $security, UserGroupDefiner $userGroupDefiner, UserOrderCounter $userOrderCounter, ProductSalesCounter $productSalesCounter, StockManager $stockManager, PromotionUseCounter $promotionUseCounter, SellerAccount $sellerAccount)
     {
         $this->adminDomain = $admin;
         $this->security = $security;
         $this->publicDomain = $public;
         $this->constructor = $constructor;
         $this->stockManager = $stockManager;
+        $this->sellerAccount = $sellerAccount;
         $this->userOrderCounter = $userOrderCounter;
         $this->userGroupDefiner = $userGroupDefiner;
         $this->productSalesCounter = $productSalesCounter;
@@ -86,8 +89,10 @@ class OrderCreationSubscriber implements EventSubscriberInterface
             if ( in_array($order->getStatus(), ["WAITING", "PRE-PREPARED"]) )
                 $this->constructor->adjustPreparation($order);
             else if ( in_array($order->getStatus(), ["COLLECTABLE", "DELIVERED"]) ) {
-                $this->constructor->adjustDelivery($order);
-                
+                if (is_null($order->getRegulated()) || !$order->getRegulated())
+                    $this->constructor->adjustDelivery($order);
+                else
+                    $this->sellerAccount->dispatchTurnover($order, "DECREASE");
             }
         }
     }

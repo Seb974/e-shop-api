@@ -86,6 +86,12 @@ class Touring
      */
     private $deliverer;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"tourings_read", "touring_write", "admin:orders_read"})
+     */
+    private $regulated;
+
     public function __construct()
     {
         $this->orderEntities = new ArrayCollection();
@@ -182,6 +188,18 @@ class Touring
     public function setDeliverer(?Deliverer $deliverer): self
     {
         $this->deliverer = $deliverer;
+
+        return $this;
+    }
+
+    public function getRegulated(): ?bool
+    {
+        return $this->regulated;
+    }
+
+    public function setRegulated(?bool $regulated): self
+    {
+        $this->regulated = $regulated;
 
         return $this;
     }

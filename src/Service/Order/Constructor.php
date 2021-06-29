@@ -49,6 +49,7 @@ class Constructor
         $deliveryCostTTC = $this->getDeliveryCostTTC($order->getAppliedCondition(), $catalog, $deliveryCostHT);
         $order->setUser($user)
               ->setIsRemains(false)
+              ->setRegulated(false)
               ->setStatus($status)
               ->setTotalHT($totalHT + $deliveryCostHT)
               ->setTotalTTC($totalTTC + $deliveryCostTTC);
@@ -61,7 +62,8 @@ class Constructor
         $totalTTC = $this->getItemsCostTTC($order->getItems(), 'ORDERED');
         $deliveryCostHT = $this->getDeliveryCostHT($order->getAppliedCondition(), $totalHT);
         $deliveryCostTTC = $this->getDeliveryCostTTC($order->getAppliedCondition(), $catalog, $deliveryCostHT);
-        $order->setTotalHT($totalHT + $deliveryCostHT)
+        $order->setRegulated(false)
+              ->setTotalHT($totalHT + $deliveryCostHT)
               ->setTotalTTC($totalTTC + $deliveryCostTTC);
     }
 
@@ -128,7 +130,7 @@ class Constructor
         $totalTTC = $this->getItemsCostTTC($order->getItems(), ($isPaidOnline ? 'ORDERED' : 'DELIVERED'));
         $order->setTotalHT($totalHT)
               ->setTotalTTC($totalTTC);
-        $this->sellerAccount->dispatchTurnover($order);
+        $this->sellerAccount->dispatchTurnover($order, "INCREASE");
     }
 
     private function needsStatusUpdate(&$order)
