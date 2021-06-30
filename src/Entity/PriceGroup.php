@@ -56,6 +56,12 @@ class PriceGroup
      */
     private $userGroup;
 
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     * @Groups({"priceGroups_read"})
+     */
+    private $rate;
+
     public function __construct()
     {
         $this->userGroup = new ArrayCollection();
@@ -104,6 +110,18 @@ class PriceGroup
                 $userGroup->setPriceGroup(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getRate(): ?float
+    {
+        return $this->rate;
+    }
+
+    public function setRate(?float $rate): self
+    {
+        $this->rate = $rate;
 
         return $this;
     }
