@@ -36,27 +36,33 @@ class City
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"cities_read", "city_write"})
+     * @Groups({"cities_read", "city_write", "zones_read", "zone_write"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"cities_read", "city_write"})
+     * @Groups({"cities_read", "city_write", "zones_read", "zone_write"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=20, nullable=true)
-     * @Groups({"cities_read", "city_write"})
+     * @Groups({"cities_read", "city_write", "zones_read", "zone_write"})
      */
     private $zipCode;
 
     /**
      * @ORM\ManyToMany(targetEntity=Condition::class, cascade={"persist", "remove"})
-     * @Groups({"cities_read", "city_write"})
+     * @Groups({"cities_read", "city_write", "zones_read", "zone_write"})
      */
     private $conditions;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Zone::class, inversedBy="cities")
+     * @Groups({"cities_read", "city_write"})
+     */
+    private $zone;
 
     public function __construct()
     {
@@ -112,6 +118,18 @@ class City
     public function removeCondition(Condition $condition): self
     {
         $this->conditions->removeElement($condition);
+
+        return $this;
+    }
+
+    public function getZone(): ?Zone
+    {
+        return $this->zone;
+    }
+
+    public function setZone(?Zone $zone): self
+    {
+        $this->zone = $zone;
 
         return $this;
     }
