@@ -20,7 +20,10 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *          "disable_type_enforcement"=true,
  *          "groups"={"order_write"}
  *     },
- *     normalizationContext={"groups"={"orders_read", "admin:orders_read"}},
+ *     normalizationContext={
+ *          "groups"={"orders_read", "admin:orders_read"},
+ *          "enable_max_depth"=true
+ *     },
  *     collectionOperations={
  *          "GET"={"security"="is_granted('ROLE_TEAM') or object.getUser() == user"},
  *          "POST"
@@ -31,12 +34,18 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *          "PATCH"={"security"="is_granted('ROLE_PICKER')"},
  *          "DELETE"={"security"="is_granted('ROLE_PICKER') or object.isOwner(request, object)"}
  *     },
+ *     mercure="object.getMercureOptions(object.getUser())"
  * )
  * @ApiFilter(SearchFilter::class, properties={"status"="partial"})
  * @ApiFilter(DateFilter::class, properties={"deliveryDate"})
  */
 class OrderEntity
 {
+    /**
+     * server domain, used to configure the Mercure hub topics
+     */
+    private static $domain = 'http://localhost:8000';
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -168,6 +177,12 @@ class OrderEntity
     {
         $data = $request->query->get('id');
         return $object->getUuid() === $data;
+    }
+
+    public function getMercureOptions($user): array
+    {
+        $id = $user != null ? $user->getId() : 0;
+        return ["private" => true, "topics" => self::$domain . "/api/users/" . $id . "/shipments"];
     }
 
     public function getId(): ?int

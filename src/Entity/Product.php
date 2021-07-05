@@ -152,7 +152,7 @@ class Product
 
     /**
      * @ORM\OneToOne(targetEntity=Stock::class, cascade={"persist", "remove"})
-     * @Groups({"products_read", "product_write"})
+     * @Groups({"products_read", "product_write", "admin:orders_read"})
      */
     private $stock;
 

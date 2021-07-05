@@ -40,7 +40,7 @@ class Item
 
     /**
      * @ORM\ManyToOne(targetEntity=Product::class)
-     * @Groups({"items_read", "orders_read", "order_write", "tourings_read"})
+     * @Groups({"items_read", "orders_read", "order_write", "tourings_read", "admin:orders_read"})
      */
     private $product;
 

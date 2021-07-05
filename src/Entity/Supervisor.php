@@ -44,19 +44,15 @@ class Supervisor
      */
     private $id;
 
-    // @MaxDepth(1)
     /**
      * @ORM\OneToOne(targetEntity=User::class, inversedBy="supervisorAuthority", cascade={"persist"})
      * @Groups({"supervisors_read", "supervisor_write"})
-     * 
      */
     private $supervisor;
 
-    // @MaxDepth(1)
     /**
      * @ORM\ManyToMany(targetEntity=User::class)
      * @Groups({"supervisors_read", "supervisor_write", "users_read"})
-     * 
      */
     private $users;
 

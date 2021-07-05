@@ -45,7 +45,7 @@ class Size
 
     /**
      * @ORM\OneToOne(targetEntity=Stock::class, cascade={"persist", "remove"})
-     * @Groups({"sizes_read", "variations_read", "variation_write", "products_read", "orders_read"})
+     * @Groups({"sizes_read", "variations_read", "variation_write", "products_read", "orders_read", "admin:orders_read"})
      */
     private $stock;
 
