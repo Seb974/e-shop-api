@@ -52,7 +52,7 @@ class Seller
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"sellers_read"})
+     * @Groups({"sellers_read", "admin:orders_read"})
      */
     private $ownerRate;
 

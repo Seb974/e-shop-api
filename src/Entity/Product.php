@@ -122,7 +122,7 @@ class Product
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"products_read", "product_write"})
+     * @Groups({"products_read", "product_write", "orders_read"})
      */
     private $weight;
 
