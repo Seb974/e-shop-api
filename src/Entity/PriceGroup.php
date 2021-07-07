@@ -39,26 +39,26 @@ class PriceGroup
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"priceGroups_read", "groups_read", "products_read"})
+     * @Groups({"priceGroups_read", "groups_read", "products_read", "price_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=60, nullable=true)
      * @Assert\Length(max = 60, maxMessage = "Le nom ne peut dépasser {{ limit }} caractères.")
-     * @Groups({"priceGroups_read", "groups_read", "products_read"})
+     * @Groups({"priceGroups_read", "groups_read", "products_read", "price_read"})
      */
     private $name;
 
     /**
      * @ORM\OneToMany(targetEntity=Group::class, mappedBy="priceGroup")
-     * @Groups({"priceGroups_read", "products_read"})
+     * @Groups({"priceGroups_read", "products_read", "price_read"})
      */
     private $userGroup;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"priceGroups_read"})
+     * @Groups({"priceGroups_read", "price_read"})
      */
     private $rate;
 

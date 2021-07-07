@@ -11,6 +11,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass=PriceRepository::class)
  * @ApiResource(
+ *      mercure="object.getMercureOptions(object.getProduct())",
  *      normalizationContext={"groups"={"price_read"}},
  *      collectionOperations={
  *          "GET",
@@ -26,6 +27,11 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class Price
 {
+    /**
+     * server domain, used to configure the Mercure hub topics
+     */
+    private static $domain = 'http://localhost:8000';
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -51,6 +57,14 @@ class Price
      * @Groups({"price_read"})
      */
     private $product;
+
+    public function getMercureOptions($product): array
+    {
+        return [
+            "private" => false, 
+            "topics" => self::$domain . "/api/products/" . $product->getId()
+        ];
+    }
 
     public function getId(): ?int
     {
