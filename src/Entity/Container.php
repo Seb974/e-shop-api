@@ -13,6 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass=ContainerRepository::class)
  * @ApiResource(
+ *      mercure={"private": false},
  *      denormalizationContext={"groups"={"container_write"}},
  *      normalizationContext={"groups"={"containers_read"}},
  *      collectionOperations={

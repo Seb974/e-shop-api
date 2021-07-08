@@ -16,6 +16,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 /**
  * @ORM\Entity(repositoryClass=ProvisionRepository::class)
  * @ApiResource(
+ *     mercure={"private": true},
  *     denormalizationContext={
  *          "disable_type_enforcement"=true,
  *          "groups"={"provision_write"}
