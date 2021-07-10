@@ -7,7 +7,7 @@ use App\Entity\Catalog;
 use App\Entity\Product;
 use App\Service\Tax\Tax;
 use App\Entity\Container;
-use App\Service\Order\Packer;
+use App\Service\Package\Packer;
 use App\Repository\CatalogRepository;
 use App\Repository\ProductRepository;
 use App\Service\User\UserGroupDefiner;
@@ -54,7 +54,6 @@ class Calculator
             return round($itemsCost * 100) / 100;
         else if ($discount['percentage'])
             return round($itemsCost * (1 - ($discount['discount'] < 1 ? $discount['discount'] : $discount['discount'] / 100)) * 100) / 100 ;
-            // return round($itemsCost * 100) / 100 * (1 - ($discount['discount'] < 1 ? $discount['discount'] : $discount['discount'] / 100));
         else
             return (round($itemsCost * 100) / 100) - $discount['discount'];
     }

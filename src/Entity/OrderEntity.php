@@ -174,6 +174,18 @@ class OrderEntity
      */
     private $packages;
 
+    /**
+     * @ORM\Column(type="array", nullable=true)
+     * @Groups({"orders_read", "order_write"})
+     */
+    private $trackIds = [];
+
+    /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     * @Groups({"orders_read", "order_write"})
+     */
+    private $reservationNumber;
+
     public function __construct()
     {
         $this->items = new ArrayCollection();
@@ -469,6 +481,30 @@ class OrderEntity
                 $package->setOrderEntity(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getTrackIds(): ?array
+    {
+        return $this->trackIds;
+    }
+
+    public function setTrackIds(?array $trackIds): self
+    {
+        $this->trackIds = $trackIds;
+
+        return $this;
+    }
+
+    public function getReservationNumber(): ?string
+    {
+        return $this->reservationNumber;
+    }
+
+    public function setReservationNumber(?string $reservationNumber): self
+    {
+        $this->reservationNumber = $reservationNumber;
 
         return $this;
     }

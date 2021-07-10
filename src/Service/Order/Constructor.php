@@ -5,7 +5,7 @@ namespace App\Service\Order;
 use App\Entity\Group;
 use App\Entity\Product;
 use App\Service\Tax\Tax;
-use App\Service\Order\Packer;
+use App\Service\Package\Packer;
 use App\Service\Sms\OrdersNotifier;
 use App\Service\Stock\StockManager;
 use App\Service\Seller\SellerAccount;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\Order;
+namespace App\Service\Package;
 
 use App\Entity\OrderEntity;
 use App\Entity\Package;
