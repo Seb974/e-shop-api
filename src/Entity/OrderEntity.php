@@ -168,9 +168,16 @@ class OrderEntity
      */
     private $regulated;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Package::class, mappedBy="orderEntity")
+     * @Groups({"orders_read", "order_write", "tourings_read", "touring_write"})
+     */
+    private $packages;
+
     public function __construct()
     {
         $this->items = new ArrayCollection();
+        $this->packages = new ArrayCollection();
     }
 
     public function isOwner($request, $object)
@@ -432,6 +439,36 @@ class OrderEntity
     public function setRegulated(?bool $regulated): self
     {
         $this->regulated = $regulated;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Package[]
+     */
+    public function getPackages(): Collection
+    {
+        return $this->packages;
+    }
+
+    public function addPackage(Package $package): self
+    {
+        if (!$this->packages->contains($package)) {
+            $this->packages[] = $package;
+            $package->setOrderEntity($this);
+        }
+
+        return $this;
+    }
+
+    public function removePackage(Package $package): self
+    {
+        if ($this->packages->removeElement($package)) {
+            // set the owning side to null (unless already changed)
+            if ($package->getOrderEntity() === $this) {
+                $package->setOrderEntity(null);
+            }
+        }
 
         return $this;
     }

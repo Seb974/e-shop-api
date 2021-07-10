@@ -4,17 +4,19 @@ namespace App\Service\Order;
 
 use App\Entity\Group;
 use App\Entity\Product;
-use App\Service\Deliverer\DelivererAccount;
-use App\Service\Seller\SellerAccount;
 use App\Service\Tax\Tax;
+use App\Service\Order\Packer;
 use App\Service\Sms\OrdersNotifier;
 use App\Service\Stock\StockManager;
+use App\Service\Seller\SellerAccount;
 use App\Service\User\UserGroupDefiner;
+use App\Service\Deliverer\DelivererAccount;
 use Symfony\Component\Security\Core\Security;
 
 class Constructor
 {
     private $tax;
+    private $packer;
     private $security;
     private $stockManager;
     private $orderNotifier;
@@ -22,9 +24,10 @@ class Constructor
     private $remainsCreator;
     private $userGroupDefiner;
 
-    public function __construct(UserGroupDefiner $userGroupDefiner, Tax $tax, OrdersNotifier $orderNotifier, Security $security, RemainsCreator $remainsCreator, StockManager $stockManager, SellerAccount $sellerAccount)
+    public function __construct(UserGroupDefiner $userGroupDefiner, Tax $tax, OrdersNotifier $orderNotifier, Security $security, RemainsCreator $remainsCreator, StockManager $stockManager, SellerAccount $sellerAccount, Packer $packer)
     {
         $this->tax = $tax;
+        $this->packer = $packer;
         $this->security = $security;
         $this->stockManager = $stockManager;
         $this->orderNotifier = $orderNotifier;
@@ -53,6 +56,9 @@ class Constructor
               ->setStatus($status)
               ->setTotalHT($totalHT + $deliveryCostHT)
               ->setTotalTTC($totalTTC + $deliveryCostTTC);
+        if ($catalog->getNeedsParcel()) {
+            $this->packer->setPackageEntities($order);
+        }
     }
 
     public function adjustAdminOrder(&$order)
@@ -136,10 +142,14 @@ class Constructor
     private function needsStatusUpdate(&$order)
     {
         $isComplete = true;
-        foreach ($order->getItems() as $item) {
-            if (!$item->getIsPrepared()) {
-                $isComplete = false;
-                break;
+        if ($order->getCatalog()->getNeedsParcel() && !$this->security->isGranted('ROLE_PICKER')) {
+            $isComplete = false;
+        } else {
+            foreach ($order->getItems() as $item) {
+                if (!$item->getIsPrepared()) {
+                    $isComplete = false;
+                    break;
+                }
             }
         }
         return $isComplete;

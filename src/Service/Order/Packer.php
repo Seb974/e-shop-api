@@ -2,15 +2,21 @@
 
 namespace App\Service\Order;
 
+use App\Entity\OrderEntity;
+use App\Entity\Package;
 use App\Repository\ProductRepository;
 use App\Repository\ContainerRepository;
+use Doctrine\ORM\EntityManagerInterface;
 
 class Packer
 {
+    private $em;
     private $containerRepository;
     private $productRepository;
 
-    public function __construct(ProductRepository $productRepository, ContainerRepository $containerRepository) {
+    public function __construct(EntityManagerInterface $em, ProductRepository $productRepository, ContainerRepository $containerRepository) 
+    {
+        $this->em = $em;
         $this->productRepository = $productRepository;
         $this->containerRepository = $containerRepository;
     }
@@ -36,6 +42,28 @@ class Packer
         return $packages;
     }
 
+    public function setPackageEntities(OrderEntity $order)
+    {
+        $packages = [];
+        $containers = $this->containerRepository->findBy(['available' => true], ['max'=> 'DESC']);
+        $weight = $this->getProductsWeight($order);
+        $minParcel = $this->getSmallestContainer($containers);
+        $total = $weight;
+        while ($total >= $this->getCapacity($minParcel)) {
+            $container = $this->getSuitestFormat($total, $containers);
+            $needs = floor($total / $this->getCapacity($container));
+            $quantity = $needs > 0 ? $needs : 1;
+            $this->setPackageEntity($packages, $container, $quantity);
+            $rest = $total - $quantity * $this->getCapacity($container);
+            $total = $rest > 0 ? $rest : 0;
+        }
+        if ($total > 0)
+            $this->addPackageEntity($packages, $minParcel);
+        
+        if (count($packages) > 0)
+            $this->addPackagesToOrder($packages, $order);
+    }
+
     private function setPackage(&$packages, $container, $quantity)
     {
         $index = null;
@@ -50,6 +78,28 @@ class Packer
             $packages[] = $package;
         } else {
             $packages[$index]['quantity'] += $quantity;
+        }
+    }
+
+    private function setPackageEntity(&$packages, $container, $quantity)
+    {
+        $index = null;
+        foreach ($packages as $i => $package) {
+            if ($package->getContainer()->getId() === $container->getId()) {
+                $index = $i;
+                break;
+            }
+        }
+        if ($index === null) {
+            $package = new Package();
+            $package->setContainer($container)
+                    ->setQuantity($quantity);
+            
+            $this->em->persist($package);
+            $packages[] = $package;
+        } else {
+            $package = $packages[$index];
+            $package->setQuantity($package->getQuantity() + $quantity);
         }
     }
 
@@ -70,6 +120,26 @@ class Packer
         }
     }
 
+    private function addPackageEntity(&$packages, $minParcel)
+    {
+        $restAdded = false;
+        foreach ($packages as $package) {
+            if ($package->getContainer()->getMax() === $minParcel->getMax()) {
+                $package->setQuantity($package->getQuantity() + 1);
+                $restAdded = true;
+                break;
+            }
+        }
+        if (!$restAdded) {
+            $package = new Package();
+            $package->setContainer($minParcel)
+                    ->setQuantity(1);
+
+            $this->em->persist($package);
+            $packages[] = $package;
+        }
+    }
+
     private function getWeight(array $items)
     {
         $total = 0;
@@ -78,6 +148,19 @@ class Packer
             if (!$product->getIsMixed()) {
                 $weight = $product->getUnit() === "Kg" || $product->getWeight() === null ? 1 : $product->getWeight();
                 $total += ($weight * $item['quantity']);
+            }
+        }
+        return $total;
+    }
+
+    private function getProductsWeight(OrderEntity $order)
+    {
+        $total = 0;
+        foreach ($order->getItems() as $item) {
+            $product = $item->getProduct();
+            if (!$product->getIsMixed()) {
+                $weight = $product->getUnit() === "Kg" || $product->getWeight() === null ? 1 : $product->getWeight();
+                $total += ($weight * $item->getOrderedQty());
             }
         }
         return $total;
@@ -125,5 +208,12 @@ class Packer
     private function getOrderedContainers(&$containers)
     {
         return usort($containers, function($a, $b) { return $a->getMax() > $b->getMax() ? 1 : -1; });
+    }
+
+    private function addPackagesToOrder($packages, $order)
+    {
+        foreach ($packages as $package) {
+            $order->addPackage($package);
+        }
     }
 }

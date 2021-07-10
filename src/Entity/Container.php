@@ -34,13 +34,13 @@ class Container
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"containers_read", "container_write"})
+     * @Groups({"containers_read", "container_write", "packages_read", "orders_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=120, nullable=true)
-     * @Groups({"containers_read", "container_write"})
+     * @Groups({"containers_read", "container_write", "packages_read", "orders_read"})
      * @Assert\NotBlank(message="Un nom est obligatoire.")
      */
     private $name;
@@ -48,55 +48,55 @@ class Container
     // @Assert\PositiveOrZero(message="Le prix du colis doit être un nombre positif.")
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"containers_read", "container_write"})
+     * @Groups({"containers_read", "container_write", "packages_read", "orders_read"})
      */
     private $max;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"containers_read", "container_write"})
+     * @Groups({"containers_read", "container_write", "packages_read", "orders_read"})
      */
     private $tare;
 
     /**
      * @ORM\ManyToOne(targetEntity=Tax::class)
-     * @Groups({"containers_read", "container_write"})
+     * @Groups({"containers_read", "container_write", "packages_read", "orders_read"})
      */
     private $tax;
 
     /**
      * @ORM\OneToOne(targetEntity=Stock::class, cascade={"persist", "remove"})
-     * @Groups({"containers_read", "container_write"})
+     * @Groups({"containers_read", "container_write", "packages_read", "orders_read"})
      */
     private $stock;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"containers_read", "container_write"})
+     * @Groups({"containers_read", "container_write", "packages_read", "orders_read"})
      */
     private $height;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"containers_read", "container_write"})
+     * @Groups({"containers_read", "container_write", "packages_read", "orders_read"})
      */
     private $width;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"containers_read", "container_write"})
+     * @Groups({"containers_read", "container_write", "packages_read", "orders_read"})
      */
     private $length;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"containers_read", "container_write"})
+     * @Groups({"containers_read", "container_write", "packages_read", "orders_read"})
      */
     private $available;
 
     /**
      * @ORM\OneToMany(targetEntity=CatalogPrice::class, mappedBy="container", cascade={"persist", "remove"})
-     * @Groups({"containers_read", "container_write"})
+     * @Groups({"containers_read", "container_write", "packages_read", "orders_read"})
      */
     private $catalogPrices;
 
