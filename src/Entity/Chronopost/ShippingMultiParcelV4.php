@@ -150,12 +150,12 @@ class ShippingMultiParcelV4
         return $this;
     }
 
-    public function getSkybillValue(): ?SkybillValue
+    public function getSkybillValue()
     {
         return $this->skybillValue;
     }
 
-    public function setSkybillValue(?SkybillValue $skybillValue): self
+    public function setSkybillValue($skybillValue): self
     {
         $this->skybillValue = $skybillValue;
 

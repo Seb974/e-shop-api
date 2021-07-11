@@ -23,6 +23,7 @@ use App\Entity\Chronopost\GetReservedSkybillWithTypeAndModeAuth;
 class Shipping
 {
     private $password;
+    private $accountNumber;
     private $contractNumber;
     private $shippingService;
     private $packagesPlanner;
@@ -30,7 +31,7 @@ class Shipping
     private $platformRepository;
     private $ticket;
 
-    public function __construct($contractNumber, $password, PackagePlanner $packagesPlanner, PlatformRepository $platformRepository, CatalogRepository $catalogRepository, Ticket $ticket)
+    public function __construct($contractNumber, $accountNumber, $password, PackagePlanner $packagesPlanner, PlatformRepository $platformRepository, CatalogRepository $catalogRepository, Ticket $ticket)
     {
         $this->shippingService = new \SoapClient('https://ws.chronopost.fr/shipping-cxf/ShippingServiceWS?wsdl');
         $this->shippingService->soap_defencoding = 'UTF-8';
@@ -39,6 +40,7 @@ class Shipping
         $this->shippingService->decode_utf8 = false;
         $this->packagesPlanner = $packagesPlanner;
         $this->contractNumber = $contractNumber;
+        $this->accountNumber = $accountNumber;
         $this->password = $password;
         $this->ticket = $ticket;
     }
@@ -61,7 +63,9 @@ class Shipping
             $params = $this->getReservationParams($reservationNumber);
             $encodedResult = $this->shippingService->getReservedSkybillWithTypeAndModeAuth($params);
             $skybill = base64_decode($encodedResult->return->skybill, false);
-            return $this->ticket->getPrintableZPL($skybill, $reservationNumber);
+            
+            // return $this->ticket->getPrintableZPL($skybill, $reservationNumber);
+            return $skybill;
 
         } catch (\SoapFault $soapFault) { 
             return $soapFault; 
