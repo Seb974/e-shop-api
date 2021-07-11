@@ -3,12 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\OrderEntity;
-use App\Service\Stripe\Stripe;
-use App\Service\Order\Calculator;
-use App\Service\Request\PostRequest;
 use App\Service\Chronopost\Chronopost;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -31,14 +26,9 @@ class SkybillController extends AbstractController
      * Informations :
      * Create the skybill in ZPL encoded format
      */
-    public function create(OrderEntity $order, Chronopost $chronopost, Request $request, PostRequest $postRequest): JsonResponse
+    public function create(OrderEntity $order, Chronopost $chronopost): JsonResponse
     {
         $skybill = $chronopost->getSkybill($order->getReservationNumber());
-        $skybill = mb_convert_encoding($skybill, 'UTF-8', 'UTF-8');
-        // $data = $postRequest->getData($request);
-        // $amount = $calculator->getTotalCost($data);
-        // $stripe->getClientSecret($amount)
-        // ['zpl' => $skybill]
-        return new JsonResponse( $skybill );
+        return new JsonResponse( mb_convert_encoding($skybill, 'UTF-8', 'UTF-8') );
     }
 }
