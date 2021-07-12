@@ -2,26 +2,19 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\CategoryRepository;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-// denormalizationContext={"disable_type_enforcement"=true},
 /**
  * @ORM\Entity(repositoryClass=CategoryRepository::class)
  * @ApiResource(
- *      mercure={"private": false}),
- *      denormalizationContext={
- *          "groups"={"category_write"},
- *          "disable_type_enforcement"=true
- *      },
- *      normalizationContext={
- *          "groups"={"categories_read"}
- *      },
+ *      denormalizationContext={"groups"={"category_write"}},
+ *      normalizationContext={"groups"={"categories_read"}},
  *      collectionOperations={
  *          "GET",
  *          "POST"={"security"="is_granted('ROLE_ADMIN')"},
@@ -32,6 +25,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          "PATCH"={"security"="is_granted('ROLE_ADMIN')"},
  *          "DELETE"={"security"="is_granted('ROLE_ADMIN')"}
  *     },
+ *      mercure={"private": false})
  * )
  */
 class Category
@@ -57,9 +51,23 @@ class Category
      */
     private $userGroups;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Catalog::class)
+     * @Groups({"categories_read", "products_read", "category_write"})
+     */
+    private $catalogs;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Restriction::class, mappedBy="category", cascade={"persist", "remove"})
+     * @Groups({"categories_read", "products_read", "category_write"})
+     */
+    private $restrictions;
+
     public function __construct()
     {
         $this->userGroups = new ArrayCollection();
+        $this->catalogs = new ArrayCollection();
+        $this->restrictions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -99,6 +107,60 @@ class Category
     public function removeUserGroup(Group $userGroup): self
     {
         $this->userGroups->removeElement($userGroup);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Catalog[]
+     */
+    public function getCatalogs(): Collection
+    {
+        return $this->catalogs;
+    }
+
+    public function addCatalog(Catalog $catalog): self
+    {
+        if (!$this->catalogs->contains($catalog)) {
+            $this->catalogs[] = $catalog;
+        }
+
+        return $this;
+    }
+
+    public function removeCatalog(Catalog $catalog): self
+    {
+        $this->catalogs->removeElement($catalog);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Restriction[]
+     */
+    public function getRestrictions(): Collection
+    {
+        return $this->restrictions;
+    }
+
+    public function addRestriction(Restriction $restriction): self
+    {
+        if (!$this->restrictions->contains($restriction)) {
+            $this->restrictions[] = $restriction;
+            $restriction->setCategory($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRestriction(Restriction $restriction): self
+    {
+        if ($this->restrictions->removeElement($restriction)) {
+            // set the owning side to null (unless already changed)
+            if ($restriction->getCategory() === $this) {
+                $restriction->setCategory(null);
+            }
+        }
 
         return $this;
     }
