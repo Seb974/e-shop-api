@@ -144,11 +144,3 @@ services:
             $rootPath: '%kernel.project_dir%'
             $password: '%env(CHRONOPOST_ACCOUNT_PASSWORD)%'
             $accountNumber: '%env(CHRONOPOST_ACCOUNT_NUMBER)%'
-
-    App\Service\Chronopost\Ticket:
-        arguments:
-            $rootPath: '%kernel.project_dir%'
-            $pdfConverter: '%env(CHRONOPOST_PDF_CONVERTER)%'
-            $ticketWidth: '%env(CHRONOPOST_TICKET_WIDTH)%'
-            $ticketHeight: '%env(CHRONOPOST_TICKET_HEIGHT)%'
-            $folder: '%env(CHRONOPOST_TICKET_FOLDER)%'

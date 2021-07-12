@@ -29,6 +29,6 @@ class SkybillController extends AbstractController
     public function create(OrderEntity $order, Chronopost $chronopost): JsonResponse
     {
         $skybill = $chronopost->getSkybill($order->getReservationNumber());
-        return new JsonResponse( mb_convert_encoding($skybill, 'UTF-8', 'UTF-8') );
+        return new JsonResponse(mb_convert_encoding($skybill, 'UTF-8', 'UTF-8'));
     }
 }
