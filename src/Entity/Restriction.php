@@ -11,7 +11,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass=RestrictionRepository::class)
  * @ApiResource(
- *      mercure={"private": false}),
  *      denormalizationContext={
  *          "groups"={"restriction_write"},
  *          "disable_type_enforcement"=true
