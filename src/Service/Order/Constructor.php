@@ -71,6 +71,9 @@ class Constructor
         $order->setRegulated(false)
               ->setTotalHT($totalHT + $deliveryCostHT)
               ->setTotalTTC($totalTTC + $deliveryCostTTC);
+        if ($catalog->getNeedsParcel()) {
+            $this->packer->setPackageEntities($order);
+        }
     }
 
     public function adjustPreparation(&$order)
