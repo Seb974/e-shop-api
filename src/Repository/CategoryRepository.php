@@ -2,9 +2,10 @@
 
 namespace App\Repository;
 
+use App\Entity\Catalog;
 use App\Entity\Category;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @method Category|null find($id, $lockMode = null, $lockVersion = null)
@@ -19,22 +20,19 @@ class CategoryRepository extends ServiceEntityRepository
         parent::__construct($registry, Category::class);
     }
 
-    // /**
-    //  * @return Category[] Returns an array of Category objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @return Category[] Returns an array of Category objects
+     */
+    public function findRestrictedCategoriesByCatalog(Catalog $catalog)
     {
         return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('c.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
+                    ->join('c.restrictions', 'r')
+                    ->andWhere(':catalog MEMBER OF c.catalogs')
+                    ->setParameter('catalog', $catalog)
+                    ->getQuery()
+                    ->getResult()
         ;
     }
-    */
 
     /*
     public function findOneBySomeField($value): ?Category
@@ -44,6 +42,9 @@ class CategoryRepository extends ServiceEntityRepository
             ->setParameter('val', $value)
             ->getQuery()
             ->getOneOrNullResult()
+
+            // ->orderBy('c.id', 'ASC')
+            // ->setMaxResults(10)
         ;
     }
     */

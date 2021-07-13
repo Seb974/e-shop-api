@@ -216,6 +216,18 @@ class Product
      */
     private $lastCost;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"seller:products_read", "product_write"})
+     */
+    private $requireDeclaration;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     * @Groups({"products_read", "product_write", "orders_read"})
+     */
+    private $contentWeight;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
@@ -653,6 +665,30 @@ class Product
     public function setLastCost(?float $lastCost): self
     {
         $this->lastCost = $lastCost;
+
+        return $this;
+    }
+
+    public function getRequireDeclaration(): ?bool
+    {
+        return $this->requireDeclaration;
+    }
+
+    public function setRequireDeclaration(?bool $requireDeclaration): self
+    {
+        $this->requireDeclaration = $requireDeclaration;
+
+        return $this;
+    }
+
+    public function getContentWeight(): ?float
+    {
+        return $this->contentWeight;
+    }
+
+    public function setContentWeight(?float $contentWeight): self
+    {
+        $this->contentWeight = $contentWeight;
 
         return $this;
     }

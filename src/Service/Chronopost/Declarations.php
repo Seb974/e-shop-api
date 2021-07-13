@@ -4,138 +4,137 @@ namespace App\Service\Chronopost;
 
 use App\Entity\Product;
 use App\Entity\Category;
+use App\Entity\OrderEntity;
 use App\Entity\Chronopost\SkybillValue;
+use App\Entity\Restriction;
+use App\Repository\CategoryRepository;
 
-class setDeclarations
+class Declarations
 {
-    private static $AUTHORIZED_PRODUCTS = ["BANANE", "COCO", "ANANAS"];
-    private statIc $RESTRICTED_CATEGORIES = ["FRUIT", "LEGUME", "LÉGUME"];
+    private $categoryRepository;
 
-    public function __construct()
+    public function __construct(CategoryRepository $categoryRepository)
     {
-
+        $this->categoryRepository = $categoryRepository;
     }
 
-    public function setDeclarations(array &$skybills, array &$packagesPlan)
+    public function setContent(SkybillValue $skybill, OrderEntity &$order, array &$packagePlan)
     {
-        foreach ($packagesPlan as $package) {
-            $lineNumber = 1;
-            $skybill = $this->getCorrespondingSkybill($skybills, $package);
-            $itemsToDeclare = $this->getItemsToDeclare($package['content']);
-            if (count($itemsToDeclare) > 0)
-                $this->setDeliveryContent($skybill, $itemsToDeclare, $lineNumber);
+        $lines = $this->getPackageContent($order, $packagePlan);
+        foreach ($lines as $key => $line) {
+            $method = 'setContent'. ($key + 1);
+            if (method_exists($skybill, $method))
+                $skybill->$method($line);
         }
     }
 
-    private function setDeliveryContent(SkybillValue $skybill, array &$itemsToDeclare, int $lineNumber)
+    private function getPackageContent(OrderEntity $order, array &$packagePlan)
     {
-        if (count($itemsToDeclare['vegetables']) > 0) {
-            foreach ($itemsToDeclare['vegetables'] as $vegetable) {
-                $lineNumber = $this->makeVegetablesDeclaration($skybill, $vegetable, $lineNumber);
+        $contentArray = $this->getInitialContents();
+        $declarations = $this->getPackageDeclaration($packagePlan);
+        $restrictions = $this->getPackageRestrictions($order, $packagePlan);
+        $content = $this->getContentDeclaration($declarations, $restrictions, $contentArray);
+        return $content;
+    }
+
+    private function getContentDeclaration(array $declarations, array $restrictions, array $lines)
+    {
+        $i = 0;
+        $announcements = array_merge($declarations, $restrictions);
+        foreach ($announcements as $key => $announcement) {
+            $entry = $key == count($announcements) - 1 ? $announcement : $announcement . ', ';
+            if ( strlen($lines[$i]) + strlen($entry) <= 45 )
+                $lines[$i] .= $entry;
+            else {
+                $lines[$i + 1] .= $entry;
+                $i++;
             }
         }
-        if (count($itemsToDeclare['alcohols']) > 0)
-            $this->makeAlcoholDeclaration($skybill, $itemsToDeclare['alcohols'], $lineNumber);
+        return $lines;
     }
 
-    private function makeVegetablesDeclaration(SkybillValue $skybill, array $vegetable, int $lineNumber)
+    private function getPackageDeclaration(array &$packagePlan)
     {
-        $lineDeclaration = 'content' . $lineNumber;
-        $intro = $lineNumber == 1 && strlen($skybill->$lineDeclaration) == 0 ? 'Végétaux à déclarer : ' : '';
-        $productDeclaration = $vegetable['product']->getName() . ': ' . (round($vegetable['weight'] * 100) / 100) . ' Kg';
-        if ( (strlen($intro) == 0 && strlen($skybill->$lineDeclaration . ', ' . $productDeclaration) > 45) || (strlen($intro) > 0 && strlen($skybill->$lineDeclaration . $intro. $productDeclaration) > 45) ) {
-            $skybill->$lineDeclaration .= $intro;
-            $lineNumber++;
-            $lineDeclaration = 'content' . $lineNumber;
-            $skybill->$lineDeclaration .= $productDeclaration;
-        } else {
-            $skybill->$lineDeclaration .= (strlen($intro) == 0 ? ', ' . $productDeclaration : $intro . $productDeclaration);
+        $declarations = [];
+        foreach ($packagePlan['content'] as $item) {
+            if ($item['product']->getRequireDeclaration()) {
+                    $declarations[] = $item['product']->getName() . ' : ~ ' . $item['totalWeight'] . 'Kg';
+            }
         }
-        return $lineNumber;
+        return $declarations;
     }
 
-    private function makeAlcoholDeclaration(SkybillValue $skybill, array $alcohols, int $lineNumber)
+    private function getPackageRestrictions(OrderEntity $order, $package)
     {
-        $line = $this->getAlcoholLine($skybill, $lineNumber);
-        $lineDeclaration = 'content' . $line;
-        $numberOfBottles = $this->getnumberOfBottles($alcohols);
-        $skybill->$lineDeclaration .= (strlen($skybill->$lineDeclaration) > 0 ? ', s' : 'S') . 'piritueux : ' . $numberOfBottles . ($numberOfBottles > 1 ? ' bouteilles' : ' bouteille');
-    }
-
-    private function getnumberOfBottles(array $alcohols)
-    {
-        $bottles = 0;
-        foreach ($alcohols as $alcohol) {
-            $bottles += ($alcohol['weight'] / $alcohol['product']->getWeight());
+        $restrictions = [];
+        $restrictedCategories = $this->getRestrictedCategories($order);
+        foreach ($restrictedCategories as $category) {
+            $restriction = $this->getAssociatedRestriction($category, $order);
+            $count = $this->countPackageRestrictions($package, $category, $restriction);
+            if ($count > 0) {
+                $unit = ' : ' . ($restriction->getUnit() === 'Kg' ? '~' : '') . $count . $restriction->getUnit();
+                $restrictions[] = $category->getName() . $unit;
+            }
         }
-        return $bottles;
+        return $restrictions;
     }
 
-    private function getAlcoholLine(SkybillValue $skybill, int $lineNumber)
+    private function countPackageRestrictions($package, $category, $restriction)
     {
-        $lineDeclaration = 'content' . $lineNumber;
-        return strlen($skybill->$lineDeclaration) > 0 && $lineNumber < 4 ? $lineNumber + 1 : $lineNumber;
-    }
-
-    private function getItemsToDeclare(array &$items)
-    {
-        $itemsToDeclare = ['vegetables' => [], 'alcohols' => []];
-        foreach ($items as $item) {
-            if ( $this->isAVegetableToDeclare($item['product'], $item['totalWeight']) )
-                $itemsToDeclare['vegetables'][] = ['product' => $item['product'],'weight' => $item['totalWeight']];
-            else if ( $this->isAnAlcoholToDeclare($item['product']) )
-                $itemsToDeclare['alcohols'][] = ['product' => $item['product'],'weight' => $item['totalWeight']];
+        $count = 0;
+        foreach ($package['content'] as $item) {
+            if ($this->belongsToCategory($item['product'], $category))
+                $count += $this->getQuantityToConsider($restriction, $item);
         }
-        return $itemsToDeclare;
+        return $count;
     }
 
-    private function getCorrespondingSkybill(array &$skybills, $package)
+    private function getQuantityToConsider($restriction, $item)
     {
-        $selection = $skybills[0];
-        if (count($skybills) > 1) {
-            foreach ($skybills as $skybill) {
-                if (strlen($skybill->content1) == 0 && $skybill->height == $package['height'] && $skybill->length == $package['length'] && $skybill->width == $package['width']) {
-                    $selection = $skybill;
-                    break;
-                }
+        $rUnit = $restriction->getUnit();
+        $pUnit = $item['product']->getUnit();
+        if ( $rUnit === $pUnit )
+            return $rUnit === "U" ? $item['quantity'] : round($item['quantity'] * $item['product']->getContentWeight(), 2);
+        else
+            return $rUnit === "U" ? round($item['totalWeight'] / $item['fraction'], 0) : round($item['quantity'] * $item['product']->getContentWeight(), 2);
+    }
+
+    private function belongsToCategory($product, $category)
+    {
+        $belong = false;
+        foreach ($product->getCategories() as $productCategory) {
+            if ($productCategory->getId() === $category->getId()) {
+                $belong = true;
+                break;
+            }
+        }
+        return $belong;
+    }
+
+    private function getInitialContents()
+    {
+        $content = [];
+        for ($i = 0; $i < 5; $i++) {
+            $content[$i] = "";
+        }
+        return $content;
+    }
+
+    private function getRestrictedCategories(OrderEntity $order)
+    {
+        return $this->categoryRepository->findRestrictedCategoriesByCatalog($order->getCatalog());
+    }
+
+    private function getAssociatedRestriction($category, OrderEntity $order)
+    {
+        $catalog = $order->getCatalog();
+        $selection = null;
+        foreach ($category->getRestrictions() as $restriction) {
+            if ($restriction->getCatalog()->getId() === $catalog->getId()) {
+                $selection = $restriction;
+                break;
             }
         }
         return $selection;
-    }
-
-    private function isAVegetableToDeclare(Product $product, float $weight)
-    {
-        if ( $this->hasRestrictions($product) ) {
-            foreach ($product->getCategories() as $category) {
-                if ($this->needsDeclaration($weight, $category))
-                    return true;
-            }
-        }
-        return false;
-    }
-
-    private function isAnAlcoholToDeclare(Product $product)
-    {
-        return $product->getRequireLegalAge();
-    }
-
-    private function hasRestrictions(Product $product)
-    {
-        foreach (self::$AUTHORIZED_PRODUCTS as $productName) {
-            if ( strpos(trim(strtoupper($product->getName())), $productName) !== false ) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private function needsDeclaration(float $weight, Category $category)
-    {
-        foreach (self::$RESTRICTED_CATEGORIES as $categoryName) {
-            if ( strpos(trim(strtoupper($category->getName())), $categoryName) !== false && $weight > 5 ) {
-                return true;
-            }
-        }
-        return false;
     }
 }

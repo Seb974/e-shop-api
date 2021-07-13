@@ -14,6 +14,7 @@ use App\Entity\Chronopost\ShipperValue;
 use App\Entity\Chronopost\SkybillValue;
 use App\Service\Package\PackagePlanner;
 use App\Entity\Chronopost\CustomerValue;
+use App\Service\Chronopost\Declarations;
 use App\Entity\Chronopost\RecipientValue;
 use App\Entity\Chronopost\SkybillParamsValue;
 use App\Entity\Chronopost\ShippingMultiParcelV4;
@@ -22,6 +23,7 @@ use App\Entity\Chronopost\GetReservedSkybillWithTypeAndModeAuth;
 class Shipping
 {
     private $password;
+    private $declarations;
     private $accountNumber;
     private $contractNumber;
     private $shippingService;
@@ -29,7 +31,7 @@ class Shipping
     private $catalogRepository;
     private $platformRepository;
 
-    public function __construct($contractNumber, $accountNumber, $password, PackagePlanner $packagesPlanner, PlatformRepository $platformRepository, CatalogRepository $catalogRepository)
+    public function __construct($contractNumber, $accountNumber, $password, PackagePlanner $packagesPlanner, Declarations $declarations, PlatformRepository $platformRepository, CatalogRepository $catalogRepository)
     {
         $this->shippingService = new \SoapClient('https://ws.chronopost.fr/shipping-cxf/ShippingServiceWS?wsdl');
         $this->shippingService->soap_defencoding = 'UTF-8';
@@ -39,6 +41,7 @@ class Shipping
         $this->packagesPlanner = $packagesPlanner;
         $this->contractNumber = $contractNumber;
         $this->accountNumber = $accountNumber;
+        $this->declarations = $declarations;
         $this->password = $password;
     }
 
@@ -239,11 +242,6 @@ class Shipping
         $skybill->setBulkNumber('1')
                 ->setCodCurrency('EUR')
                 ->setCodValue(0)
-                ->setContent1('')
-                ->setContent2('')
-                ->setContent3('')
-                ->setContent4('')
-                ->setContent5('')
                 ->setCustomsCurrency('EUR')
                 ->setCustomsValue($packagesPlan[0]['cost'])
                 ->setEvtCode('DC')
@@ -264,8 +262,9 @@ class Shipping
                 ->setLength($packages[0]->getContainer()->getLength())
                 ->setWidth($packages[0]->getContainer()->getWidth())
                 ->setAs('');
+        $this->declarations->setContent($skybill, $order, $packagesPlan[0]);
+        dump($skybill);
         $skybills[] = $skybill;
-        // $this->setDeclarations($skybills, $packagesPlan);
         return $skybill;
     }
 
@@ -278,11 +277,6 @@ class Shipping
             $skybill->setBulkNumber(count($packages))
                     ->setCodCurrency('EUR')
                     ->setCodValue(0)
-                    ->setContent1('')
-                    ->setContent2('')
-                    ->setContent3('')
-                    ->setContent4('')
-                    ->setContent5('')
                     ->setCustomsCurrency('EUR')
                     ->setCustomsValue($packagesPlan[$i]['cost'])
                     ->setEvtCode('DC')
@@ -303,9 +297,10 @@ class Shipping
                     ->setLength($package['length'])
                     ->setWidth($package['width'])
                     ->setAs('');
+            $this->declarations->setContent($skybill, $order, $packagesPlan[$i]);
+            dump($skybill);
             $skybills[] = $skybill;
         }
-        // $this->setDeclarations($skybills, $packagesPlan);
         return $skybills;
     }
 

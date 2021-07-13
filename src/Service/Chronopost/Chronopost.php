@@ -21,7 +21,8 @@ class Chronopost
     {
         $reservation = $this->shipping->getReservationNumbers($order);
         if (isset($reservation->return)) {
-
+            dump($reservation);
+            dump($reservation->return);
             $results = $reservation->return->resultMultiParcelValue;
             $reservationNumber = $reservation->return->reservationNumber;
             $trackIds = $this->tracking->getTrackIds($results, $order);
