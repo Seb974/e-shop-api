@@ -72,14 +72,11 @@ class OrderCreationSubscriber implements EventSubscriberInterface
     {
         if ( $method === "POST" ) {
             $this->constructor->adjustOrder($order);
-            // if ($order->getStatus() === "WAITING")
-            //     $this->updateEntitiesCounters($order);
         } else if ( $method === "PUT" ) {
             if (!$userGroup->getOnlinePayment() || ($userGroup->getOnlinePayment() && $this->isCurrentUser($order->getPaymentId(), $request)) )
                 throw new \Exception();
 
             $order->setStatus("WAITING");
-            // $this->updateEntitiesCounters($order);
         }
         if (($method === "POST" || $method === "PUT") && $order->getStatus() === "WAITING") {
             $this->updateEntitiesCounters($order);
@@ -98,7 +95,7 @@ class OrderCreationSubscriber implements EventSubscriberInterface
         } else if ( $method === "PUT" ) {
             if ( in_array($order->getStatus(), ["WAITING", "PRE-PREPARED"]) )
                 $this->constructor->adjustPreparation($order);
-            else if ( in_array($order->getStatus(), ["COLLECTABLE", "DELIVERED"]) ) {
+            else if ( in_array($order->getStatus(), ["COLLECTABLE", "SHIPPED", "DELIVERED"]) ) {
                 if (is_null($order->getRegulated()) || !$order->getRegulated())
                     $this->constructor->adjustDelivery($order);
                 else

@@ -100,7 +100,7 @@ class Constructor
         $isRelayPoint = $order->getMetas()->getIsRelaypoint();
         $status = $order->getStatus();
 
-        if ($status === "COLLECTABLE" || ($status === "DELIVERED" && (is_null($isRelayPoint) || !$isRelayPoint)))
+        if ($status === "COLLECTABLE" || ($status === "SHIPPED" || $status === "DELIVERED" && (is_null($isRelayPoint) || !$isRelayPoint)))
             $this->updateDeliveredOrder($order, $isPaidOnline);
 
         if ($status === "COLLECTABLE" && !is_null($isRelayPoint) && $isRelayPoint ) {
@@ -134,9 +134,10 @@ class Constructor
         }
         $totalHT  = $this->getItemsCostHT($order->getItems(),  ($isPaidOnline ? 'ORDERED' : 'DELIVERED'));
         $totalTTC = $this->getItemsCostTTC($order->getItems(), ($isPaidOnline ? 'ORDERED' : 'DELIVERED'));
-        $order->setTotalHT($totalHT)
-              ->setTotalTTC($totalTTC);
         $this->sellerAccount->dispatchTurnover($order, "INCREASE");
+        $order->setTotalHT($totalHT)
+              ->setTotalTTC($totalTTC)
+              ->setRegulated(true);
     }
 
     private function needsStatusUpdate(&$order)
@@ -156,8 +157,8 @@ class Constructor
     }
 
     private function getAdaptedStatus(&$order)
-    { 
-        return !$this->security->isGranted('ROLE_PICKER') && $this->needsRecovery($order) ? "PRE-PREPARED" : "PREPARED";
+    {
+        return $order->getCatalog()->getNeedsParcel() ? "READY" : (!$this->security->isGranted('ROLE_PICKER') && $this->needsRecovery($order) ? "PRE-PREPARED" : "PREPARED");
     }
 
     private function needsRecovery(&$order)

@@ -169,7 +169,7 @@ class OrderEntity
     private $regulated;
 
     /**
-     * @ORM\OneToMany(targetEntity=Package::class, mappedBy="orderEntity")
+     * @ORM\OneToMany(targetEntity=Package::class, mappedBy="orderEntity", cascade={"remove"})
      * @Groups({"orders_read", "order_write", "tourings_read", "touring_write"})
      */
     private $packages;

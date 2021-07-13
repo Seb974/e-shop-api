@@ -50,10 +50,7 @@ class Tracking
                     return $soapFault; 
                 }
             }
-            $fileName = $this->rootPath . '/public/uploads/etiquettes/' . $order->getReservationNumber() .'.zpl';
-            if (file_exists($fileName))
-                $this->fileSystem->remove($fileName);
-    
+            dump($results);
             return $results;
 
         } catch (\Exception $e) { 
