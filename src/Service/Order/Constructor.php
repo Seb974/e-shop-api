@@ -53,6 +53,7 @@ class Constructor
         $order->setUser($user)
               ->setIsRemains(false)
               ->setRegulated(false)
+              ->setInvoiced(false)
               ->setStatus($status)
               ->setTotalHT($totalHT + $deliveryCostHT)
               ->setTotalTTC($totalTTC + $deliveryCostTTC);
@@ -69,6 +70,7 @@ class Constructor
         $deliveryCostHT = $this->getDeliveryCostHT($order->getAppliedCondition(), $totalHT);
         $deliveryCostTTC = $this->getDeliveryCostTTC($order->getAppliedCondition(), $catalog, $deliveryCostHT);
         $order->setRegulated(false)
+              ->setInvoiced(false)
               ->setTotalHT($totalHT + $deliveryCostHT)
               ->setTotalTTC($totalTTC + $deliveryCostTTC);
         if ($catalog->getNeedsParcel()) {

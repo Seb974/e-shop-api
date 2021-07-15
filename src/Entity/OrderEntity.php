@@ -169,7 +169,7 @@ class OrderEntity
     private $regulated;
 
     /**
-     * @ORM\OneToMany(targetEntity=Package::class, mappedBy="orderEntity", cascade={"remove"})
+     * @ORM\OneToMany(targetEntity=Package::class, mappedBy="orderEntity", cascade={"persist", "remove"})
      * @Groups({"orders_read", "order_write", "tourings_read", "touring_write"})
      */
     private $packages;
@@ -185,6 +185,12 @@ class OrderEntity
      * @Groups({"orders_read", "order_write"})
      */
     private $reservationNumber;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"admin:orders_read", "order_write"})
+     */
+    private $invoiced;
 
     public function __construct()
     {
@@ -505,6 +511,18 @@ class OrderEntity
     public function setReservationNumber(?string $reservationNumber): self
     {
         $this->reservationNumber = $reservationNumber;
+
+        return $this;
+    }
+
+    public function getInvoiced(): ?bool
+    {
+        return $this->invoiced;
+    }
+
+    public function setInvoiced(?bool $invoiced): self
+    {
+        $this->invoiced = $invoiced;
 
         return $this;
     }

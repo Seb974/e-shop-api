@@ -2,12 +2,13 @@
 
 namespace App\EventSubscriber\Product;
 
+use App\Entity\Price;
 use App\Entity\Product;
+use App\Service\Axonaut\AxonautProduct;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use ApiPlatform\Core\EventListener\EventPriorities;
-use App\Entity\Price;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -22,20 +23,35 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class UpdateSubscriber implements EventSubscriberInterface 
 {
+    private $axonaut;
+
+    public function __construct(AxonautProduct $axonaut)
+    {
+        $this->axonaut = $axonaut;
+    }
+
     public static function getSubscribedEvents()
     {
         return [
-            KernelEvents::VIEW => ['updateDateTime', EventPriorities::PRE_WRITE]
+            KernelEvents::VIEW => ['updateEntity', EventPriorities::PRE_WRITE]
         ];
     }
 
-    public function updateDateTime(ViewEvent $event)
+    public function updateEntity(ViewEvent $event)
     {
         $result = $event->getControllerResult();
         $method = $event->getRequest()->getMethod();
 
-        // if ($result instanceof Product && ($method === "POST" || $method === "PUT" || $method === "PATCH")) {
-        //     $result->setUpdatedAt(new \DateTime());
-        // }
+        if ($result instanceof Product && ($method === "POST" || $method === "PUT" || $method === "PATCH")) {
+            $result->setUpdatedAt(new \DateTime());
+
+            if ($method === "POST") {
+                $accountingId = $this->axonaut->createProduct($result);
+                $result->setAccountingId($accountingId);
+            } else {
+                $accountingId = $this->axonaut->updateProduct($result);
+                $result->setAccountingId($accountingId);
+            }
+        }
     }
 }

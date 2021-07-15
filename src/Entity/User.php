@@ -109,6 +109,18 @@ class User implements UserInterface
      */
     private $supervisorAuthority;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"users_read", "user_write", "supervisors_read", "admin:orders_read"})
+     */
+    private $accountingId;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"users_read", "user_write", "supervisors_read", "admin:orders_read"})
+     */
+    private $billingDetails;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -256,6 +268,30 @@ class User implements UserInterface
         }
 
         $this->supervisorAuthority = $supervisorAuthority;
+
+        return $this;
+    }
+
+    public function getAccountingId(): ?int
+    {
+        return $this->accountingId;
+    }
+
+    public function setAccountingId(?int $accountingId): self
+    {
+        $this->accountingId = $accountingId;
+
+        return $this;
+    }
+
+    public function getBillingDetails(): ?bool
+    {
+        return $this->billingDetails;
+    }
+
+    public function setBillingDetails(?bool $billingDetails): self
+    {
+        $this->billingDetails = $billingDetails;
 
         return $this;
     }

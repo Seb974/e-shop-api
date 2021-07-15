@@ -228,6 +228,12 @@ class Product
      */
     private $contentWeight;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"seller:products_read", "product_write"})
+     */
+    private $accountingId;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
@@ -689,6 +695,18 @@ class Product
     public function setContentWeight(?float $contentWeight): self
     {
         $this->contentWeight = $contentWeight;
+
+        return $this;
+    }
+
+    public function getAccountingId(): ?int
+    {
+        return $this->accountingId;
+    }
+
+    public function setAccountingId(?int $accountingId): self
+    {
+        $this->accountingId = $accountingId;
 
         return $this;
     }

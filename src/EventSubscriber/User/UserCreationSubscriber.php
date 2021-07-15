@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use ApiPlatform\Core\EventListener\EventPriorities;
+use App\Service\Axonaut\AxonautUser;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
@@ -25,11 +26,13 @@ class UserCreationSubscriber implements EventSubscriberInterface
 {
     private $em;
     private $encoder;
+    private $axonaut;
 
-    public function __construct(EntityManagerInterface $em, UserPasswordEncoderInterface $encoder)
+    public function __construct(EntityManagerInterface $em, UserPasswordEncoderInterface $encoder, AxonautUser $axonaut)
     {
         $this->em = $em;
         $this->encoder = $encoder;
+        $this->axonaut = $axonaut;
     }
 
     public static function getSubscribedEvents()
@@ -50,11 +53,18 @@ class UserCreationSubscriber implements EventSubscriberInterface
                 $result->setPassword($hash);
             }
             if ($method === "POST") {
-                if ($result->getMetas() == null) {
+                if (is_null($result->getMetas())) {
                     $meta = new Meta();
                     $this->em->persist($meta);
                     $result->setMetas($meta);
                 }
+                if (is_null($result->getAccountingId())) {
+                    $accountingId = $this->axonaut->createUser($result);
+                    $result->setAccountingId($accountingId);
+                }
+            } else {
+                $accountingId = $this->axonaut->updateUser($result);
+                $result->setAccountingId($accountingId);
             }
         }
     }

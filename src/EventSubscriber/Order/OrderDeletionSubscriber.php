@@ -1,6 +1,6 @@
 <?php
 
-namespace App\EventSubscriber\Supervisor;
+namespace App\EventSubscriber\Order;
 
 use App\Entity\OrderEntity;
 use App\Service\Chronopost\Chronopost;

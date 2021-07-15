@@ -35,7 +35,7 @@ services:
     App\Service\Mercure\JwtProvider:
         arguments:
             $key: '%env(MERCURE_JWT_KEY)%'
-    
+
     App\Service\Mercure\CookieGenerator:
         arguments:
             $key: '%env(MERCURE_JWT_KEY)%'
@@ -53,11 +53,11 @@ services:
         arguments:
             $mercurePath: '%env(MERCURE_PATH)%'
             $cookieDomain: '%env(STRICT_DOMAIN)%'
-    
+
     App\Service\Stripe\Stripe:
         arguments:
             $secretKey: '%env(STRIPE_SECRET_KEY)%'
-    
+
     App\Service\User\UserGroupDefiner:
         arguments:
             $requestStack: '@request_stack'
@@ -87,11 +87,11 @@ services:
     App\EventSubscriber\Authentication\AuthenticationSuccessSubscriber :
         tags:
             - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_success, method: onAuthenticationSuccess, priority: -2 }
-    
+
     App\EventSubscriber\Authentication\LogoutSuccessSubscriber:
         tags:
             - { name: 'kernel.event_listener', event: 'Symfony\Component\Security\Http\Event\LogoutEvent', dispatcher: security.event_dispatcher.main, method: onLogoutSuccess }
-    
+
     acme_api.event.jwt_decoded_listener:
         class: App\EventSubscriber\Authentication\JWTDecodedListener
         # arguments: [ '@request_stack' ]
@@ -100,7 +100,7 @@ services:
             $admin: '%env(ADMIN_DOMAIN)%'
         tags:
             - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_decoded, method: onJWTDecoded }
-    
+
     App\EventSubscriber\Order\OrderCreationSubscriber:
         arguments:
             $admin: '%env(ADMIN_DOMAIN)%'
@@ -132,15 +132,30 @@ services:
             $url: '%env(SMS_URL)%'
             $user: '%env(SMS_USER)%'
             $pass: '%env(SMS_PASS)%'
-    
+
     App\Service\Chronopost\Shipping:
         arguments:
             $password: '%env(CHRONOPOST_ACCOUNT_PASSWORD)%'
             $contractNumber: '%env(CHRONOPOST_CONTRACT_NUMBER)%'
             $accountNumber: '%env(CHRONOPOST_ACCOUNT_NUMBER)%'
-    
+
     App\Service\Chronopost\Tracking:
         arguments:
             $rootPath: '%kernel.project_dir%'
             $password: '%env(CHRONOPOST_ACCOUNT_PASSWORD)%'
             $accountNumber: '%env(CHRONOPOST_ACCOUNT_NUMBER)%'
+
+    App\Service\Axonaut\AxonautUser:
+        arguments:
+            $key: '%env(AXONAUT_API_KEY)%'
+            $domain: '%env(AXONAUT_DOMAIN)%'
+
+    App\Service\Axonaut\AxonautProduct:
+        arguments:
+            $key: '%env(AXONAUT_API_KEY)%'
+            $domain: '%env(AXONAUT_DOMAIN)%'
+
+    App\Service\Axonaut\AxonautInvoice:
+        arguments:
+            $key: '%env(AXONAUT_API_KEY)%'
+            $domain: '%env(AXONAUT_DOMAIN)%'
