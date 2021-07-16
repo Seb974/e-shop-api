@@ -100,6 +100,12 @@ class Container
      */
     private $catalogPrices;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"containers_read", "container_write", "packages_read", "orders_read"})
+     */
+    private $accountingId;
+
     public function __construct()
     {
         $this->catalogPrices = new ArrayCollection();
@@ -244,6 +250,18 @@ class Container
                 $catalogPrice->setContainer(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getAccountingId(): ?int
+    {
+        return $this->accountingId;
+    }
+
+    public function setAccountingId(?int $accountingId): self
+    {
+        $this->accountingId = $accountingId;
 
         return $this;
     }

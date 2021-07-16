@@ -2,12 +2,10 @@
 
 namespace App\Service\Axonaut;
 
-use App\Entity\User;
-use App\Entity\Product;
-use App\Entity\OrderEntity;
+use App\Entity\Product as ProductEntity;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class AxonautProduct
+class Product
 {
     private $key;
     private $domain;
@@ -20,7 +18,7 @@ class AxonautProduct
         $this->client = $client;
     }
 
-    public function createProduct(Product $product)
+    public function createProduct(ProductEntity $product)
     {
         $axonautProduct = $this->getAxonautProduct($product);
         $parameters = [ 'headers' => ['userApiKey' => $this->key], 'body' => $axonautProduct];
@@ -29,7 +27,7 @@ class AxonautProduct
         return $content['id'];
     }
 
-    public function updateProduct($product)
+    public function updateProduct(ProductEntity $product)
     {
         $axonautId = $product->getAccountingId();
         if (is_null($axonautId))
@@ -42,7 +40,7 @@ class AxonautProduct
         return $content['id'];
     }
 
-    private function getAxonautProduct($product)
+    private function getAxonautProduct(ProductEntity $product)
     {
         return [
             'name' => $product->getName(),
@@ -56,5 +54,24 @@ class AxonautProduct
                 'available' => $product->getAvailable()
             ]
         ];
+    }
+
+    public function createDeliveryFormProduct()
+    {
+        $DeliveryFormProduct = [
+            'name' => "Bon de livraison",
+            'description' => '',
+            'weight' => 0,
+            'product-type' => 706,
+            'custom_fields' => [
+                'seller' => '-',
+                'unit' => '-',
+                'available' => 0
+            ]
+        ];
+        $parameters = [ 'headers' => ['userApiKey' => $this->key], 'body' => $DeliveryFormProduct];
+        $response = $this->client->request('POST', $this->domain . 'products', $parameters);
+        $content = $response->toArray();
+        return $content['id'];
     }
 }

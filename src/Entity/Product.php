@@ -230,7 +230,7 @@ class Product
 
     /**
      * @ORM\Column(type="integer", nullable=true)
-     * @Groups({"seller:products_read", "product_write"})
+     * @Groups({"seller:products_read", "product_write", "admin:orders_read"})
      */
     private $accountingId;
 

@@ -1,23 +1,19 @@
 <?php
 
-namespace App\EventSubscriber\Product;
+namespace App\EventSubscriber\Container;
 
-use App\Entity\Price;
-use App\Entity\Product;
-use App\Service\Axonaut\Product as AxonautProduct;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\Container;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use ApiPlatform\Core\EventListener\EventPriorities;
+use App\Service\Axonaut\Container as AxonautContainer;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * UpdateSubscriber
  *
  * Informations :
- * When a product is created or updated, this event subscriber updates its 'updatedAt' value.
- * This purpose allow Mercure to automatically send an event concerning the Product's update 
- * even when it's not the product itself that's updated but one of its dependances.
+ * When a container is created or updated, this event subscriber set the Axonaut id.
  *
  * @author Sébastien : sebastien.maillot@coding-academy.fr
  */
@@ -25,7 +21,7 @@ class UpdateSubscriber implements EventSubscriberInterface
 {
     private $axonaut;
 
-    public function __construct(AxonautProduct $axonaut)
+    public function __construct(AxonautContainer $axonaut)
     {
         $this->axonaut = $axonaut;
     }
@@ -42,14 +38,12 @@ class UpdateSubscriber implements EventSubscriberInterface
         $result = $event->getControllerResult();
         $method = $event->getRequest()->getMethod();
 
-        if ($result instanceof Product && ($method === "POST" || $method === "PUT" || $method === "PATCH")) {
-            $result->setUpdatedAt(new \DateTime());
-
+        if ($result instanceof Container) {
             if ($method === "POST") {
-                $accountingId = $this->axonaut->createProduct($result);
+                $accountingId = $this->axonaut->createContainer($result);
                 $result->setAccountingId($accountingId);
-            } else {
-                $accountingId = $this->axonaut->updateProduct($result);
+            } else if ($method === "PUT" || $method === "PATCH") {
+                $accountingId = $this->axonaut->updateContainer($result);
                 $result->setAccountingId($accountingId);
             }
         }

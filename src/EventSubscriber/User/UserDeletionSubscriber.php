@@ -5,7 +5,7 @@ namespace App\EventSubscriber\User;
 use App\Entity\User;
 use Symfony\Component\HttpKernel\KernelEvents;
 use ApiPlatform\Core\EventListener\EventPriorities;
-use App\Service\Axonaut\AxonautUser;
+use App\Service\Axonaut\User as AxonautUser;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 

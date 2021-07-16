@@ -145,17 +145,22 @@ services:
             $password: '%env(CHRONOPOST_ACCOUNT_PASSWORD)%'
             $accountNumber: '%env(CHRONOPOST_ACCOUNT_NUMBER)%'
 
-    App\Service\Axonaut\AxonautUser:
+    App\Service\Axonaut\User:
         arguments:
             $key: '%env(AXONAUT_API_KEY)%'
             $domain: '%env(AXONAUT_DOMAIN)%'
 
-    App\Service\Axonaut\AxonautProduct:
+    App\Service\Axonaut\Product:
         arguments:
             $key: '%env(AXONAUT_API_KEY)%'
             $domain: '%env(AXONAUT_DOMAIN)%'
 
-    App\Service\Axonaut\AxonautInvoice:
+    App\Service\Axonaut\Container:
+        arguments:
+            $key: '%env(AXONAUT_API_KEY)%'
+            $domain: '%env(AXONAUT_DOMAIN)%'
+
+    App\Service\Axonaut\Invoice:
         arguments:
             $key: '%env(AXONAUT_API_KEY)%'
             $domain: '%env(AXONAUT_DOMAIN)%'

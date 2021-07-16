@@ -2,11 +2,12 @@
 
 namespace App\Service\Axonaut;
 
-use App\Entity\User;
+use App\Entity\OrderEntity;
+use App\Entity\User as UserEntity;
 use App\Service\User\RolesManager;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class AxonautUser
+class User
 {
     private $key;
     private $domain;
@@ -57,11 +58,12 @@ class AxonautUser
     private function getAxonautUser($entity)
     {
         $metas = $entity->getMetas();
-        $isCustomer = $entity instanceof User;
-        $roles = $entity instanceof User ? $this->rolesManager->getShopRoles($entity) : ["ROLE_USER"];
+        $isCustomer = !($entity instanceof OrderEntity);
+        $roles = $entity instanceof OrderEntity ? ["ROLE_USER"] : $this->rolesManager->getShopRoles($entity) ;
 
         return [
             'name' => $entity->getName(),
+            'internal_id' => $entity instanceof OrderEntity ? '0' : '' . $entity->getId(),
             'address_contact_name' => $entity->getName(),
             'address_street' => is_null($metas) || is_null($metas->getAddress()) ? '' : $metas->getAddress(),
             'address_zip_code' => is_null($metas) || is_null($metas->getZipcode()) ? '' : $metas->getZipcode(),

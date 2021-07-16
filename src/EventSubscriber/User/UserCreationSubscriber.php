@@ -8,7 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use ApiPlatform\Core\EventListener\EventPriorities;
-use App\Service\Axonaut\AxonautUser;
+use App\Service\Axonaut\User as AxonautUser;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
@@ -61,6 +61,9 @@ class UserCreationSubscriber implements EventSubscriberInterface
                 if (is_null($result->getAccountingId())) {
                     $accountingId = $this->axonaut->createUser($result);
                     $result->setAccountingId($accountingId);
+                }
+                if (is_null($result->getBillingDetails())) {
+                    $result->setBillingDetails(true);
                 }
             } else {
                 $accountingId = $this->axonaut->updateUser($result);

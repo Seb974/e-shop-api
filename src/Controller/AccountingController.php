@@ -3,9 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\OrderEntity;
-use App\Service\Axonaut\AxonautUser;
-use App\Repository\ProductRepository;
-use App\Service\Axonaut\AxonautProduct;
+use App\Service\Request\PostRequest;
+use App\Service\Axonaut\User as AxonautUser;
+use App\Service\Axonaut\Invoice as AxonautInvoice;
+use App\Service\Axonaut\Product as AxonautProduct;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -32,5 +34,20 @@ class AccountingController extends AbstractController
     {
         $id = $axonaut->createUser($order);
         return new JsonResponse($id);
+    }
+
+    /**
+     * @Route("/api/accounting/invoices", name="invoices-create", methods={"POST"})
+     *
+     * Informations :
+     * Create invoices for orders sent using POST method
+     */
+    public function createInvoices(Request $request, PostRequest $postRequest, AxonautInvoice $axonaut): JsonResponse
+    {
+        $data = $postRequest->getData($request);
+        $invoices = $data->all();
+        $axonautInvoices = $axonaut->createInvoices($invoices);
+        $axonautPayments = $axonaut->updateAllStatuses($invoices, $axonautInvoices);
+        return new JsonResponse($axonautInvoices);
     }
 }
