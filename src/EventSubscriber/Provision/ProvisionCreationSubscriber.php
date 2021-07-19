@@ -3,20 +3,23 @@
 namespace App\EventSubscriber\Provision;
 
 use App\Entity\Provision;
+use App\Service\Axonaut\Expense;
+use App\Service\Stock\StockManager;
 use App\Service\Sms\ProvisionNotifier;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use ApiPlatform\Core\EventListener\EventPriorities;
-use App\Service\Stock\StockManager;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ProvisionCreationSubscriber implements EventSubscriberInterface 
 {
+    private $axonaut;
     private $stockManager;
     private $provisionNotifier;
 
-    public function __construct(ProvisionNotifier $provisionNotifier, StockManager $stockManager)
+    public function __construct(ProvisionNotifier $provisionNotifier, StockManager $stockManager, Expense $axonaut)
     {
+        $this->axonaut = $axonaut;
         $this->stockManager = $stockManager;
         $this->provisionNotifier = $provisionNotifier;
     }
@@ -43,6 +46,7 @@ class ProvisionCreationSubscriber implements EventSubscriberInterface
             }
             else if ( $method === "PUT" && $result->getStatus() === "ORDERED" && !$result->getIntegrated() ) {
                 $this->integrateProvision($result);
+                $this->axonaut->createExpense($result);
                 $result->setStatus("RECEIVED")
                        ->setIntegrated(true);
             }

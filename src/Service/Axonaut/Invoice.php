@@ -33,7 +33,7 @@ class Invoice
             $response = $this->client->request('POST', $this->domain . 'invoices', $parameters);
             $content = $response->toArray();
             $contents[] = $content;
-            dump($content);
+            $this->updateStatuses($invoice['orders'], $content);
         }
         return $contents;
     }
@@ -44,10 +44,10 @@ class Invoice
         foreach ($invoice['orders'] as $id) {
             $order = $this->orderRepository->find($id);
             $consumer = $order->getUser();
-            if (is_null($consumer) || $consumer->getBillingDetails() !== false) {
+            if (is_null($consumer) || !$consumer->getBillingDetails()) {
                 $productsOrders = array_merge($productsOrders, $this->getDetailedProductsOrder($order));
             } else {
-                $productsOrders = array_merge($productsOrders, $this->getSummarizedOrder($order));
+                $productsOrders[] = $this->getSummarizedOrder($order);
             }
         }
         return $productsOrders;
@@ -60,18 +60,23 @@ class Invoice
 
     private function getSummarizedOrder($order)
     {
-        $totalOrder = $this->getItemsCost($order) + $this->getPackagesCost($order);
-        return [
-            'id' => 4249901,
-            'name' => 'BL N°' . str_pad(strval($order->getId()), 10, "0", STR_PAD_LEFT),
-            'description' => 'Du ' . ($order->getDeliveryDate())->format('d/m/Y'),
-            'price' => $totalOrder,
-            'tax_rate' => 0,
-            'quantity' => 1,
-            'description' => '',
-            'discount_percent' => 0,
-            'discount_flat' => 0,
-        ];
+        $chapter = $this->getChapter($order);
+        $taxes = $this->getTaxesRates($order);
+        foreach ($taxes as $taxRate) {
+            $totalOrder = $this->getItemsCost($order, $taxRate) + $this->getPackagesCost($order, $taxRate);
+            return [
+                'id' => 4249901,
+                'name' => 'Total produits à TVA ' . number_format((float)$taxRate, 2, ',', ' ') . '%',
+                'description' => '',        // 'Du ' . ($order->getDeliveryDate())->format('d/m/Y')
+                'price' => $totalOrder,
+                'tax_rate' => $taxRate,
+                'quantity' => 1,
+                'description' => '',
+                'chapter' => $chapter,
+                'discount_percent' => 0,
+                'discount_flat' => 0,
+            ];
+        }
     }
 
     private function getItems($order)
@@ -83,18 +88,20 @@ class Invoice
         return $formattedItems;
     }
 
-    private function getItemsCost($order)
+    private function getItemsCost($order, $taxRateSearched)
     {
         $total = 0;
         $promotion = $order->getPromotion();
         $onlinePayment = !is_null($order->getPaymentId());
         foreach ($order->getItems() as $item) {
-            $quantity = $this->getQuantity($item, $onlinePayment);
-            $price = $this->getPrice($item, $order->getCatalog());
             $taxRate = $this->getTaxRate($item, $order->getCatalog());
-            $itemCost = $quantity * $price * (1 + $taxRate);
-            $discountedPrice = (!is_null($promotion) ? ($promotion->getPercentage() ? $itemCost * (1 - $promotion->getDiscount()) : $itemCost - round($promotion->getDiscount() / count($order->getItems()), 3)) : $itemCost);;
-            $total += $discountedPrice;
+            if ($taxRate === $taxRateSearched) {
+                $quantity = $this->getQuantity($item, $onlinePayment);
+                $price = $this->getPrice($item, $order->getCatalog());
+                $itemCost = $quantity * $price;
+                $discountedPrice = (!is_null($promotion) ? ($promotion->getPercentage() ? $itemCost * (1 - $promotion->getDiscount()) : $itemCost - round($promotion->getDiscount() / count($order->getItems()), 3)) : $itemCost);;
+                $total += $discountedPrice;
+            }
         }
         return $total;
     }
@@ -108,15 +115,17 @@ class Invoice
         return $formattedPackages;
     }
 
-    private function getPackagesCost($order)
+    private function getPackagesCost($order, $taxRateSearched)
     {
         $total = 0;
         $onlinePayment = !is_null($order->getPaymentId());
         foreach ($order->getPackages() as $package) {
-            $quantity = $this->getQuantity($package, $onlinePayment);
-            $price = $this->getPrice($package, $order->getCatalog());
             $taxRate = $this->getTaxRate($package, $order->getCatalog());
-            $total += ($quantity * $price * (1 + $taxRate));
+            if ($taxRate === $taxRateSearched) {
+                $quantity = $this->getQuantity($package, $onlinePayment);
+                $price = $this->getPrice($package, $order->getCatalog());
+                $total += ($quantity * $price);
+            }
         }
         return $total;
     }
@@ -126,7 +135,10 @@ class Invoice
         $onlinePayment = !is_null($order->getPaymentId());
         $element = $this->getPurchaseItem($purchase);
         $promotion = $order->getPromotion();
-        return [
+        $chapter = $this->getChapter($order);
+        $quantity = $this->getQuantity($purchase, $onlinePayment);
+
+        return $quantity <= 0 ? [] : [
             'id' => $element->getId(),
             'internal_id' => $element->getAccountingId(),
             'name' => $element->getName(),
@@ -134,9 +146,15 @@ class Invoice
             'tax_rate' => $this->getTaxRate($purchase, $order->getCatalog()),
             'quantity' => $this->getQuantity($purchase, $onlinePayment),
             'description' => '',
+            'chapter' => $chapter,
             'discount_percent' => $purchase instanceof Item && !is_null($promotion) && $promotion->getPercentage() ? $promotion->getDiscount() : 0,
             'discount_flat' => $purchase instanceof Item && !is_null($promotion) && !$promotion->getPercentage() ? round($promotion->getDiscount() / count($order->getItems()), 3) : 0,
         ];
+    }
+
+    private function getChapter($order)
+    {
+        return 'BL N°' . str_pad(strval($order->getId()), 10, "0", STR_PAD_LEFT);
     }
 
     private function getPurchaseItem($purchase)
@@ -175,13 +193,24 @@ class Invoice
 
     private function getTaxRate($purchase, $catalog)
     {
-        return $purchase instanceof Item ? $purchase->getTaxRate() * 100 : $this->getContainerTaxRate($purchase, $catalog);
+        return $this->getEntityTaxRate($purchase, $catalog);
     }
 
-    private function getContainerTaxRate($purchase, $catalog)
+    private function getTaxesRates($order)
+    {
+        $taxes = [];
+        $purchases = array_merge($order->getItems()->toArray(), $order->getPackages()->toArray());
+        foreach ($purchases as $purchase) {
+            $taxes[] = $this->getEntityTaxRate($purchase, $order->getCatalog());
+        }
+        return array_unique($taxes);
+    }
+
+    private function getEntityTaxRate($purchase, $catalog)
     {
         $selectedTaxRate = 0;
-        $taxes = $purchase->getContainer()->getTax()->getCatalogTaxes();
+        $entity = $purchase instanceof Item ? $purchase->getProduct() : $purchase->getContainer();
+        $taxes = $entity->getTax()->getCatalogTaxes();
         foreach ($taxes as $tax) {
             if ($tax->getCatalog()->getId() === $catalog->getId()) {
                 $selectedTaxRate = $tax->getPercent();
@@ -221,7 +250,11 @@ class Invoice
         // $this->em->flush();
 
         if ($isPaid) {
-            $this->setInvoiceAsPaid($invoice);
+            try {
+                $this->setInvoiceAsPaid($invoice);
+            } catch(\Exception $e) {
+                dump($e->getMessage());
+            }
         }
     }
 
@@ -231,25 +264,11 @@ class Invoice
             'invoice_id' => $invoice['id'],
             'nature' => 1,
             'amount' => $invoice['total'],
-            'date' => (new \DateTime())->format('d/m/Y'),
+            'date' => (new \DateTime())->format(\DateTime::RFC3339),
             'reference' => ''
         ];
-        dump($axonautPayment);
         $parameters = [ 'headers' => ['userApiKey' => $this->key], 'body' => $axonautPayment];
         $response = $this->client->request('POST', $this->domain . 'payments', $parameters);
         return $response->toArray();
-    }
-
-    public function updateAllStatuses($invoices, $axonautInvoices)
-    {
-        $payments = [];
-        try {
-            foreach ($invoices as $key => $invoice) {
-                $payments[] = $this->updateStatuses($invoice['orders'], $axonautInvoices[$key]);
-            }
-        } catch(\Exception $e) {
-            dump($e->getMessage());
-        }
-        return $payments;
     }
 }

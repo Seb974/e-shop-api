@@ -164,3 +164,13 @@ services:
         arguments:
             $key: '%env(AXONAUT_API_KEY)%'
             $domain: '%env(AXONAUT_DOMAIN)%'
+
+    App\Service\Axonaut\Supplier:
+        arguments:
+            $key: '%env(AXONAUT_API_KEY)%'
+            $domain: '%env(AXONAUT_DOMAIN)%'
+
+    App\Service\Axonaut\Expense:
+        arguments:
+            $key: '%env(AXONAUT_API_KEY)%'
+            $domain: '%env(AXONAUT_DOMAIN)%'

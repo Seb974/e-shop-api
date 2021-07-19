@@ -64,6 +64,18 @@ class Supplier
      */
     private $phone;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"suppliers_read", "provisions_read"})
+     */
+    private $accountingId;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"suppliers_read", "provisions_read"})
+     */
+    private $accountingCompanyId;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -113,6 +125,30 @@ class Supplier
     public function setPhone(?string $phone): self
     {
         $this->phone = $phone;
+
+        return $this;
+    }
+
+    public function getAccountingId(): ?int
+    {
+        return $this->accountingId;
+    }
+
+    public function setAccountingId(?int $accountingId): self
+    {
+        $this->accountingId = $accountingId;
+
+        return $this;
+    }
+
+    public function getAccountingCompanyId(): ?int
+    {
+        return $this->accountingCompanyId;
+    }
+
+    public function setAccountingCompanyId(?int $accountingCompanyId): self
+    {
+        $this->accountingCompanyId = $accountingCompanyId;
 
         return $this;
     }

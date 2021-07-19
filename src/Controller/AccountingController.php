@@ -6,7 +6,6 @@ use App\Entity\OrderEntity;
 use App\Service\Request\PostRequest;
 use App\Service\Axonaut\User as AxonautUser;
 use App\Service\Axonaut\Invoice as AxonautInvoice;
-use App\Service\Axonaut\Product as AxonautProduct;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -47,7 +46,6 @@ class AccountingController extends AbstractController
         $data = $postRequest->getData($request);
         $invoices = $data->all();
         $axonautInvoices = $axonaut->createInvoices($invoices);
-        $axonautPayments = $axonaut->updateAllStatuses($invoices, $axonautInvoices);
         return new JsonResponse($axonautInvoices);
     }
 }
