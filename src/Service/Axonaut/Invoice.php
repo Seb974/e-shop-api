@@ -24,6 +24,20 @@ class Invoice
         $this->orderRepository = $orderRepository;
     }
 
+    public function getAllInvoices($from, $to)
+    {
+        $parameters = [ 'headers' => ['userApiKey' => $this->key]];
+        $response = $this->client->request('GET', $this->domain . 'invoices?date_before=' . $to->format('d/m/Y') . '&date_after=' . $from->format('d/m/Y') , $parameters);
+        return $response->toArray();
+    }
+
+    public function getInvoicesForUser($userId, $from, $to)
+    {
+        $parameters = [ 'headers' => ['userApiKey' => $this->key]];
+        $response = $this->client->request('GET', $this->domain . 'companies/' . $userId . '/invoices?updated_before=' . $to->format('d/m/Y') . '&updated_after=' . $from->format('d/m/Y'), $parameters);
+        return $response->toArray();
+    }
+
     public function createInvoices($invoices)
     {
         $contents = [];
@@ -67,7 +81,7 @@ class Invoice
             return [
                 'id' => 4249901,
                 'name' => 'Total produits à TVA ' . number_format((float)$taxRate, 2, ',', ' ') . '%',
-                'description' => '',        // 'Du ' . ($order->getDeliveryDate())->format('d/m/Y')
+                'description' => '',
                 'price' => $totalOrder,
                 'tax_rate' => $taxRate,
                 'quantity' => 1,
@@ -245,9 +259,9 @@ class Invoice
         foreach ($orders as $id) {
             $order = $this->orderRepository->find($id);
             $isPaid = is_null($order->getPaymentId()) ? false : $isPaid;
-            // $order->setInvoiced(true);
+            $order->setInvoiced(true);
         }
-        // $this->em->flush();
+        $this->em->flush();
 
         if ($isPaid) {
             try {
