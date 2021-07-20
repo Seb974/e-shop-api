@@ -33,4 +33,20 @@ class PaymentController extends AbstractController
         $amount = $calculator->getTotalCost($data);
         return new JsonResponse( $stripe->getClientSecret($amount) );
     }
+
+    /**
+     * @Route("/api/bills-payment", name="bills-payment", methods={"POST"})
+     *
+     * Informations :
+     * Create the paymentIntent object to charge when supervisors calls for payment form
+     */
+    public function billsPaymentCreate(Request $request, PostRequest $postRequest, Calculator $calculator, Stripe $stripe): JsonResponse
+    {
+        $amount = 0;
+        $data = $postRequest->getData($request);
+        foreach ($data->get('bills') as $bill) {
+            $amount += $bill['total'];
+        }
+        return new JsonResponse( $stripe->getClientSecret($amount) );
+    }
 }

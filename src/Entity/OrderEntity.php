@@ -192,6 +192,12 @@ class OrderEntity
      */
     private $invoiced;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"admin:orders_read", "order_write"})
+     */
+    private $invoiceId;
+
     public function __construct()
     {
         $this->items = new ArrayCollection();
@@ -523,6 +529,18 @@ class OrderEntity
     public function setInvoiced(?bool $invoiced): self
     {
         $this->invoiced = $invoiced;
+
+        return $this;
+    }
+
+    public function getInvoiceId(): ?int
+    {
+        return $this->invoiceId;
+    }
+
+    public function setInvoiceId(?int $invoiceId): self
+    {
+        $this->invoiceId = $invoiceId;
 
         return $this;
     }

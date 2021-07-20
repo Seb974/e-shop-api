@@ -52,6 +52,24 @@ class Invoice
         return $contents;
     }
 
+    public function createPayment($invoices, $paymentId)
+    {
+        try {
+            foreach ($invoices as $invoice) {
+                $this->setInvoiceAsPaid($invoice);
+                $orders = $this->orderRepository->findBy(['invoiceId' => $invoice['id']]);
+                foreach ($orders as $order) {
+                    $order->setPaymentId($paymentId);
+                }
+                $this->em->flush();
+            }
+            return ['data' => true];
+        } catch(\Exception $e) {
+            dump($e->getMessage());
+            return ['error' => $e->getMessage()];
+        }
+    }
+
     private function getOrdersDetails($invoice)
     {
         $productsOrders = [];
@@ -259,7 +277,8 @@ class Invoice
         foreach ($orders as $id) {
             $order = $this->orderRepository->find($id);
             $isPaid = is_null($order->getPaymentId()) ? false : $isPaid;
-            $order->setInvoiced(true);
+            $order->setInvoiced(true)
+                  ->setInvoiceId($invoice['id']);
         }
         $this->em->flush();
 
@@ -276,7 +295,7 @@ class Invoice
     {
         $axonautPayment = [
             'invoice_id' => $invoice['id'],
-            'nature' => 1,
+            'nature' => 4,
             'amount' => $invoice['total'],
             'date' => (new \DateTime())->format(\DateTime::RFC3339),
             'reference' => ''

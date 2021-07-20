@@ -57,7 +57,7 @@ class AccountingController extends AbstractController
      * @IsGranted("ROLE_SUPERVISOR")
      *
      * Informations :
-     * get invoices
+     * Get invoices depending on user's role : Admins have access to all invoices whereas supervisors are restricted to invoices of the users they supervize
      */
     public function getInvoices(User $user, Request $request, PostRequest $postRequest, RolesManager $rolesManager, AxonautInvoice $axonaut): JsonResponse
     {
@@ -70,5 +70,19 @@ class AccountingController extends AbstractController
         return $rolesManager->isUserGranted($user, "ROLE_ADMIN") ?
                 new JsonResponse($axonaut->getAllInvoices($from, $to)) :
                 new JsonResponse($axonaut->getInvoicesForUser($user->getAccountingId(), $from, $to));
+    }
+
+    /**
+     * @Route("/api/accounting/payments", name="invoices-payment-create", methods={"POST"})
+     * @IsGranted("ROLE_SUPERVISOR")
+     *
+     * Informations :
+     * Get invoices depending on user's role : Admins have access to all invoices whereas supervisors are restricted to invoices of the users they supervize
+     */
+    public function createPayment(Request $request, PostRequest $postRequest, AxonautInvoice $axonaut): JsonResponse
+    {
+        $data = $postRequest->getData($request);
+        $parameters = $data->all();
+        return new JsonResponse($axonaut->createPayment($parameters['bills'], $parameters['paymentId']));
     }
 }
