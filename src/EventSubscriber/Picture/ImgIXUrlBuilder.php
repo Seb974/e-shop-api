@@ -4,6 +4,7 @@ namespace App\EventSubscriber\Picture;
 
 use Imgix\UrlBuilder;
 use App\Entity\Picture;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use ApiPlatform\Core\EventListener\EventPriorities;
@@ -21,21 +22,21 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class ImgIXUrlBuilder implements EventSubscriberInterface 
 {
+    private $em;
     private $key;
     private $domain;
-    private $builder;
 
-    public function __construct($key, $domain)
+    public function __construct($key, $domain, EntityManagerInterface $em)
     {
+        $this->em = $em;
         $this->key = $key;
         $this->domain = $domain;
-        $this->builder = $this->getImgIXUrlBuilder();
     }
 
     public static function getSubscribedEvents()
     {
         return [
-            KernelEvents::VIEW => ['addImgIXUrl', EventPriorities::PRE_WRITE]
+            KernelEvents::VIEW => ['addImgIXUrl', EventPriorities::PRE_SERIALIZE]
         ];
     }
 
@@ -44,28 +45,21 @@ class ImgIXUrlBuilder implements EventSubscriberInterface
         $result = $event->getControllerResult();
         $method = $event->getRequest()->getMethod();
 
-        if ($result instanceof Picture && $method === "POST") {
+        if ($result instanceof Picture && ($method === "POST" || $method === "PUT" || $method === "PATCH")) {
             $params = $this->getParams($result);
-            $imgPath = $this->builder->createURL($result->filePath, $params);
-            dump($imgPath);
+            $builder = new UrlBuilder($this->domain, true, $this->key, false);
+            $imgPath = $builder->createURL($result->filePath, $params);
             $result->setImgPath($imgPath);
+            $this->em->flush();
         }
     }
 
-    private function getImgIXUrlBuilder()
-    {
-        $builder = new UrlBuilder($this->domain);
-        $builder->setSignKey($this->key);
-        $builder->setUseHttps(true);
-        $builder->setIncludeLibraryParam(false);
-        return $builder;
-    }
 
     private function getParams($picture)
     {
         $entity = $picture->getLinkInstance();
         $width = $entity === "product" ? 600 : 750;
         $height = $entity === "product" ? 800 : 440;
-        return ["w" => $width, "h" => $height, "fit" => "crop", "crop" => "edges"];
+        return ["w" => $width, "h" => $height, "fit" => "crop", "crop" => "edges", "auto" => "format"];
     }
 }

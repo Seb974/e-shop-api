@@ -19,12 +19,16 @@ final class CreatePictureAction
     public function __invoke(Request $request): Picture
     {
         $uploadedFile = $request->files->get('file');
+        $instance = $request->request->get('instance');
         if (!$uploadedFile) {
             throw new BadRequestHttpException('"file" is required');
         }
 
         $picture = new Picture();
         $picture->file = $uploadedFile;
+
+        if (!is_null($instance))
+            $picture->setLinkInstance($instance);
 
         return $picture;
     }
