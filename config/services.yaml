@@ -174,3 +174,8 @@ services:
         arguments:
             $key: '%env(AXONAUT_API_KEY)%'
             $domain: '%env(AXONAUT_DOMAIN)%'
+
+    App\EventSubscriber\Picture\ImgIXUrlBuilder:
+        arguments:
+            $key: '%env(IMGIX_TOKEN_KEY)%'
+            $domain: '%env(IMGIX_DOMAIN)%'

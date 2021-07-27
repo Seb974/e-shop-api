@@ -102,7 +102,7 @@ class Picture
      *
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue
-     * @Groups({"picture_read", "products_read"})
+     * @Groups({"picture_read", "products_read", "articles_read"})
      * @ORM\Id
      */
     protected $id;
@@ -111,7 +111,7 @@ class Picture
      * @var string|null
      *
      * @ApiProperty(iri="http://schema.org/contentUrl")
-     * @Groups({"picture_read", "products_read"})
+     * @Groups({"picture_read", "products_read", "articles_read"})
      */
     public $contentUrl;
 
@@ -127,12 +127,48 @@ class Picture
      * @var string|null
      *
      * @ORM\Column(nullable=true)
-     * @Groups({"picture_read", "products_read"})
+     * @Groups({"picture_read", "products_read", "articles_read"})
      */
     public $filePath;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"picture_read", "products_read", "articles_read"})
+     */
+    private $imgPath;
+
+    /**
+     * @ORM\Column(type="string", length=20, nullable=true)
+     * @Groups({"picture_read", "products_read", "articles_read"})
+     */
+    private $linkInstance;
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getImgPath(): ?string
+    {
+        return $this->imgPath;
+    }
+
+    public function setImgPath(?string $imgPath): self
+    {
+        $this->imgPath = $imgPath;
+
+        return $this;
+    }
+
+    public function getLinkInstance(): ?string
+    {
+        return $this->linkInstance;
+    }
+
+    public function setLinkInstance(?string $linkInstance): self
+    {
+        $this->linkInstance = $linkInstance;
+
+        return $this;
     }
 }

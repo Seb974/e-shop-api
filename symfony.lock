@@ -108,6 +108,9 @@
     "friendsofphp/proxy-manager-lts": {
         "version": "v1.0.3"
     },
+    "imgix/imgix-php": {
+        "version": "3.3.1"
+    },
     "jms/metadata": {
         "version": "2.5.0"
     },
