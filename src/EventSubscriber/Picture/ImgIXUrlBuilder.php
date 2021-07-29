@@ -4,6 +4,7 @@ namespace App\EventSubscriber\Picture;
 
 use Imgix\UrlBuilder;
 use App\Entity\Picture;
+use App\Service\Image\Dimension;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
@@ -25,12 +26,14 @@ class ImgIXUrlBuilder implements EventSubscriberInterface
     private $em;
     private $key;
     private $domain;
+    private $dimension;
 
-    public function __construct($key, $domain, EntityManagerInterface $em)
+    public function __construct($key, $domain, EntityManagerInterface $em, Dimension $dimension)
     {
         $this->em = $em;
         $this->key = $key;
         $this->domain = $domain;
+        $this->dimension = $dimension;
     }
 
     public static function getSubscribedEvents()
@@ -54,12 +57,23 @@ class ImgIXUrlBuilder implements EventSubscriberInterface
         }
     }
 
-
     private function getParams($picture)
     {
         $entity = $picture->getLinkInstance();
-        $width = $entity === "product" ? 600 : 750;
-        $height = $entity === "product" ? 800 : 440;
-        return ["w" => $width, "h" => $height, "fit" => "crop", "crop" => "edges", "auto" => "format"];
+        $sizes = getimagesize($picture->file);
+        $width = $this->dimension->getWidth($entity);
+        $height = $this->dimension->getHeight($entity);
+        $params = [
+            "w" => $width,
+            "h" => $height, 
+            "fit" => "crop", 
+            "crop" => "edges",
+             "auto" => "format"
+        ];
+
+        if ($sizes[0] < $width || $sizes[1] < $height) {
+            $params = array_merge($params, ["dpr" => 0.9]);
+        }
+        return $params;
     }
 }

@@ -41,13 +41,13 @@ class Product
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"products_read", "orders_read", "tourings_read", "provisions_read", "goods_read"})
+     * @Groups({"products_read", "orders_read", "tourings_read", "provisions_read", "goods_read", "heroes_read", "homepages_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=120, nullable=true)
-     * @Groups({"products_read", "product_write", "orders_read", "tourings_read", "provisions_read", "goods_read"})
+     * @Groups({"products_read", "product_write", "orders_read", "tourings_read", "provisions_read", "goods_read", "heroes_read", "homepages_read"})
      * @Assert\NotBlank(message="Un nom est obligatoire.")
      */
     private $name;
@@ -68,19 +68,19 @@ class Product
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"products_read", "product_write"})
+     * @Groups({"products_read", "product_write", "heroes_read", "homepages_read"})
      */
     private $discount;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
-     * @Groups({"products_read", "product_write"})
+     * @Groups({"products_read", "product_write", "heroes_read", "homepages_read"})
      */
     private $offerEnd;
 
     /**
      * @ORM\Column(type="text", nullable=true)
-     * @Groups({"products_read", "product_write"})
+     * @Groups({"products_read", "product_write", "heroes_read", "homepages_read"})
      */
     private $fullDescription;
 
@@ -92,13 +92,13 @@ class Product
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"products_read", "product_write"})
+     * @Groups({"products_read", "product_write", "heroes_read", "homepages_read"})
      */
     private $new;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"products_read", "product_write"})
+     * @Groups({"products_read", "product_write", "heroes_read", "homepages_read"})
      */
     private $available;
 
@@ -116,7 +116,7 @@ class Product
 
     /**
      * @ORM\Column(type="string", length=12, nullable=true)
-     * @Groups({"products_read", "product_write", "orders_read", "tourings_read", "provisions_read", "goods_read"})
+     * @Groups({"products_read", "product_write", "orders_read", "tourings_read", "provisions_read", "goods_read", "heroes_read", "homepages_read"})
      */
     private $unit;
 
