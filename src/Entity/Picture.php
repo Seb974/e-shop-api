@@ -138,7 +138,7 @@ class Picture
     private $imgPath;
 
     /**
-     * @ORM\Column(type="string", length=20, nullable=true)
+     * @ORM\Column(type="string", length=120, nullable=true)
      * @Groups({"picture_read", "products_read", "articles_read", "heroes_read", "homepages_read", "banners_read", "countdowns_read"})
      */
     private $linkInstance;

@@ -13,6 +13,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass=HomepageRepository::class)
  * @ApiResource(
+ *      denormalizationContext={
+ *          "disable_type_enforcement"=true,
+ *          "groups"={"homepage_write"}
+ *     },
  *      normalizationContext={"groups"={"homepages_read"}},
  *      collectionOperations={
  *          "GET",
@@ -32,39 +36,45 @@ class Homepage
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"homepages_read", "heroes_read", "banners_read", "countdowns_read"})
+     * @Groups({"homepage_write", "homepages_read", "heroes_read", "banners_read", "countdowns_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=150, nullable=true)
-     * @Groups({"homepages_read", "heroes_read", "banners_read", "countdowns_read"})
+     * @Groups({"homepage_write", "homepages_read", "heroes_read", "banners_read", "countdowns_read"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"homepages_read", "heroes_read", "banners_read", "countdowns_read"})
+     * @Groups({"homepage_write", "homepages_read", "heroes_read", "banners_read", "countdowns_read"})
      */
     private $selected;
 
     /**
      * @ORM\OneToMany(targetEntity=Hero::class, mappedBy="homepage")
-     * @Groups({"homepages_read"})
+     * @Groups({"homepage_write", "homepages_read"})
      */
     private $heroes;
 
     /**
      * @ORM\OneToMany(targetEntity=Banner::class, mappedBy="homepage")
-     * @Groups({"homepages_read"})
+     * @Groups({"homepage_write", "homepages_read"})
      */
     private $banners;
 
     /**
-     * @ORM\OneToMany(targetEntity=Countdown::class, mappedBy="homepage")
-     * @Groups({"homepages_read"})
+     * @ORM\OneToMany(targetEntity=Countdown::class, mappedBy="homepage", cascade={"persist", "remove"})
+     * @Groups({"homepage_write", "homepages_read"})
      */
     private $countdowns;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"homepage_write", "homepages_read", "heroes_read", "banners_read", "countdowns_read"})
+     */
+    private $bannersNumber;
 
     public function __construct()
     {
@@ -188,6 +198,18 @@ class Homepage
                 $countdown->setHomepage(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getBannersNumber(): ?int
+    {
+        return $this->bannersNumber;
+    }
+
+    public function setBannersNumber(?int $bannersNumber): self
+    {
+        $this->bannersNumber = $bannersNumber;
 
         return $this;
     }

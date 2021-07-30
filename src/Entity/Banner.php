@@ -29,6 +29,7 @@ class Banner
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"banners_read", "homepages_read"})
      */
     private $id;
 
@@ -67,6 +68,18 @@ class Banner
      * @Groups({"banners_read"})
      */
     private $homepage;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"banners_read", "homepages_read"})
+     */
+    private $main;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"banners_read", "homepages_read"})
+     */
+    private $bannerNumber;
 
     public function getId(): ?int
     {
@@ -141,6 +154,30 @@ class Banner
     public function setHomepage(?Homepage $homepage): self
     {
         $this->homepage = $homepage;
+
+        return $this;
+    }
+
+    public function getMain(): ?bool
+    {
+        return $this->main;
+    }
+
+    public function setMain(?bool $main): self
+    {
+        $this->main = $main;
+
+        return $this;
+    }
+
+    public function getBannerNumber(): ?int
+    {
+        return $this->bannerNumber;
+    }
+
+    public function setBannerNumber(?int $bannerNumber): self
+    {
+        $this->bannerNumber = $bannerNumber;
 
         return $this;
     }

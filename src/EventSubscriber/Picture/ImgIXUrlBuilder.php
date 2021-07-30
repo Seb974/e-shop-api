@@ -68,7 +68,7 @@ class ImgIXUrlBuilder implements EventSubscriberInterface
             "h" => $height, 
             "fit" => "crop", 
             "crop" => "edges",
-             "auto" => "format"
+            "auto" => "format"
         ];
 
         if ($sizes[0] < $width || $sizes[1] < $height) {

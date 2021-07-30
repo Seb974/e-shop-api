@@ -10,6 +10,10 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * @ORM\Entity(repositoryClass=CountdownRepository::class)
  * @ApiResource(
+ *      denormalizationContext={
+ *          "disable_type_enforcement"=true,
+ *          "groups"={"countdown_write"}
+ *     },
  *      normalizationContext={"groups"={"countdowns_read"}},
  *      collectionOperations={
  *          "GET",
@@ -29,27 +33,33 @@ class Countdown
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"countdowns_read", "homepages_read"})
+     * @Groups({"countdown_write", "homepage_write", "countdowns_read", "homepages_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
-     * @Groups({"countdowns_read", "homepages_read"})
+     * @Groups({"countdown_write", "homepage_write", "countdowns_read", "homepages_read"})
      */
     private $date;
 
     /**
      * @ORM\OneToOne(targetEntity=Picture::class, cascade={"persist", "remove"})
-     * @Groups({"countdowns_read", "homepages_read"})
+     * @Groups({"countdown_write", "homepage_write", "countdowns_read", "homepages_read"})
      */
     private $image;
 
     /**
      * @ORM\ManyToOne(targetEntity=Homepage::class, inversedBy="countdowns")
-     * @Groups({"countdowns_read"})
+     * @Groups({"countdown_write", "countdowns_read"})
      */
     private $homepage;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Product::class)
+     * @Groups({"countdown_write", "homepage_write", "countdowns_read", "homepages_read"})
+     */
+    private $product;
 
     public function getId(): ?int
     {
@@ -88,6 +98,18 @@ class Countdown
     public function setHomepage(?Homepage $homepage): self
     {
         $this->homepage = $homepage;
+
+        return $this;
+    }
+
+    public function getProduct(): ?Product
+    {
+        return $this->product;
+    }
+
+    public function setProduct(?Product $product): self
+    {
+        $this->product = $product;
 
         return $this;
     }

@@ -16,9 +16,35 @@ class Dimension
             case 'HERO-BLACK_FRIDAY':
             case 'HERO-BLACK_FRIDAY_TWO':
             case 'HERO-VALENTINES_DAY':
+            case 'COUNTDOWN-VALENTINES_DAY':
                 return 1920;
             case 'HERO-CHRISTMAS':
                 return 530;
+            case 'BANNER-DEFAULT-1-MAIN':
+            case 'BANNER-DEFAULT-1':
+            case 'BANNER-BLACK_FRIDAY_TWO-2-MAIN':
+            case 'BANNER-BLACK_FRIDAY_TWO-2':
+                return 575;
+            case 'BANNER-BLACK_FRIDAY-1-MAIN':
+            case 'BANNER-BLACK_FRIDAY-1':
+            case 'BANNER-BLACK_FRIDAY_TWO-1-MAIN':
+            case 'BANNER-BLACK_FRIDAY_TWO-1':
+            case 'BANNER-CHRISTMAS-1':
+            case 'BANNER-CHRISTMAS-1-MAIN':
+                return 370;
+            case 'BANNER-BLACK_FRIDAY-2-MAIN':
+            case 'BANNER-BLACK_FRIDAY-2':
+            case 'BANNER-VALENTINES_DAY-1':
+            case 'BANNER-VALENTINES_DAY-1-MAIN':
+            case 'COUNTDOWN-DEFAULT':
+                return 570;
+            case 'BANNER-VALENTINES_DAY-2':
+            case 'BANNER-VALENTINES_DAY-2-MAIN':
+                return 945;
+            case 'COUNTDOWN-CHRISTMAS':
+                return 549;
+            case 'COUNTDOWN-BLACK_FRIDAY':
+            case 'COUNTDOWN-BLACK_FRIDAY_TWO':
             default;
                 return 600;
         }
@@ -40,6 +66,35 @@ class Dimension
                 return 802;
             case 'HERO-CHRISTMAS':
                 return 638;
+            case 'BANNER-DEFAULT-1-MAIN':
+            case 'BANNER-BLACK_FRIDAY_TWO-2-MAIN':
+                return 610;
+            case 'BANNER-DEFAULT-1':
+            case 'BANNER-BLACK_FRIDAY_TWO-2':
+                return 295;
+            case 'BANNER-BLACK_FRIDAY-1-MAIN':
+            case 'BANNER-BLACK_FRIDAY-1':
+            case 'BANNER-BLACK_FRIDAY_TWO-1-MAIN':
+            case 'BANNER-BLACK_FRIDAY_TWO-1':
+            case 'BANNER-CHRISTMAS-1':
+            case 'BANNER-CHRISTMAS-1-MAIN':
+                return 215;
+            case 'BANNER-BLACK_FRIDAY-2-MAIN':
+            case 'BANNER-BLACK_FRIDAY-2':
+                return 347;
+            case 'BANNER-VALENTINES_DAY-1':
+            case 'BANNER-VALENTINES_DAY-1-MAIN':
+            case 'BANNER-VALENTINES_DAY-2':
+            case 'BANNER-VALENTINES_DAY-2-MAIN':
+                return 300;
+            case 'COUNTDOWN-DEFAULT':
+                return 525;
+            case 'COUNTDOWN-CHRISTMAS':
+                return 352;
+            case 'COUNTDOWN-VALENTINES_DAY':
+                return 482;
+            case 'COUNTDOWN-BLACK_FRIDAY':
+            case 'COUNTDOWN-BLACK_FRIDAY_TWO':
             default;
                 return 800;
         }
