@@ -15,6 +15,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
+use App\Entity\OrderEntity;
 use App\Entity\Touring;
 
 class CurrentUserExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
@@ -84,6 +85,13 @@ class CurrentUserExtension implements QueryCollectionExtensionInterface, QueryIt
                              ->setParameter("userId", $user->getId())
                              ->andWhere("$rootAlias.isOpen = :open")
                              ->setParameter("open", true);
+            }
+
+            if ($resourceClass == OrderEntity::class) {
+                $queryBuilder->leftJoin("$rootAlias.user","u")
+                             ->andWhere("u IS NOT NULL")
+                             ->andWhere("u.id = :userId")
+                             ->setParameter("userId", $user->getId());
             }
 
             if ($resourceClass == Product::class && ($user == null || (count($user->getRoles()) == 1 && $this->auth->isGranted('ROLE_USER')))) {

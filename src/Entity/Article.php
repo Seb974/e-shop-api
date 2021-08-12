@@ -11,6 +11,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass=ArticleRepository::class)
  * @ApiResource(
+ *      mercure={"private": false},
  *      denormalizationContext={
  *          "groups"={"article_write"},
  *          "disable_type_enforcement"=true
@@ -67,6 +68,12 @@ class Article
      * @Groups({"articles_read", "article_write"})
      */
     private $publishedAt;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"articles_read", "article_write"})
+     */
+    private $visible;
 
     public function getId(): ?int
     {
@@ -129,6 +136,18 @@ class Article
     public function setPublishedAt(?\DateTimeInterface $publishedAt): self
     {
         $this->publishedAt = $publishedAt;
+
+        return $this;
+    }
+
+    public function getVisible(): ?bool
+    {
+        return $this->visible;
+    }
+
+    public function setVisible(?bool $visible): self
+    {
+        $this->visible = $visible;
 
         return $this;
     }
