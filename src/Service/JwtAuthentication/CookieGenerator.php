@@ -17,11 +17,13 @@ class CookieGenerator
 {
     private $tokenTTL;
     private $cookieDomain;
+    private $cookieSecure;
     
-    public function __construct(string $tokenTTL, string $cookieDomain)
+    public function __construct(string $tokenTTL, string $cookieDomain, string $cookieSecure)
     {
         $this->tokenTTL = $tokenTTL;
         $this->cookieDomain = $cookieDomain;
+        $this->cookieSecure = $cookieSecure;
     }
 
     public function generate($token) : Cookie 
@@ -31,7 +33,7 @@ class CookieGenerator
                     ->withValue($token)
                     ->withDomain($this->cookieDomain)
                     ->withPath('/')
-                    ->withSecure(true)
+                    ->withSecure($this->cookieSecure == 'yes')
                     ->withHttpOnly(true)
                     ->withSameSite('lax')
                     ->withExpires($expire);

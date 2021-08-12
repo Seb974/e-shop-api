@@ -11,6 +11,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass=CatalogPriceRepository::class)
  * @ApiResource(
+ *      mercure={"private": false},
  *      normalizationContext={"groups"={"catalogPrices_read"}},
  *      collectionOperations={
  *          "GET",

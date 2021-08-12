@@ -13,6 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass=RelaypointRepository::class)
  * @ApiResource(
+ *      mercure={"private": false},
  *      denormalizationContext={
  *          "groups"={"relaypoint_write"},
  *          "disable_type_enforcement"=true

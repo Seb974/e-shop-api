@@ -10,6 +10,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * @ORM\Entity(repositoryClass=HeroRepository::class)
  * @ApiResource(
+ *      mercure={"private": false},
  *      normalizationContext={"groups"={"heroes_read"}},
  *      collectionOperations={
  *          "GET",

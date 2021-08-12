@@ -8,6 +8,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
+// mercure="object.getMercureOptions(object.getUser())"
 /**
  * @ORM\Entity(repositoryClass=MetaRepository::class)
  * @ApiResource(
@@ -26,7 +27,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          "PATCH"={"security"="is_granted('ROLE_PICKER') or is_granted('ROLE_SUPERVISOR') or object.getUser() == user"},
  *          "DELETE"={"security"="is_granted('ROLE_PICKER') or is_granted('ROLE_SUPERVISOR') or object.getUser() == user"}
  *     },
- *     mercure="object.getMercureOptions(object.getUser())"
+ *     mercure="object.getMercureOptions(object)"
  * )
  */
 class Meta
@@ -203,12 +204,22 @@ class Meta
         return $this;
     }
 
-    public function getMercureOptions($user): array
+    public function getMercureOptions($object): array
     {
-        return $user == null ? ["private" => false] : ["private" => true, 
+        if (is_null($object->getIsRelaypoint()) || !$object->getIsRelaypoint()) {
+            $user = $object->getUser();
+            return $user == null ? ["private" => false] : [
+                "private" => true, 
                 "topics" => self::$domain . "/api/users/" . $user->getId() . "/metas",
                 "normalization_context" => [ "group" => "users_read"]
-        ];
+            ];
+        } else {
+            return [
+                "private" => false,
+                "topics" => self::$domain . "/api/relaypoints/metas/" .$object->getId(),
+                "normalization_context" => [ "group" => "relaypoints_read"]
+            ];
+        }
     }
 
     public function getIsRelaypoint(): ?bool

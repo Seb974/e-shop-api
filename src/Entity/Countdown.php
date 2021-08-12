@@ -10,6 +10,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * @ORM\Entity(repositoryClass=CountdownRepository::class)
  * @ApiResource(
+ *      mercure={"private": false},
  *      denormalizationContext={
  *          "disable_type_enforcement"=true,
  *          "groups"={"countdown_write"}
@@ -24,8 +25,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *          "PUT"={"security"="is_granted('ROLE_ADMIN')"},
  *          "PATCH"={"security"="is_granted('ROLE_ADMIN')"},
  *          "DELETE"={"security"="is_granted('ROLE_ADMIN')"}
- *     }
- * )v
+ *     },
+ * )
  */
 class Countdown
 {

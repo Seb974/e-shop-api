@@ -13,6 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass=CityRepository::class)
  * @ApiResource(
+ *      mercure={"private": false},
  *      denormalizationContext={
  *          "groups"={"city_write"},
  *          "disable_type_enforcement"=true

@@ -58,7 +58,7 @@ class CurrentUserExtension implements QueryCollectionExtensionInterface, QueryIt
 
             $group = [Group::class];
             $needingAvailability = [Promotion::class];
-            $groupFilterable = [Category::class, Product::class];
+            $groupFilterable = [Category::class];       // , Product::class
 
             if (in_array($resourceClass, $group)) {
                 $queryBuilder->andWhere("$rootAlias.id = :userGroupId")
@@ -84,6 +84,13 @@ class CurrentUserExtension implements QueryCollectionExtensionInterface, QueryIt
                              ->setParameter("userId", $user->getId())
                              ->andWhere("$rootAlias.isOpen = :open")
                              ->setParameter("open", true);
+            }
+
+            if ($resourceClass == Product::class && ($user == null || (count($user->getRoles()) == 1 && $this->auth->isGranted('ROLE_USER')))) {
+                $queryBuilder->andWhere("$rootAlias.available = :available")
+                             ->setParameter("available", true)
+                             ->andWhere(":userGroup MEMBER OF $rootAlias.userGroups")
+                             ->setParameter("userGroup", $userGroup);
             }
         }
     }

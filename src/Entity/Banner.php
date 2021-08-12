@@ -10,6 +10,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * @ORM\Entity(repositoryClass=BannerRepository::class)
  * @ApiResource(
+ *      mercure={"private": false},
  *      normalizationContext={"groups"={"banners_read"}},
  *      collectionOperations={
  *          "GET",

@@ -14,6 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity(repositoryClass=ConditionRepository::class)
  * @ORM\Table(name="`condition`")
  * @ApiResource(
+ *      mercure={"private": false},
  *      normalizationContext={"groups"={"conditions_read"}},
  *      collectionOperations={
  *          "GET",
@@ -66,6 +67,12 @@ class Condition
      * @Groups({"conditions_read", "cities_read", "city_write", "relaypoints_read", "relaypoint_write"})
      */
     private $minForFree;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"conditions_read", "cities_read", "city_write", "relaypoints_read", "relaypoint_write"})
+     */
+    private $isRelaypoint;
 
     public function __construct()
     {
@@ -145,6 +152,18 @@ class Condition
     public function setMinForFree(?float $minForFree): self
     {
         $this->minForFree = $minForFree;
+
+        return $this;
+    }
+
+    public function getIsRelaypoint(): ?bool
+    {
+        return $this->isRelaypoint;
+    }
+
+    public function setIsRelaypoint(?bool $isRelaypoint): self
+    {
+        $this->isRelaypoint = $isRelaypoint;
 
         return $this;
     }

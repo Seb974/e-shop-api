@@ -43,11 +43,13 @@ services:
             $path: '%env(MERCURE_PATH)%'
             $tokenTTL: '%env(JWT_TOKEN_TTL)%'
             $cookieDomain: '%env(STRICT_DOMAIN)%'
+            $cookieSecure: '%env(COOKIE_SECURE)%'
 
     App\Service\JwtAuthentication\CookieGenerator:
         arguments:
             $tokenTTL: '%env(JWT_TOKEN_TTL)%'
             $cookieDomain: '%env(STRICT_DOMAIN)%'
+            $cookieSecure: '%env(COOKIE_SECURE)%'
 
     App\Service\CookieCleaner\CookieCleaner:
         arguments:

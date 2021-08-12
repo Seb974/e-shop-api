@@ -31,8 +31,9 @@ class CookieGenerator
     private $security;
     private $tokenTTL;
     private $cookieDomain;
+    private $cookieSecure;
     
-    public function __construct(string $key, string $domain, string $path, string $tokenTTL, string $cookieDomain, Security $security)
+    public function __construct(string $key, string $domain, string $path, string $tokenTTL, string $cookieDomain, string $cookieSecure, Security $security)
     {
         $this->key = $key;
         $this->path = $path;
@@ -40,6 +41,7 @@ class CookieGenerator
         $this->tokenTTL = $tokenTTL;
         $this->security = $security;
         $this->cookieDomain = $cookieDomain;
+        $this->cookieSecure = $cookieSecure;
         $this->config = Configuration::forSymmetricSigner(new Sha256(), InMemory::plainText($this->key));
     }
 
@@ -56,7 +58,7 @@ class CookieGenerator
                       ->withValue($token)
                       ->withDomain($this->cookieDomain)
                       ->withPath($this->path)
-                      ->withSecure(true)
+                      ->withSecure($this->cookieSecure == 'yes')
                       ->withHttpOnly(true)
                       ->withSameSite('lax')
                       ->withExpires($expiresDate);
