@@ -2,12 +2,10 @@
 
 namespace App\EventSubscriber\Article;
 
-use App\Entity\Container;
+use App\Entity\Article;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use ApiPlatform\Core\EventListener\EventPriorities;
-use App\Entity\Article;
-use App\Service\Axonaut\Container as AxonautContainer;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -30,7 +28,7 @@ class ArticleCreationSubscriber implements EventSubscriberInterface
         $result = $event->getControllerResult();
         $method = $event->getRequest()->getMethod();
 
-        if ($result instanceof Article && $method === "POST" || $method === "PUT")
+        if ($result instanceof Article && ($method === "POST" || $method === "PUT"))
             $result->setPublishedAt(new \DateTime());
     }
 }

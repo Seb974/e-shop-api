@@ -98,7 +98,7 @@ class Product
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"products_read", "product_write", "heroes_read", "homepages_read", "countdowns_read", "banners_read"})
+     * @Groups({"products_read", "product_write", "heroes_read", "homepages_read", "countdowns_read", "banners_read", "orders_read", "tourings_read"})
      */
     private $available;
 

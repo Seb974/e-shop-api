@@ -25,7 +25,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *          "enable_max_depth"=true
  *     },
  *     collectionOperations={
- *          "GET"={"security"="is_granted('ROLE_TEAM') or object.getUser() == user"},
+ *          "GET"={"security"="is_granted('ROLE_USER')"},
  *          "POST"
  *     },
  *     itemOperations={
@@ -34,7 +34,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *          "PATCH"={"security"="is_granted('ROLE_PICKER')"},
  *          "DELETE"={"security"="is_granted('ROLE_PICKER') or object.isOwner(request, object)"}
  *     },
- *     mercure="object.getMercureOptions(object.getUser())"
+ *     mercure="object.getMercureOptions(object)"
  * )
  * @ApiFilter(SearchFilter::class, properties={"status"="partial"})
  * @ApiFilter(DateFilter::class, properties={"deliveryDate"})
@@ -210,9 +210,10 @@ class OrderEntity
         return $object->getUuid() === $data;
     }
 
-    public function getMercureOptions($user): array
+    public function getMercureOptions($order): array
     {
-        $id = $user != null ? $user->getId() : 0;
+        
+        $id = $order != null && $order->getUser() != null ? $order->getUser()->getId() : 0;
         return ["private" => true, "topics" => self::$domain . "/api/users/" . $id . "/shipments"];
     }
 

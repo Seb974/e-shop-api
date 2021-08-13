@@ -78,8 +78,8 @@ class CurrentUserExtension implements QueryCollectionExtensionInterface, QueryIt
             }
 
             if ($resourceClass == Touring::class) {
-                $queryBuilder->leftJoin("$rootAlias.orderEntities","o")
-                             ->leftJoin("o.user", "u")
+                $queryBuilder->leftJoin("$rootAlias.orderEntities","z")
+                             ->leftJoin("z.user", "u")
                              ->andWhere("u IS NOT NULL")
                              ->andWhere(":userId = u.id")
                              ->setParameter("userId", $user->getId())

@@ -25,17 +25,17 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
  *     },
  *     normalizationContext={"groups"={"tourings_read"}},
  *     collectionOperations={
- *          "GET"={"security"="is_granted('ROLE_TEAM')"},
+ *          "GET"={"security"="is_granted('ROLE_USER')"},
  *          "POST"={"security"="is_granted('ROLE_TEAM')"},
  *     },
  *     itemOperations={
- *          "GET"={"security"="is_granted('ROLE_TEAM')"},
+ *          "GET"={"security"="is_granted('ROLE_USER')"},
  *          "PUT"={"security"="is_granted('ROLE_TEAM')"},
  *          "PATCH"={"security"="is_granted('ROLE_ADMIN')"},
  *          "DELETE"={"security"="is_granted('ROLE_ADMIN')"}
  *     },
  * )
- * @ApiFilter(SearchFilter::class, properties={"deliverer"="exact"})
+ * @ApiFilter(SearchFilter::class, properties={"deliverer"="exact", "orderEntities"="exact"})
  * @ApiFilter(DateFilter::class, properties={"start"=DateFilter::EXCLUDE_NULL, "end"=DateFilter::EXCLUDE_NULL})
  * @ApiFilter(BooleanFilter::class, properties={"isOpen"})
  * @ApiFilter(ExistsFilter::class, properties={"position"})
