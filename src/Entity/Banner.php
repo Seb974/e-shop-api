@@ -74,13 +74,31 @@ class Banner
      * @ORM\Column(type="boolean", nullable=true)
      * @Groups({"banners_read", "homepages_read"})
      */
-    private $main;
+    private $isMain;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
      * @Groups({"banners_read", "homepages_read"})
      */
     private $bannerNumber;
+
+    /**
+     * @ORM\Column(type="string", length=20, nullable=true)
+     * @Groups({"banners_read", "homepages_read"})
+     */
+    private $textColor;
+
+    /**
+     * @ORM\Column(type="string", length=20, nullable=true)
+     * @Groups({"banners_read", "homepages_read"})
+     */
+    private $titleColor;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"banners_read", "homepages_read"})
+     */
+    private $textShadow;
 
     public function getId(): ?int
     {
@@ -159,14 +177,14 @@ class Banner
         return $this;
     }
 
-    public function getMain(): ?bool
+    public function getIsMain(): ?bool
     {
-        return $this->main;
+        return $this->isMain;
     }
 
-    public function setMain(?bool $main): self
+    public function setIsMain(?bool $isMain): self
     {
-        $this->main = $main;
+        $this->isMain = $isMain;
 
         return $this;
     }
@@ -179,6 +197,42 @@ class Banner
     public function setBannerNumber(?int $bannerNumber): self
     {
         $this->bannerNumber = $bannerNumber;
+
+        return $this;
+    }
+
+    public function getTextColor(): ?string
+    {
+        return $this->textColor;
+    }
+
+    public function setTextColor(?string $textColor): self
+    {
+        $this->textColor = $textColor;
+
+        return $this;
+    }
+
+    public function getTitleColor(): ?string
+    {
+        return $this->titleColor;
+    }
+
+    public function setTitleColor(?string $titleColor): self
+    {
+        $this->titleColor = $titleColor;
+
+        return $this;
+    }
+
+    public function getTextShadow(): ?bool
+    {
+        return $this->textShadow;
+    }
+
+    public function setTextShadow(?bool $textShadow): self
+    {
+        $this->textShadow = $textShadow;
 
         return $this;
     }

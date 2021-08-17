@@ -28,11 +28,11 @@ class MainSelectionUpdateSubscriber implements EventSubscriberInterface
         $result = $event->getControllerResult();
         $method = $event->getRequest()->getMethod();
 
-        if ($result instanceof Banner && ($method === "POST" || $method === "PUT" || $method === "PATCH") && $result->getMain()) {
+        if ($result instanceof Banner && ($method === "POST" || $method === "PUT" || $method === "PATCH") && $result->getIsMain()) {
             $homepage = $result->getHomepage();
             foreach ($homepage->getBanners() as $banner) {
-                if ($banner->getBannerNumber() === $result->getBannerNumber() && $banner->getMain()) {
-                    $banner->setMain(false);
+                if ($banner->getBannerNumber() === $result->getBannerNumber() && $banner->getIsMain() && $result->getId() !== $banner->getId()) {
+                    $banner->setIsMain(false);
                 }
             }
         }

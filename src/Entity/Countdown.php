@@ -62,6 +62,30 @@ class Countdown
      */
     private $product;
 
+    /**
+     * @ORM\Column(type="string", length=20, nullable=true)
+     * @Groups({"countdown_write", "homepage_write", "countdowns_read", "homepages_read"})
+     */
+    private $textColor;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"countdown_write", "homepage_write", "countdowns_read", "homepages_read"})
+     */
+    private $textShadow;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"countdown_write", "homepage_write", "countdowns_read", "homepages_read"})
+     */
+    private $title;
+
+    /**
+     * @ORM\Column(type="string", length=20, nullable=true)
+     * @Groups({"countdown_write", "homepage_write", "countdowns_read", "homepages_read"})
+     */
+    private $buttonText;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -111,6 +135,54 @@ class Countdown
     public function setProduct(?Product $product): self
     {
         $this->product = $product;
+
+        return $this;
+    }
+
+    public function getTextColor(): ?string
+    {
+        return $this->textColor;
+    }
+
+    public function setTextColor(?string $textColor): self
+    {
+        $this->textColor = $textColor;
+
+        return $this;
+    }
+
+    public function getTextShadow(): ?bool
+    {
+        return $this->textShadow;
+    }
+
+    public function setTextShadow(?bool $textShadow): self
+    {
+        $this->textShadow = $textShadow;
+
+        return $this;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(?string $title): self
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function getButtonText(): ?string
+    {
+        return $this->buttonText;
+    }
+
+    public function setButtonText(?string $buttonText): self
+    {
+        $this->buttonText = $buttonText;
 
         return $this;
     }

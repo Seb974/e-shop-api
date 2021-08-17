@@ -64,6 +64,24 @@ class Hero
      */
     private $product;
 
+    /**
+     * @ORM\Column(type="string", length=20, nullable=true)
+     * @Groups({"heroes_read", "homepages_read"})
+     */
+    private $textColor;
+
+    /**
+     * @ORM\Column(type="string", length=20, nullable=true)
+     * @Groups({"heroes_read", "homepages_read"})
+     */
+    private $titleColor;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"heroes_read", "homepages_read"})
+     */
+    private $textShadow;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -125,6 +143,42 @@ class Hero
     public function setProduct(?Product $product): self
     {
         $this->product = $product;
+
+        return $this;
+    }
+
+    public function getTextColor(): ?string
+    {
+        return $this->textColor;
+    }
+
+    public function setTextColor(?string $textColor): self
+    {
+        $this->textColor = $textColor;
+
+        return $this;
+    }
+
+    public function getTitleColor(): ?string
+    {
+        return $this->titleColor;
+    }
+
+    public function setTitleColor(?string $titleColor): self
+    {
+        $this->titleColor = $titleColor;
+
+        return $this;
+    }
+
+    public function getTextShadow(): ?bool
+    {
+        return $this->textShadow;
+    }
+
+    public function setTextShadow(?bool $textShadow): self
+    {
+        $this->textShadow = $textShadow;
 
         return $this;
     }
