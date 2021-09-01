@@ -3,10 +3,13 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Core\Annotation\ApiFilter;
 use App\Repository\ResetPasswordRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 
 /**
  * @ORM\Entity(repositoryClass=ResetPasswordRepository::class)
@@ -27,6 +30,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          "DELETE"={"security"="is_granted('ROLE_ADMIN')"}
  *     }
  * )
+ * @ApiFilter(SearchFilter::class, properties={"token"="exact"})
+ * @ApiFilter(BooleanFilter::class, properties={"isUsed"})
  */
 class ResetPassword
 {
