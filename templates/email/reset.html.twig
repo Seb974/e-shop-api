@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{{ name }} : Demande de réinitialisation du mot de passe</title>
+		 	<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap" rel="stylesheet">
+            <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+            <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet"
+            	  integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    </head>
+	<body>
+        <div class="container">
+            <p>
+                Bonjour,
+            </p>
+            <br/>
+            <p>
+                Nous avons reçu une requête pour réinitialiser le mot de passe pour le compte {{ name }}, 
+                associé à l'adresse e-mail {{ reset.email }}.
+                Aucune modification n'a été faite pour le moment.
+                <br/><br/>
+                Vous pouvez réinitialiser votre mot de passe en cliquant sur le lien suivant :
+                <br/>
+                <a href="{{ root }}/#/reset-password/{{ reset.token }}">Modifier mon mot de passe</a>
+            </p>
+        </div>
+        <div class="container">
+            <p>{{ " " }}</p>
+        </div>
+        <div class="container">
+            <div class="row justify-content-end" style="margin-top: -25px; font-size: 0.9em;">
+                <div class="col align-self-end">
+                    <div>
+                        <strong>L'équipe de {{ name }}</strong><br/>
+                        {# 119 allée de Montaignac<br/>
+                        97427- Etang-Salé les Hauts<br/>
+                        02 62 34 58 58 #}
+                    </div>
+                </div>
+            </div>
+        </div>
+	</body>
+</html>

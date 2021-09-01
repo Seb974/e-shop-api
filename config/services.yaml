@@ -181,3 +181,13 @@ services:
         arguments:
             $key: '%env(IMGIX_TOKEN_KEY)%'
             $domain: '%env(IMGIX_DOMAIN)%'
+
+    App\Service\Email\Mailer:
+        arguments: 
+            $sender: '%env(EMAIL_SENDER)%'
+
+    App\Service\Email\ResetPasswordNotifier:
+        arguments:
+            $appName: '%env(APP_NAME)%'
+            $publicRoot: '%env(PUBLIC_DOMAIN)%'
+            
