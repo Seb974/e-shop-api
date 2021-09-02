@@ -3,13 +3,14 @@
 namespace App\Controller;
 
 use App\Entity\Meta;
-use App\Entity\ResetPassword;
 use App\Entity\User;
+use App\Entity\ResetPassword;
 use App\Repository\UserRepository;
-use App\Service\Email\ResetPasswordNotifier;
 use App\Service\Request\PostRequest;
-use App\Service\Security\TokenGenerator;
 use App\Service\User\OrdersAnonymizer;
+use App\Service\Security\TokenGenerator;
+use App\Service\Email\ResetPasswordNotifier;
+use App\Service\Axonaut\User as AxonautUser;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -17,6 +18,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Security\Http\Authentication\AuthenticationSuccessHandler;
 /**
  * SecurityController
  *
@@ -130,26 +132,31 @@ class SecurityController extends AbstractController
      * Informations :
      * Authenticate a user using Facebook
      */
-    public function logWithFacebook(Request $request, PostRequest $postRequest, UserRepository $userRepository, JWTTokenManagerInterface $JWTManager, UserPasswordEncoderInterface $encoder)
+    public function logWithFacebook(Request $request, PostRequest $postRequest, UserRepository $userRepository, JWTTokenManagerInterface $JWTManager, UserPasswordEncoderInterface $encoder, AuthenticationSuccessHandler $authenticationSuccessHandler, AxonautUser $axonaut)
     {
         $data = $postRequest->getData($request);
         $user = $userRepository->findOneBy(['email' => $data->get('email')]);
 
         if (is_null($user))
-            $user = $this->createNewFacebookUser($data, $encoder);
+            $user = $this->createNewFacebookUser($data, $encoder, $axonaut);
 
-        $authenticationSuccessHandler = $this->container->get('lexik_jwt_authentication.handler.authentication_success');
         return $authenticationSuccessHandler->handleAuthenticationSuccess($user, $JWTManager->create($user));
     }
 
-    private function createNewFacebookUser($data, $encoder)
+    private function createNewFacebookUser($data, $encoder, $axonaut)
     {
         $metas = new Meta();
         $user = new User();
+
         $user->setName($data->get('name'))
              ->setEmail($data->get('email'))
+             ->setRoles(['ROLE_USER'])
              ->setPassword($encoder->encodePassword($user, $data->get('userID')))
+             ->setBillingDetails(true)
              ->setMetas($metas);
+
+        $accountingId = $axonaut->createUser($user);
+        $user->setAccountingId($accountingId);
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($user);
