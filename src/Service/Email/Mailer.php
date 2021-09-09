@@ -22,7 +22,7 @@ class Mailer
             // throw new \Exception("L'envoi d'email a merdé");
             $message = new \Swift_Message();
             $message->setSubject($subject)
-                    ->setFrom($this->sender)
+                    ->setFrom([$this->sender => 'Frais Péi'])
                     ->setTo($sendTo)
                     ->setBody($this->templating->render($template, $args), 'text/html');
             $this->mailer->send($message);

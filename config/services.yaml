@@ -197,3 +197,9 @@ services:
             $user: '%env(DB_USER)%'
             $pass: '%env(DB_PASS)%'
             $path: '%env(DB_BACKUP_PATH)%'
+
+    App\Service\Email\BackupSender:
+        arguments: 
+            $sender: '%env(EMAIL_SENDER)%'
+            $appName: '%env(APP_NAME)%'
+            $receptor: '%env(BACKUP_RECEPTOR)%'
