@@ -190,4 +190,10 @@ services:
         arguments:
             $appName: '%env(APP_NAME)%'
             $publicRoot: '%env(PUBLIC_DOMAIN)%'
-            
+        
+    App\Command\BackupCommand:
+        arguments:
+            $name: '%env(DB_NAME)%'
+            $user: '%env(DB_USER)%'
+            $pass: '%env(DB_PASS)%'
+            $path: '%env(DB_BACKUP_PATH)%'

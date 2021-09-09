@@ -30,3 +30,7 @@
 ###> MacOS ###
 /.DS_Store
 ###< MacOS ###
+
+###> MacOS ###
+/db/
+###< MacOS ###

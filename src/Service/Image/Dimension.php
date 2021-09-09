@@ -31,6 +31,8 @@ class Dimension
             case 'BANNER-BLACK_FRIDAY_TWO-1':
             case 'BANNER-CHRISTMAS-1':
             case 'BANNER-CHRISTMAS-1-MAIN':
+            case 'ABOUTUS':
+            case 'ABOUT-US':
                 return 370;
             case 'BANNER-BLACK_FRIDAY-2-MAIN':
             case 'BANNER-BLACK_FRIDAY-2':
@@ -78,6 +80,8 @@ class Dimension
             case 'BANNER-BLACK_FRIDAY_TWO-1':
             case 'BANNER-CHRISTMAS-1':
             case 'BANNER-CHRISTMAS-1-MAIN':
+            case 'ABOUTUS':
+            case 'ABOUT-US':
                 return 215;
             case 'BANNER-BLACK_FRIDAY-2-MAIN':
             case 'BANNER-BLACK_FRIDAY-2':

@@ -129,6 +129,12 @@
     "lcobucci/jwt": {
         "version": "4.1.4"
     },
+    "league/flysystem": {
+        "version": "2.2.3"
+    },
+    "league/mime-type-detection": {
+        "version": "1.7.0"
+    },
     "lexik/jwt-authentication-bundle": {
         "version": "2.5",
         "recipe": {
