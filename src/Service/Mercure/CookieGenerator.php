@@ -72,6 +72,7 @@ class CookieGenerator
             $this->domain . "/api/users/{id}/metas",                // metas users updates
             $this->domain . "/api/users/{id}/shipments",            // shipments updates
             $this->domain . "/api/provisions/{id}",                 // provisions updates
+            $this->domain . "/api/messages/{id}",                   // messages updates
             $this->domain . "/api/private",                         // general updates (unused)
         ];
         $selfPrivateChannels = [

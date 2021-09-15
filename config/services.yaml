@@ -6,6 +6,7 @@
 parameters:
     pics_directory: '%kernel.project_dir%/public/uploads/pictures'
     app.path.picture: /uploads/pictures
+    app.name: '%env(APP_NAME)%'
 
 services:
     # default configuration for services in *this* file
@@ -203,3 +204,7 @@ services:
             $sender: '%env(EMAIL_SENDER)%'
             $appName: '%env(APP_NAME)%'
             $receptor: '%env(BACKUP_RECEPTOR)%'
+
+    App\Service\Email\MessageResponseSender:
+        arguments:
+            $appName: '%env(APP_NAME)%'

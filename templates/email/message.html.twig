@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>{{ name }} : Demande de réinitialisation du mot de passe</title>
+        <title>RE : {{ message.subject }}</title>
 		 	<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap" rel="stylesheet">
             <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
             <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet"
@@ -11,27 +11,27 @@
 	<body>
         <div class="container">
             <p>
-                Bonjour,
+                Bonjour {{ message.name }},
             </p>
             <br/>
             <p>
-                Nous avons reçu une requête pour réinitialiser le mot de passe pour le compte {{ name }}, 
-                associé à l'adresse e-mail {{ reset.email }}.
-                Aucune modification n'a été faite pour le moment.
+                Voici ci-dessous notre réponse à votre sollicitation du {{ message.sentAt|date("d/m/Y") }} :
                 <br/><br/>
-                Vous pouvez réinitialiser votre mot de passe en cliquant sur le lien suivant :
-                <br/>
-                <a href="{{ root }}/#/reset-password/{{ reset.token }}">Modifier mon mot de passe</a>
+                {{ message.response }}
+                <br/><br/>
             </p>
         </div>
+        <br/>
         <div class="container">
             <p>{{ " " }}</p>
         </div>
         <div class="container">
             <div class="row justify-content-end" style="margin-top: -25px; font-size: 0.9em;">
                 <div class="col align-self-end">
+                    <p>Bien cordialement, </p><br/>
                     <div>
                         <strong>L'équipe de {{ name }}</strong><br/>
+
                     </div>
                 </div>
             </div>

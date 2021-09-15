@@ -10,6 +10,8 @@ class Dimension
         {
             case 'ARTICLE':
                 return 750;
+            case 'AGENT':
+                return 270;
             case 'PRODUCT':
                 return 600;
             case 'HERO-DEFAULT':
@@ -17,6 +19,7 @@ class Dimension
             case 'HERO-BLACK_FRIDAY_TWO':
             case 'HERO-VALENTINES_DAY':
             case 'COUNTDOWN-VALENTINES_DAY':
+            case 'ABOUT-US-HEADER':
                 return 1920;
             case 'HERO-CHRISTMAS':
                 return 530;
@@ -31,8 +34,7 @@ class Dimension
             case 'BANNER-BLACK_FRIDAY_TWO-1':
             case 'BANNER-CHRISTMAS-1':
             case 'BANNER-CHRISTMAS-1-MAIN':
-            case 'ABOUTUS':
-            case 'ABOUT-US':
+            case 'ABOUT-US-BANNER':
                 return 370;
             case 'BANNER-BLACK_FRIDAY-2-MAIN':
             case 'BANNER-BLACK_FRIDAY-2':
@@ -58,8 +60,12 @@ class Dimension
         {
             case 'ARTICLE':
                 return 440;
+            case 'AGENT':
+                return 330;
             case 'HERO-DEFAULT':
                 return 775;
+            case 'ABOUT-US-HEADER':
+                return 750;
             case 'PRODUCT':
             case 'HERO-BLACK_FRIDAY':
             case 'HERO-BLACK_FRIDAY_TWO':
@@ -80,8 +86,7 @@ class Dimension
             case 'BANNER-BLACK_FRIDAY_TWO-1':
             case 'BANNER-CHRISTMAS-1':
             case 'BANNER-CHRISTMAS-1-MAIN':
-            case 'ABOUTUS':
-            case 'ABOUT-US':
+            case 'ABOUT-US-BANNER':
                 return 215;
             case 'BANNER-BLACK_FRIDAY-2-MAIN':
             case 'BANNER-BLACK_FRIDAY-2':
