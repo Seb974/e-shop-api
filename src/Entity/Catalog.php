@@ -11,6 +11,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass=CatalogRepository::class)
  * @ApiResource(
+ *      mercure={"private": false},
  *      normalizationContext={"groups"={"catalogs_read"}},
  *      collectionOperations={
  *          "GET",
@@ -93,6 +94,12 @@ class Catalog
      * @Groups({"catalogs_read", "catalogTaxes_read"})
      */
     private $zoom;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"catalogs_read", "catalogTaxes_read", "catalogPrices_read", "taxes_read", "containers_read", "products_read", "conditions_read", "cities_read", "orders_read", "deliverers_read", "categories_read", "restrictions_read"})
+     */
+    private $isActive;
 
     public function getId(): ?int
     {
@@ -215,6 +222,18 @@ class Catalog
     public function setZoom(?int $zoom): self
     {
         $this->zoom = $zoom;
+
+        return $this;
+    }
+
+    public function getIsActive(): ?bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(?bool $isActive): self
+    {
+        $this->isActive = $isActive;
 
         return $this;
     }

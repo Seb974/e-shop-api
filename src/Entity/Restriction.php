@@ -36,25 +36,25 @@ class Restriction
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"restrictions_read", "restriction_write", "categories_read", "category_write"})
+     * @Groups({"restrictions_read", "restriction_write", "categories_read", "category_write", "products_read"})
      */
     private $id;
 
     /**
      * @ORM\ManyToOne(targetEntity=Catalog::class)
-     * @Groups({"restrictions_read", "restriction_write", "categories_read", "category_write"})
+     * @Groups({"restrictions_read", "restriction_write", "categories_read", "category_write", "products_read"})
      */
     private $catalog;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"restrictions_read", "restriction_write", "categories_read", "category_write"})
+     * @Groups({"restrictions_read", "restriction_write", "categories_read", "category_write", "products_read"})
      */
     private $quantity;
 
     /**
      * @ORM\Column(type="string", length=15, nullable=true)
-     * @Groups({"restrictions_read", "restriction_write", "categories_read", "category_write"})
+     * @Groups({"restrictions_read", "restriction_write", "categories_read", "category_write", "products_read"})
      */
     private $unit;
 
