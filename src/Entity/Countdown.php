@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\CountdownRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -85,6 +87,17 @@ class Countdown
      * @Groups({"countdown_write", "homepage_write", "countdowns_read", "homepages_read"})
      */
     private $buttonText;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Catalog::class)
+     * @Groups({"countdown_write", "homepage_write", "countdowns_read", "homepages_read"})
+     */
+    private $catalogs;
+
+    public function __construct()
+    {
+        $this->catalogs = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -183,6 +196,30 @@ class Countdown
     public function setButtonText(?string $buttonText): self
     {
         $this->buttonText = $buttonText;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Catalog[]
+     */
+    public function getCatalogs(): Collection
+    {
+        return $this->catalogs;
+    }
+
+    public function addCatalog(Catalog $catalog): self
+    {
+        if (!$this->catalogs->contains($catalog)) {
+            $this->catalogs[] = $catalog;
+        }
+
+        return $this;
+    }
+
+    public function removeCatalog(Catalog $catalog): self
+    {
+        $this->catalogs->removeElement($catalog);
 
         return $this;
     }
