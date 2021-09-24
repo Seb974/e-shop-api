@@ -208,3 +208,9 @@ services:
     App\Service\Email\MessageResponseSender:
         arguments:
             $appName: '%env(APP_NAME)%'
+
+    App\Service\Email\NewsletterSubscriber:
+        arguments: 
+            $sender: '%env(EMAIL_SENDER)%'
+            $appName: '%env(APP_NAME)%'
+            $receptor: '%env(AXONAUT_PROSPECT_RECEPTOR)%'

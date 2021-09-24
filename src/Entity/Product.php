@@ -140,7 +140,7 @@ class Product
 
     /**
      * @ORM\ManyToOne(targetEntity=Tax::class)
-     * @Groups({"products_read", "product_write"})
+     * @Groups({"products_read", "product_write", "orders_read", "items_read", "tourings_read"})
      */
     private $tax;
 

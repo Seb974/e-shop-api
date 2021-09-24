@@ -30,19 +30,19 @@ class CatalogTax
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"catalogTaxes_read", "tax_write", "deliverers_read"})
+     * @Groups({"catalogTaxes_read", "tax_write", "deliverers_read", "orders_read", "items_read", "tourings_read"})
      */
     private $id;
 
     /**
      * @ORM\ManyToOne(targetEntity=Catalog::class)
-     * @Groups({"catalogTaxes_read", "taxes_read", "products_read", "conditions_read", "cities_read", "containers_read", "tax_write", "deliverers_read"})
+     * @Groups({"catalogTaxes_read", "taxes_read", "products_read", "conditions_read", "cities_read", "containers_read", "tax_write", "deliverers_read", "orders_read", "items_read", "tourings_read"})
      */
     private $catalog;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"catalogTaxes_read", "taxes_read", "products_read", "conditions_read", "cities_read", "containers_read", "tax_write", "deliverers_read"})
+     * @Groups({"catalogTaxes_read", "taxes_read", "products_read", "conditions_read", "cities_read", "containers_read", "tax_write", "deliverers_read", "orders_read", "items_read", "tourings_read"})
      */
     private $percent;
 

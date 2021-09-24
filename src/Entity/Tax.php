@@ -38,20 +38,20 @@ class Tax
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"taxes_read", "products_read", "conditions_read", "cities_read", "containers_read", "tax_write", "deliverers_read"})
+     * @Groups({"taxes_read", "products_read", "conditions_read", "cities_read", "containers_read", "tax_write", "deliverers_read", "orders_read", "items_read", "tourings_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=120, nullable=true)
-     * @Groups({"taxes_read", "products_read", "conditions_read", "cities_read", "containers_read", "tax_write", "deliverers_read"})
+     * @Groups({"taxes_read", "products_read", "conditions_read", "cities_read", "containers_read", "tax_write", "deliverers_read", "orders_read", "items_read", "tourings_read"})
      * @Assert\NotBlank(message="Un nom est obligatoire.")
      */
     private $name;
 
     /**
      * @ORM\OneToMany(targetEntity=CatalogTax::class, mappedBy="tax", cascade={"persist", "remove"})
-     * @Groups({"taxes_read", "products_read", "conditions_read", "cities_read", "containers_read", "tax_write", "deliverers_read"})
+     * @Groups({"taxes_read", "products_read", "conditions_read", "cities_read", "containers_read", "tax_write", "deliverers_read", "orders_read", "items_read", "tourings_read"})
      */
     private $catalogTaxes;
 

@@ -104,6 +104,18 @@ class Seller
      */
     private $totalToPayTTC;
 
+    /**
+     * @ORM\OneToOne(targetEntity=Picture::class, cascade={"persist", "remove"})
+     * @Groups({"sellers_read"})
+     */
+    private $image;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"sellers_read"})
+     */
+    private $isActive;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -254,6 +266,30 @@ class Seller
     public function setTotalToPayTTC(?float $totalToPayTTC): self
     {
         $this->totalToPayTTC = $totalToPayTTC;
+
+        return $this;
+    }
+
+    public function getImage(): ?Picture
+    {
+        return $this->image;
+    }
+
+    public function setImage(?Picture $image): self
+    {
+        $this->image = $image;
+
+        return $this;
+    }
+
+    public function getIsActive(): ?bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(?bool $isActive): self
+    {
+        $this->isActive = $isActive;
 
         return $this;
     }

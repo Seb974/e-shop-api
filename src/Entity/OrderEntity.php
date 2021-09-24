@@ -122,7 +122,7 @@ class OrderEntity
 
     /**
      * @ORM\ManyToOne(targetEntity=Catalog::class)
-     * @Groups({"admin:orders_read", "order_write"})
+     * @Groups({"admin:orders_read", "order_write", "orders_read", "tourings_read"})
      */
     private $catalog;
 
@@ -134,7 +134,7 @@ class OrderEntity
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"orders_read", "order_write"})
+     * @Groups({"orders_read", "order_write", "tourings_read"})
      */
     private $paymentId;
 
@@ -170,7 +170,7 @@ class OrderEntity
 
     /**
      * @ORM\OneToMany(targetEntity=Package::class, mappedBy="orderEntity", cascade={"persist", "remove"})
-     * @Groups({"orders_read", "order_write", "tourings_read", "touring_write"})
+     * @Groups({"admin:orders_read", "orders_read", "order_write", "tourings_read", "touring_write"})
      */
     private $packages;
 
@@ -197,6 +197,12 @@ class OrderEntity
      * @Groups({"admin:orders_read", "order_write"})
      */
     private $invoiceId;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class)
+     * @Groups({"admin:orders_read", "order_write"})
+     */
+    private $preparator;
 
     public function __construct()
     {
@@ -542,6 +548,18 @@ class OrderEntity
     public function setInvoiceId(?int $invoiceId): self
     {
         $this->invoiceId = $invoiceId;
+
+        return $this;
+    }
+
+    public function getPreparator(): ?User
+    {
+        return $this->preparator;
+    }
+
+    public function setPreparator(?User $preparator): self
+    {
+        $this->preparator = $preparator;
 
         return $this;
     }

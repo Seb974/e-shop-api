@@ -11,7 +11,8 @@ class Dimension
             case 'ARTICLE':
                 return 750;
             case 'AGENT':
-                return 270;
+            case 'SELLER-LOGO':
+                return 180;
             case 'PRODUCT':
                 return 600;
             case 'HERO-DEFAULT':
@@ -62,6 +63,8 @@ class Dimension
                 return 440;
             case 'AGENT':
                 return 330;
+            case 'SELLER-LOGO':
+                return 120;
             case 'HERO-DEFAULT':
                 return 775;
             case 'ABOUT-US-HEADER':

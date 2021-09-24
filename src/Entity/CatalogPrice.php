@@ -31,19 +31,19 @@ class CatalogPrice
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"catalogPrices_read", "containers_read", "container_write"})
+     * @Groups({"catalogPrices_read", "containers_read", "container_write", "packages_read", "orders_read"})
      */
     private $id;
 
     /**
      * @ORM\ManyToOne(targetEntity=Catalog::class)
-     * @Groups({"catalogPrices_read", "containers_read", "container_write"})
+     * @Groups({"catalogPrices_read", "containers_read", "container_write", "packages_read", "orders_read"})
      */
     private $catalog;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"catalogPrices_read", "containers_read", "container_write"})
+     * @Groups({"catalogPrices_read", "containers_read", "container_write", "packages_read", "orders_read"})
      */
     private $amount;
 
