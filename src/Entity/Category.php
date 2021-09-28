@@ -34,7 +34,7 @@ class Category
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"categories_read", "products_read", "category_write"})
+     * @Groups({"categories_read", "products_read", "category_write", "banners_read", "countdowns_read", "heroes_read", "homepages_read"})
      */
     private $id;
 

@@ -94,6 +94,12 @@ class Countdown
      */
     private $catalogs;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Category::class)
+     * @Groups({"countdown_write", "homepage_write", "countdowns_read", "homepages_read"})
+     */
+    private $category;
+
     public function __construct()
     {
         $this->catalogs = new ArrayCollection();
@@ -220,6 +226,18 @@ class Countdown
     public function removeCatalog(Catalog $catalog): self
     {
         $this->catalogs->removeElement($catalog);
+
+        return $this;
+    }
+
+    public function getCategory(): ?Category
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?Category $category): self
+    {
+        $this->category = $category;
 
         return $this;
     }

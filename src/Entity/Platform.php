@@ -55,6 +55,18 @@ class Platform
      */
     private $pickers;
 
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     * @Groups({"platforms_read", "platform_write"})
+     */
+    private $notices;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     * @Groups({"platforms_read", "platform_write"})
+     */
+    private $terms;
+
     public function __construct()
     {
         $this->pickers = new ArrayCollection();
@@ -109,6 +121,30 @@ class Platform
     public function removePicker(User $picker): self
     {
         $this->pickers->removeElement($picker);
+
+        return $this;
+    }
+
+    public function getNotices(): ?string
+    {
+        return $this->notices;
+    }
+
+    public function setNotices(?string $notices): self
+    {
+        $this->notices = $notices;
+
+        return $this;
+    }
+
+    public function getTerms(): ?string
+    {
+        return $this->terms;
+    }
+
+    public function setTerms(?string $terms): self
+    {
+        $this->terms = $terms;
 
         return $this;
     }

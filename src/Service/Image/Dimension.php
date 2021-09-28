@@ -9,6 +9,7 @@ class Dimension
         switch(strtoupper($instance))
         {
             case 'ARTICLE':
+            case 'PLATFORM':
                 return 750;
             case 'AGENT':
             case 'SELLER-LOGO':
@@ -29,12 +30,16 @@ class Dimension
             case 'BANNER-BLACK_FRIDAY_TWO-2-MAIN':
             case 'BANNER-BLACK_FRIDAY_TWO-2':
                 return 575;
+            case 'BANNER-CHRISTMAS-1':
+            case 'BANNER-CHRISTMAS-1-MAIN':
+                return 580;
+            case 'BANNER-CHRISTMAS-2':
+            case 'BANNER-CHRISTMAS-2-MAIN':
+                return 626;
             case 'BANNER-BLACK_FRIDAY-1-MAIN':
             case 'BANNER-BLACK_FRIDAY-1':
             case 'BANNER-BLACK_FRIDAY_TWO-1-MAIN':
             case 'BANNER-BLACK_FRIDAY_TWO-1':
-            case 'BANNER-CHRISTMAS-1':
-            case 'BANNER-CHRISTMAS-1-MAIN':
             case 'ABOUT-US-BANNER':
                 return 370;
             case 'BANNER-BLACK_FRIDAY-2-MAIN':
@@ -60,6 +65,7 @@ class Dimension
         switch(strtoupper($instance))
         {
             case 'ARTICLE':
+            case 'PLATFORM':
                 return 440;
             case 'AGENT':
                 return 330;
@@ -69,6 +75,13 @@ class Dimension
                 return 775;
             case 'ABOUT-US-HEADER':
                 return 750;
+            case 'BANNER-CHRISTMAS-1':
+                return 295;
+            case 'BANNER-CHRISTMAS-1-MAIN':
+                return 610;
+            case 'BANNER-CHRISTMAS-2':
+            case 'BANNER-CHRISTMAS-2-MAIN':
+                return 310;
             case 'PRODUCT':
             case 'HERO-BLACK_FRIDAY':
             case 'HERO-BLACK_FRIDAY_TWO':
