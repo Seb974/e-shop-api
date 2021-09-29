@@ -67,9 +67,22 @@ class Platform
      */
     private $terms;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Social::class, mappedBy="platform", cascade={"persist", "remove"})
+     * @Groups({"platforms_read", "platform_write"})
+     */
+    private $socials;
+
+    /**
+     * @ORM\Column(type="string", length=120, nullable=true)
+     * @Groups({"platforms_read", "platform_write"})
+     */
+    private $email;
+
     public function __construct()
     {
         $this->pickers = new ArrayCollection();
+        $this->socials = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -145,6 +158,48 @@ class Platform
     public function setTerms(?string $terms): self
     {
         $this->terms = $terms;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Social[]
+     */
+    public function getSocials(): Collection
+    {
+        return $this->socials;
+    }
+
+    public function addSocial(Social $social): self
+    {
+        if (!$this->socials->contains($social)) {
+            $this->socials[] = $social;
+            $social->setPlatform($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSocial(Social $social): self
+    {
+        if ($this->socials->removeElement($social)) {
+            // set the owning side to null (unless already changed)
+            if ($social->getPlatform() === $this) {
+                $social->setPlatform(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(?string $email): self
+    {
+        $this->email = $email;
 
         return $this;
     }
