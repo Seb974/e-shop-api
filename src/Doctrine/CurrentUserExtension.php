@@ -77,7 +77,7 @@ class CurrentUserExtension implements QueryCollectionExtensionInterface, QueryIt
                              ->setParameter("today", new \DateTime());
             }
 
-            if ($resourceClass == Touring::class) {
+            if ($resourceClass == Touring::class && !is_null($user)) {
                 $queryBuilder->leftJoin("$rootAlias.orderEntities","z")
                              ->leftJoin("z.user", "u")
                              ->andWhere("u IS NOT NULL")
@@ -87,7 +87,7 @@ class CurrentUserExtension implements QueryCollectionExtensionInterface, QueryIt
                              ->setParameter("open", true);
             }
 
-            if ($resourceClass == OrderEntity::class) {
+            if ($resourceClass == OrderEntity::class && !is_null($user)) {
                 $queryBuilder->leftJoin("$rootAlias.user","u")
                              ->andWhere("u IS NOT NULL")
                              ->andWhere("u.id = :userId")
