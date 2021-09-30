@@ -65,6 +65,12 @@ class City
      */
     private $zone;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Catalog::class)
+     * @Groups({"cities_read", "city_write", "zones_read", "zone_write"})
+     */
+    private $catalog;
+
     public function __construct()
     {
         $this->conditions = new ArrayCollection();
@@ -131,6 +137,18 @@ class City
     public function setZone(?Zone $zone): self
     {
         $this->zone = $zone;
+
+        return $this;
+    }
+
+    public function getCatalog(): ?Catalog
+    {
+        return $this->catalog;
+    }
+
+    public function setCatalog(?Catalog $catalog): self
+    {
+        $this->catalog = $catalog;
 
         return $this;
     }
