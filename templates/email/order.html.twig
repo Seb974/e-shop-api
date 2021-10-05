@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Récapitulatif de votre commande N°{{ "%'010.10s"|format(order.id) }}</title>
+        <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet"
+                integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    </head>
+	<body>
+        <div class="container">
+            <p>
+                Bonjour {{ order.name }}, 
+            </p>
+            <p>
+                Nous avons bien reçu votre commande et nous vous remercions pour votre confiance ! <br/>
+                Celle-ci vous sera {{ order.packages is not defined or order.packages is null or order.packages|length == 0 ? "livrée" : "expédiée" }} le {{ order.deliveryDate|date("d/m/Y") }} {{ order.packages is not defined or order.packages is null or order.packages|length == 0 ? "" : "et vous serez livré par Chronopost dans les 48 à 72 heures suivantes" }} à l'adresse ci-dessous :
+                <br/><br/>
+                <i>{{ order.metas.address }}</i><br/>
+                <i>{{ order.metas.address2 }}</i><br/>
+                <i>{{ order.metas.zipcode }} - {{ order.metas.city }}</i><br/>
+                <br/>
+            </p>
+            {% if order.user is not defined or order.user is null %}
+            {% else %}
+                <p> Vous pouvez dés à présent suivre l'évolution de votre commande sur <a href="{{ website }}">{{ name }}</a> dans la rubrique "Mes commandes".</p>
+            {% endif %}
+            {% if order.trackIds is not defined or order.trackIds is null or order.trackIds|length == 0 %}
+            {% else %}
+                <p>Une fois que celle-ci sera prise en charge par Chronopost, vous pourrez la suivre via notre site ou sur <a href="https://www.chronopost.fr/fr/suivi-colis">Chronopost</a> avec {{ order.trackIds|length > 1 ? 'les codes suivants' : 'le code suivant' }} :
+                    <div class="row justify-content-center" style="width: 90%; margin:auto; text-align: center;">
+                        <div class="col align-self-center">
+                            <br/><br/>
+                            <h3 style="font-size: 1.5em;"><strong>
+                                {% for track in order.trackIds %}
+                                    {{ track }} {{ loop.index == loop.last ? ' ' : ', ' }}
+                                {% endfor %}
+                            </strong></h3>
+                        </div>
+                    </div>
+                    <br/>
+                </p>
+            {% endif %}
+            <p>Voici ci-dessous, le récapitulatif de votre commande : </p>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Produit</th>
+                        <th>{{ " " }}</th>
+                        <th>Quantité</th>
+                        <th>{{ " " }}</th>
+                        <th>Prix TTC</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set totalTTC, totalTax = 0, 0 %}
+                    {% for item in order.items %}
+                        {% set itemPriceTTC = (item.orderedQty * item.price * (1 + item.taxRate))|round(2) %}
+                        {% set totalTax = totalTax + (item.orderedQty * item.price * item.taxRate)|round(2) %}
+                        {% set totalTTC = totalTTC + itemPriceTTC %}
+                        <tr>
+                            <td>{{ item.product.name }}</td>
+                            <th>{{ " " }}</th>
+                            <td>{{ item.orderedQty }} {{ item.unit }}</td>
+                            <th>{{ " " }}</th>
+                            <td> {{ itemPriceTTC|number_format(2, ',', ' ') }} €</td>
+                        </tr>
+                    {% endfor %}
+                    {% if order.packages is not defined or order.packages is null or order.packages|length == 0 %}
+                    {% else %}
+                        {% for package in order.packages %}
+                            {% set packagePrice, packageTax = 0, 0 %}
+                            {% for catalogTax in package.container.tax.catalogTaxes %}
+                                {% if catalogTax.catalog.id == order.catalog.id %}
+                                    {% set packageTax = catalogTax.percent %}
+                                {% endif %}
+                            {% endfor %}
+                            {% for catalogPrice in package.container.catalogPrices %}
+                                {% if catalogPrice.catalog.id == order.catalog.id %}
+                                    {% set packagePrice = catalogPrice.amount %}
+                                {% endif %}
+                            {% endfor %}
+                            {% set packagePriceTTC = (package.quantity * packagePrice * (1 + packageTax))|round(2) %}
+                            {% set totalTax = totalTax + (package.quantity * packagePrice * packageTax)|round(2) %}
+                            {% set totalTTC = totalTTC + packagePriceTTC %}
+                            <tr style="line-height: 0.7em;">
+                                <td>{{ package.container.name }}</td>
+                                <th>{{ " " }}</th>
+                                <td>{{ package.quantity }} U</td>
+                                <th>{{ " " }}</th>
+                                <td>{{ packagePriceTTC|number_format(2, ',', ' ') }} €</td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4"><strong>Total TTC</strong></td>
+                        <td><strong>{{ (totalTTC|round(2))|number_format(2, ',', ' ') }} €</strong></td>
+                    </tr>
+                    <tr>
+                        <td colspan="4"><strong>Dont TVA</strong></td>
+                        <td><strong>{{ (totalTax|round(2))|number_format(2, ',', ' ') }} €</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+            <br/>
+            <p>A très bientôt {{ order.name }}.</p>
+            <br/>
+        </div>
+        <div class="container">
+            <p>{{ " " }}</p>
+        </div>
+        <div class="container">
+            <div class="row justify-content-end" style="margin-top: -25px; font-size: 0.9em;">
+                <div class="col align-self-end">
+                    <p>Bien cordialement, </p><br/>
+                    <div>
+                        <strong>L'équipe de {{ name }}</strong><br/>
+                    </div>
+                </div>
+            </div>
+        </div>
+	</body>
+</html>

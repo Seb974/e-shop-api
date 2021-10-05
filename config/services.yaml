@@ -214,3 +214,8 @@ services:
             $sender: '%env(EMAIL_SENDER)%'
             $appName: '%env(APP_NAME)%'
             $receptor: '%env(AXONAUT_PROSPECT_RECEPTOR)%'
+
+    App\Service\Email\OrderConfirmer:
+        arguments:
+            $appName: '%env(APP_NAME)%'
+            $website: '%env(PUBLIC_DOMAIN)%'

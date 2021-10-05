@@ -14,6 +14,7 @@ use App\Service\Promotion\PromotionUseCounter;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use ApiPlatform\Core\EventListener\EventPriorities;
 use App\Service\Chronopost\Chronopost;
+use App\Service\Email\OrderConfirmer;
 use App\Service\Seller\SellerAccount;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -22,16 +23,17 @@ class OrderCreationSubscriber implements EventSubscriberInterface
     private $security;
     private $chronopost;
     private $constructor;
-    private $userGroupDefiner;
     private $adminDomain;
     private $publicDomain;
     private $stockManager;
     private $sellerAccount;
+    private $orderConfirmer;
     private $userOrderCounter;
+    private $userGroupDefiner;
     private $productSalesCounter;
     private $promotionUseCounter;
 
-    public function __construct($admin, $public, Constructor $constructor, Security $security, UserGroupDefiner $userGroupDefiner, UserOrderCounter $userOrderCounter, ProductSalesCounter $productSalesCounter, StockManager $stockManager, PromotionUseCounter $promotionUseCounter, SellerAccount $sellerAccount, Chronopost $chronopost)
+    public function __construct($admin, $public, Constructor $constructor, Security $security, UserGroupDefiner $userGroupDefiner, UserOrderCounter $userOrderCounter, ProductSalesCounter $productSalesCounter, StockManager $stockManager, PromotionUseCounter $promotionUseCounter, SellerAccount $sellerAccount, Chronopost $chronopost, OrderConfirmer $orderConfirmer)
     {
         $this->adminDomain = $admin;
         $this->security = $security;
@@ -40,6 +42,7 @@ class OrderCreationSubscriber implements EventSubscriberInterface
         $this->constructor = $constructor;
         $this->stockManager = $stockManager;
         $this->sellerAccount = $sellerAccount;
+        $this->orderConfirmer = $orderConfirmer;
         $this->userOrderCounter = $userOrderCounter;
         $this->userGroupDefiner = $userGroupDefiner;
         $this->productSalesCounter = $productSalesCounter;
@@ -80,6 +83,8 @@ class OrderCreationSubscriber implements EventSubscriberInterface
         }
         if (($method === "POST" || $method === "PUT") && $order->getStatus() === "WAITING") {
             $this->updateEntitiesCounters($order);
+            if ($userGroup->getOnlinePayment())
+                $this->orderConfirmer->notify($order);
             if ($order->getCatalog()->getNeedsParcel())
                 $this->chronopost->setReservationNumbers($order);
         }

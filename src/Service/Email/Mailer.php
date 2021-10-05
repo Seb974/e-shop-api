@@ -27,6 +27,7 @@ class Mailer
             $status = $return !== false && $return > 0 ? 'done' : 'failed';
         } catch (\Exception $e) {
             $status = 'failed';
+            dump($e->getMessage());
         } finally {
             return $status;
         }
