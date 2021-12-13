@@ -20,12 +20,12 @@ final class Version20210927050212 extends AbstractMigration
     public function up(Schema $schema) : void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        // $this->addSql('ALTER TABLE platform ADD notices LONGTEXT DEFAULT NULL, ADD terms LONGTEXT DEFAULT NULL');
+        $this->addSql('ALTER TABLE platform ADD notices LONGTEXT DEFAULT NULL, ADD terms LONGTEXT DEFAULT NULL');
     }
 
     public function down(Schema $schema) : void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        // $this->addSql('ALTER TABLE platform DROP notices, DROP terms');
+        $this->addSql('ALTER TABLE platform DROP notices, DROP terms');
     }
 }
