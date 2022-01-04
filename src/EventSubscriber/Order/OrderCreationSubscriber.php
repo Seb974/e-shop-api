@@ -83,10 +83,10 @@ class OrderCreationSubscriber implements EventSubscriberInterface
         }
         if (($method === "POST" || $method === "PUT") && $order->getStatus() === "WAITING") {
             $this->updateEntitiesCounters($order);
-            if ($userGroup->getOnlinePayment())
-                $this->orderConfirmer->notify($order);
             if ($order->getCatalog()->getNeedsParcel())
                 $this->chronopost->setReservationNumbers($order);
+            if ($userGroup->getOnlinePayment())
+                $this->orderConfirmer->notify($order);
         }
     }
 

@@ -43,6 +43,7 @@ class Constructor
             throw new \Exception();
         }
         $user = $this->security->getUser();
+        $notification = !is_null($order->getNotificaiton()) ? $order->getNotificaiton() : "Email";
         $userGroup = $this->userGroupDefiner->getShopGroup($user);
         $status = $userGroup->getOnlinePayment() ? "ON_PAYMENT" : "WAITING";
         $items = $this->updateItems($order->getItems(), $catalog, $userGroup);
@@ -55,6 +56,7 @@ class Constructor
               ->setRegulated(false)
               ->setInvoiced(false)
               ->setStatus($status)
+              ->setNotification($notification)
               ->setTotalHT($totalHT + $deliveryCostHT)
               ->setTotalTTC($totalTTC + $deliveryCostTTC);
         if ($catalog->getNeedsParcel()) {

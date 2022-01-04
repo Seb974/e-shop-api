@@ -204,6 +204,12 @@ class OrderEntity
      */
     private $preparator;
 
+    /**
+     * @ORM\Column(type="string", length=60, nullable=true)
+     * @Groups({"admin:orders_read", "order_write"})
+     */
+    private $notification;
+
     public function __construct()
     {
         $this->items = new ArrayCollection();
@@ -560,6 +566,18 @@ class OrderEntity
     public function setPreparator(?User $preparator): self
     {
         $this->preparator = $preparator;
+
+        return $this;
+    }
+
+    public function getNotification(): ?string
+    {
+        return $this->notification;
+    }
+
+    public function setNotification(?string $notification): self
+    {
+        $this->notification = $notification;
 
         return $this;
     }
