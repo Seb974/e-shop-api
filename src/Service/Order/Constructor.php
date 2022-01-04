@@ -43,7 +43,7 @@ class Constructor
             throw new \Exception();
         }
         $user = $this->security->getUser();
-        $notification = !is_null($order->getNotificaiton()) ? $order->getNotificaiton() : "Email";
+        $notification = !is_null($order->getNotification()) ? $order->getNotification() : "Email";
         $userGroup = $this->userGroupDefiner->getShopGroup($user);
         $status = $userGroup->getOnlinePayment() ? "ON_PAYMENT" : "WAITING";
         $items = $this->updateItems($order->getItems(), $catalog, $userGroup);
