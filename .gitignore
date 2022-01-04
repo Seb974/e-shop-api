@@ -24,6 +24,7 @@
 
 ###> symfony/mercure-bundle ###
 /Mercure
+/Mercure2
 /mercure.db
 ###< symfony/mercure-bundle ###
 
