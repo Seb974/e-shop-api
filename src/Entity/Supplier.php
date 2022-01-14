@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\SupplierRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -81,6 +83,16 @@ class Supplier
      */
     private $accountingCompanyId;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Product::class, mappedBy="suppliers")
+     */
+    private $products;
+
+    public function __construct()
+    {
+        $this->products = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -154,6 +166,33 @@ class Supplier
     public function setAccountingCompanyId(?int $accountingCompanyId): self
     {
         $this->accountingCompanyId = $accountingCompanyId;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Product[]
+     */
+    public function getProducts(): Collection
+    {
+        return $this->products;
+    }
+
+    public function addProduct(Product $product): self
+    {
+        if (!$this->products->contains($product)) {
+            $this->products[] = $product;
+            $product->addSupplier($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProduct(Product $product): self
+    {
+        if ($this->products->removeElement($product)) {
+            $product->removeSupplier($this);
+        }
 
         return $this;
     }

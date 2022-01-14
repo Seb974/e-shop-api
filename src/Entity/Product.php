@@ -251,6 +251,11 @@ class Product
      */
     private $accountingId;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Supplier::class, inversedBy="products")
+     */
+    private $suppliers;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
@@ -259,6 +264,7 @@ class Product
         $this->prices = new ArrayCollection();
         $this->userGroups = new ArrayCollection();
         $this->catalogs = new ArrayCollection();
+        $this->suppliers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -724,6 +730,30 @@ class Product
     public function setAccountingId(?int $accountingId): self
     {
         $this->accountingId = $accountingId;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Supplier[]
+     */
+    public function getSuppliers(): Collection
+    {
+        return $this->suppliers;
+    }
+
+    public function addSupplier(Supplier $supplier): self
+    {
+        if (!$this->suppliers->contains($supplier)) {
+            $this->suppliers[] = $supplier;
+        }
+
+        return $this;
+    }
+
+    public function removeSupplier(Supplier $supplier): self
+    {
+        $this->suppliers->removeElement($supplier);
 
         return $this;
     }
