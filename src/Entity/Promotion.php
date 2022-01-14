@@ -10,6 +10,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 
 /**
  * @ORM\Entity(repositoryClass=PromotionRepository::class)
@@ -26,8 +27,9 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *          "DELETE"={"security"="is_granted('ROLE_ADMIN')"}
  *     }
  * )
- * @ApiFilter(SearchFilter::class, properties={"code"="exact"})
+ * @ApiFilter(SearchFilter::class, properties={"code"="exact", "name"="word_start"})
  * @ApiFilter(DateFilter::class, properties={"endsAt"})
+ * @ApiFilter(OrderFilter::class, properties={"code", "name"})
  */
 class Promotion
 {
@@ -76,6 +78,12 @@ class Promotion
      * @Groups({"promotions_read", "relaypoints_read", "orders_read", "relaypoint_write"})
      */
     private $endsAt;
+
+    /**
+     * @ORM\Column(type="string", length=15, nullable=true)
+     * @Groups({"promotions_read"})
+     */
+    private $name;
 
     public function getId(): ?int
     {
@@ -150,6 +158,18 @@ class Promotion
     public function setEndsAt(?\DateTimeInterface $endsAt): self
     {
         $this->endsAt = $endsAt;
+
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(?string $name): self
+    {
+        $this->name = $name;
 
         return $this;
     }

@@ -8,6 +8,9 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\HeroRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 
 /**
  * @ORM\Entity(repositoryClass=HeroRepository::class)
@@ -25,6 +28,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *          "DELETE"={"security"="is_granted('ROLE_ADMIN')"}
  *     }
  * )
+ * @ApiFilter(SearchFilter::class, properties={"title"="word_start", "homepage"="exact"})
+ * @ApiFilter(OrderFilter::class, properties={"title"})
  */
 class Hero
 {

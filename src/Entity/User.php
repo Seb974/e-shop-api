@@ -14,6 +14,7 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -22,6 +23,12 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *     message="Cette adresse e-mail est déjà associée à un compte."
  * )
  * @ApiResource(
+ *     attributes={
+ *          "pagination_enabled"=true,
+ *          "pagination_items_per_page"=10,
+ *          "pagination_client_enabled"=true,
+ *          "pagination_client_items_per_page"=true,
+ *      },
  *     denormalizationContext={
  *          "disable_type_enforcement"=true,
  *          "groups"={"user_write"}
@@ -44,6 +51,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * )
  * @ApiFilter(UserFilterByNameAndEmailFilter::class, properties={"name"="partial", "email"="partial"})
  * @ApiFilter(UserFilterByRolesFilter::class, properties={"roles"="partial"})
+ * @ApiFilter(OrderFilter::class, properties={"name"})
  */
 class User implements UserInterface
 {

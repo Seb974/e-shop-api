@@ -51,11 +51,11 @@ class Calculator
     private function applyDiscount($discount, $itemsCost)
     {
         if ($discount === null)
-            return round($itemsCost * 100) / 100;
+            return round($itemsCost * 1000) / 1000;
         else if ($discount['percentage'])
-            return round($itemsCost * (1 - ($discount['discount'] < 1 ? $discount['discount'] : $discount['discount'] / 100)) * 100) / 100 ;
+            return round($itemsCost * (1 - ($discount['discount'] < 1 ? $discount['discount'] : $discount['discount'] / 100)) * 1000) / 1000 ;
         else
-            return (round($itemsCost * 100) / 100) - $discount['discount'];
+            return (round($itemsCost * 1000) / 1000) - $discount['discount'];
     }
 
     private function getItemsCost(array $items, Catalog $catalog, Group $userGroup)
@@ -87,7 +87,7 @@ class Calculator
 
         $tax = $this->tax->getTaxRate($condition, $catalog);
         $price = $itemsCost < $condition->getMinForFree() ? $condition->getPrice() : 0;
-        return round($price * (1 + $tax) * 100) / 100;
+        return round($price * (1 + $tax) * 1000) / 1000;
     }
 
     private function getProductPrice(Product $product, Catalog $catalog, Group $userGroup)
@@ -96,7 +96,7 @@ class Calculator
         $tax = $this->tax->getTaxRate($product, $catalog);
         foreach ($product->getPrices() as $price) {
             if ($price->getPriceGroup()->getId() == $priceGroup->getId())
-                return round($price->getAmount() * (1 + $tax) * 100) / 100;
+                return round($price->getAmount() * (1 + $tax) * 1000) / 1000;
         }
         return 0;
     }

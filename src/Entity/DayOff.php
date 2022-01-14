@@ -11,6 +11,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 
 /**
  * @ORM\Entity(repositoryClass=DayOffRepository::class)
@@ -28,6 +30,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
  *     }
  * )
  * @ApiFilter(DateFilter::class, properties={"date"})
+ * @ApiFilter(SearchFilter::class, properties={"name"="word_start"})
+ * @ApiFilter(OrderFilter::class, properties={"name"})
  */
 class DayOff
 {

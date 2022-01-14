@@ -8,6 +8,9 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 
 // mercure={"private"=true, "normalization_context"={"group"="users_read"}},
 /**
@@ -33,6 +36,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *          "DELETE"={"security"="is_granted('ROLE_ADMIN')"}
  *     },
  * )
+ * @ApiFilter(SearchFilter::class, properties={"label"="word_start"})
+ * @ApiFilter(OrderFilter::class, properties={"label"})
  */
 class Group
 {
