@@ -5,7 +5,8 @@ namespace App\EventSubscriber\Provision;
 use App\Entity\Provision;
 use App\Service\Axonaut\Expense;
 use App\Service\Stock\StockManager;
-use App\Service\Sms\ProvisionNotifier;
+use App\Service\Sms\ProvisionNotifier as SmsNotifier;
+use App\Service\Email\ProvisionNotifier as EmailNotifier;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use ApiPlatform\Core\EventListener\EventPriorities;
@@ -15,13 +16,15 @@ class ProvisionCreationSubscriber implements EventSubscriberInterface
 {
     private $axonaut;
     private $stockManager;
-    private $provisionNotifier;
+    private $smsNotifier;
+    private $emailNotifier;
 
-    public function __construct(ProvisionNotifier $provisionNotifier, StockManager $stockManager, Expense $axonaut)
+    public function __construct(SmsNotifier $smsNotifier, EmailNotifier $emailNotifier, StockManager $stockManager, Expense $axonaut)
     {
         $this->axonaut = $axonaut;
         $this->stockManager = $stockManager;
-        $this->provisionNotifier = $provisionNotifier;
+        $this->smsNotifier = $smsNotifier;
+        $this->emailNotifier = $emailNotifier;
     }
 
     public static function getSubscribedEvents()
@@ -38,9 +41,12 @@ class ProvisionCreationSubscriber implements EventSubscriberInterface
         if ( $result instanceof Provision ) {
             if ( $method === "POST" ) {
                 $status = !is_null($result->getStatus()) ? $result->getStatus() : "ORDERED";
-                if ($status === "ORDERED")
-                    $this->provisionNotifier->notifyOrder($result);
-
+                if ($status === "ORDERED") {
+                    if (str_contains(strtoupper($result->getSendingMode()), "SMS"))
+                        $this->smsNotifier->notifyOrder($result);
+                    if (str_contains(strtoupper($result->getSendingMode()), "EMAIL"))
+                        $this->emailNotifier->notify($result);
+                }
                 $result->setStatus($status)
                        ->setIntegrated(false);
             }

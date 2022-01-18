@@ -37,13 +37,13 @@ class Supplier
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"suppliers_read", "provisions_read"})
+     * @Groups({"seller:products_read", "suppliers_read", "provisions_read", "provision_write"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=120, nullable=true)
-     * @Groups({"suppliers_read", "provisions_read"})
+     * @Groups({"seller:products_read", "suppliers_read", "provisions_read"})
      */
     private $name;
 
@@ -55,14 +55,14 @@ class Supplier
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"suppliers_read", "provisions_read"})
+     * @Groups({"seller:products_read", "suppliers_read", "provisions_read", "provision_write"})
      * @Assert\Email(message="L'adresse email saisie n'est pas valide.")
      */
     private $email;
 
     /**
      * @ORM\Column(type="string", length=15, nullable=true)
-     * @Groups({"suppliers_read", "provisions_read"})
+     * @Groups({"seller:products_read", "suppliers_read", "provisions_read", "provision_write"})
      * @Assert\Regex(
      *     pattern="/^(?:(?:\+|00)262|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/",
      *     match=true,
@@ -85,6 +85,7 @@ class Supplier
 
     /**
      * @ORM\ManyToMany(targetEntity=Product::class, mappedBy="suppliers")
+     * @Groups({"suppliers_read"})
      */
     private $products;
 

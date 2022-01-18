@@ -253,6 +253,7 @@ class Product
 
     /**
      * @ORM\ManyToMany(targetEntity=Supplier::class, inversedBy="products")
+     * @Groups({"seller:products_read", "product_write", "admin:orders_read"})
      */
     private $suppliers;
 
