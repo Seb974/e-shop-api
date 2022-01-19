@@ -257,6 +257,11 @@ class Product
      */
     private $suppliers;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Cost::class, mappedBy="product")
+     */
+    private $costs;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
@@ -266,6 +271,7 @@ class Product
         $this->userGroups = new ArrayCollection();
         $this->catalogs = new ArrayCollection();
         $this->suppliers = new ArrayCollection();
+        $this->costs = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -755,6 +761,36 @@ class Product
     public function removeSupplier(Supplier $supplier): self
     {
         $this->suppliers->removeElement($supplier);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Cost[]
+     */
+    public function getCosts(): Collection
+    {
+        return $this->costs;
+    }
+
+    public function addCost(Cost $cost): self
+    {
+        if (!$this->costs->contains($cost)) {
+            $this->costs[] = $cost;
+            $cost->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCost(Cost $cost): self
+    {
+        if ($this->costs->removeElement($cost)) {
+            // set the owning side to null (unless already changed)
+            if ($cost->getProduct() === $this) {
+                $cost->setProduct(null);
+            }
+        }
 
         return $this;
     }
