@@ -11,6 +11,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 /**
@@ -33,8 +34,9 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *         "delete"={"security"="is_granted('ROLE_SELLER')"},
  *     }
  * )
- * @ApiFilter(SearchFilter::class, properties={"supplier"="exact", "seller"="exact"})
+ * @ApiFilter(SearchFilter::class, properties={"supplier"="exact", "seller"="exact", "status"="exact"})
  * @ApiFilter(DateFilter::class, properties={"provisionDate"})
+ * @ApiFilter(OrderFilter::class, properties={"provisionDate", "name"})
  */
 class Provision
 {
@@ -87,6 +89,12 @@ class Provision
      * @Groups({"provisions_read", "provision_write"})
      */
     private $sendingMode;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"provisions_read", "provision_write"})
+     */
+    private $receiveMode;
 
     public function __construct()
     {
@@ -196,6 +204,18 @@ class Provision
     public function setSendingMode(?string $sendingMode): self
     {
         $this->sendingMode = $sendingMode;
+
+        return $this;
+    }
+
+    public function getReceiveMode(): ?string
+    {
+        return $this->receiveMode;
+    }
+
+    public function setReceiveMode(?string $receiveMode): self
+    {
+        $this->receiveMode = $receiveMode;
 
         return $this;
     }

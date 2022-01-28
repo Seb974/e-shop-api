@@ -89,6 +89,36 @@ class Supplier
      */
     private $products;
 
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     * @Groups({"suppliers_read"})
+     */
+    private $provisionMin;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     * @Groups({"suppliers_read"})
+     */
+    private $deliveryMin;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"suppliers_read"})
+     */
+    private $dayInterval;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Groups({"suppliers_read"})
+     */
+    private $maxHour;
+
+    /**
+     * @ORM\Column(type="array", nullable=true)
+     * @Groups({"suppliers_read"})
+     */
+    private $days = [];
+
     public function __construct()
     {
         $this->products = new ArrayCollection();
@@ -194,6 +224,66 @@ class Supplier
         if ($this->products->removeElement($product)) {
             $product->removeSupplier($this);
         }
+
+        return $this;
+    }
+
+    public function getProvisionMin(): ?float
+    {
+        return $this->provisionMin;
+    }
+
+    public function setProvisionMin(?float $provisionMin): self
+    {
+        $this->provisionMin = $provisionMin;
+
+        return $this;
+    }
+
+    public function getDeliveryMin(): ?float
+    {
+        return $this->deliveryMin;
+    }
+
+    public function setDeliveryMin(?float $deliveryMin): self
+    {
+        $this->deliveryMin = $deliveryMin;
+
+        return $this;
+    }
+
+    public function getDayInterval(): ?int
+    {
+        return $this->dayInterval;
+    }
+
+    public function setDayInterval(?int $dayInterval): self
+    {
+        $this->dayInterval = $dayInterval;
+
+        return $this;
+    }
+
+    public function getMaxHour(): ?\DateTimeInterface
+    {
+        return $this->maxHour;
+    }
+
+    public function setMaxHour(?\DateTimeInterface $maxHour): self
+    {
+        $this->maxHour = $maxHour;
+
+        return $this;
+    }
+
+    public function getDays(): ?array
+    {
+        return $this->days;
+    }
+
+    public function setDays(?array $days): self
+    {
+        $this->days = $days;
 
         return $this;
     }

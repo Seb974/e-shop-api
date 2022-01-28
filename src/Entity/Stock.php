@@ -2,11 +2,16 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\StockRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 
 /**
  * @ORM\Entity(repositoryClass=StockRepository::class)
@@ -24,6 +29,8 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          "DELETE"={"security"="is_granted('ROLE_TEAM')"}
  *     }
  * )
+ * @ApiFilter(SearchFilter::class, properties={"name"="word_start"})
+ * @ApiFilter(OrderFilter::class, properties={"name"})
  */
 class Stock
 {
@@ -52,6 +59,23 @@ class Stock
      * @Groups({"stocks_read", "products_read", "containers_read", "product_write", "variation_write", "container_write", "admin:orders_read"})
      */
     private $alert;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"stocks_read", "product_write", "variation_write", "container_write"})
+     */
+    private $name;
+
+    /**
+     * @ORM\Column(type="string", length=12, nullable=true)
+     * @Groups({"stocks_read", "product_write", "variation_write", "container_write"})
+     */
+    private $unit;
+
+    public function __construct()
+    {
+        $this->warehouses = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -90,6 +114,30 @@ class Stock
     public function setAlert(?float $alert): self
     {
         $this->alert = $alert;
+
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(?string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getUnit(): ?string
+    {
+        return $this->unit;
+    }
+
+    public function setUnit(?string $unit): self
+    {
+        $this->unit = $unit;
 
         return $this;
     }

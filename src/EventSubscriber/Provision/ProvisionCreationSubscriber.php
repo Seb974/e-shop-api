@@ -52,7 +52,7 @@ class ProvisionCreationSubscriber implements EventSubscriberInterface
             }
             else if ( $method === "PUT" && $result->getStatus() === "ORDERED" && !$result->getIntegrated() ) {
                 $this->integrateProvision($result);
-                $this->axonaut->createExpense($result);
+                // $this->axonaut->createExpense($result);
                 $result->setStatus("RECEIVED")
                        ->setIntegrated(true);
             }
@@ -61,10 +61,22 @@ class ProvisionCreationSubscriber implements EventSubscriberInterface
 
     private function integrateProvision($provision)
     {
+        $supplier = $provision->getSupplier();
         foreach ($provision->getGoods() as $good) {
             $product = $good->getProduct();
             $product->setLastCost($good->getPrice());
             $this->stockManager->addToStock($good);
+            $this->updateCost($good, $supplier);
+        }
+    }
+
+    private function updateCost($good, $supplier) {
+        $product = $good->getProduct();
+        foreach ($product->getCosts() as $cost) {
+            if ($cost->getSupplier()->getId() == $supplier->getId() && $cost->getValue() !== $good->getPrice()) {
+                $cost->setValue($good->getPrice());
+                break;
+            }
         }
     }
 }

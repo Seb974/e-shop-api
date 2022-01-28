@@ -258,9 +258,16 @@ class Product
     private $suppliers;
 
     /**
-     * @ORM\OneToMany(targetEntity=Cost::class, mappedBy="product")
+     * @ORM\OneToMany(targetEntity=Cost::class, mappedBy="product", cascade={"persist", "remove"})
+     * @Groups({"seller:products_read", "product_write", "provisions_read", "provision_write", "admin:orders_read"})
      */
     private $costs;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"products_read", "product_write", "heroes_read", "homepages_read", "countdowns_read", "banners_read", "orders_read", "tourings_read"})
+     */
+    private $storeAvailable;
 
     public function __construct()
     {
@@ -791,6 +798,18 @@ class Product
                 $cost->setProduct(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getStoreAvailable(): ?bool
+    {
+        return $this->storeAvailable;
+    }
+
+    public function setStoreAvailable(?bool $storeAvailable): self
+    {
+        $this->storeAvailable = $storeAvailable;
 
         return $this;
     }

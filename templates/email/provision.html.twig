@@ -15,7 +15,7 @@
             </p>
             <br/>
             <p>
-                Voici ci-dessous la commande de <strong>{{ provision.seller.name }}</strong>, pour une livraison le {{ provision.provisionDate|date("d/m/Y") }} :
+                Voici ci-dessous la commande de <strong>{{ provision.seller.name }}</strong>, pour une {{ provision.receiveMode == "livraison" ? "livraison" : "récupération sur place" }} le {{ provision.provisionDate|date("d/m/Y") }} :
                 {# à l'adresse suivante
                 <br/><br/>
                 <i>{{ provision.metas.address }}</i><br/>
