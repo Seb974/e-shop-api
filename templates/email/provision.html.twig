@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Commande pour le {{ provision.provisionDate|date("d/m/Y") }}</title>
+        <title>{{ provision.seller.name }} : Commande pour le {{ provision.provisionDate|date("d/m/Y") }}</title>
 		 	<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap" rel="stylesheet">
             <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
             <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet"
@@ -15,13 +15,15 @@
             </p>
             <br/>
             <p>
-                Voici ci-dessous la commande de <strong>{{ provision.seller.name }}</strong>, pour une {{ provision.receiveMode == "livraison" ? "livraison" : "récupération sur place" }} le {{ provision.provisionDate|date("d/m/Y") }} :
-                {# à l'adresse suivante
-                <br/><br/>
-                <i>{{ provision.metas.address }}</i><br/>
-                <i>{{ provision.metas.address2 }}</i><br/>
-                <i>{{ provision.metas.zipcode }} - {{ provision.metas.city }}</i><br/>
-                <br/> #}
+                Voici ci-dessous la commande de <strong>{{ provision.seller.name }}</strong>, pour une {{ provision.receiveMode == "livraison" ? "livraison" : "récupération sur place" }} le {{ provision.provisionDate|date("d/m/Y") }} 
+                {% if provision.receiveMode == "livraison" %}
+                    à l'adresse suivante :
+                    <br/><br/>
+                    <i>{{ provision.metas.address }}</i><br/>
+                    <i>{{ provision.metas.address2 }}</i><br/>
+                    <i>{{ provision.metas.zipcode }} - {{ provision.metas.city }}</i><br/>
+                    <br/>
+                {% endif %}
             </p>
             <table class="table">
                 <thead>
@@ -56,9 +58,8 @@
             <div class="row justify-content-end" style="margin-top: -25px; font-size: 0.9em;">
                 <div class="col align-self-end">
                     <div>
-                        <strong>FRAIS PÉI</strong><br/>
-                        19 chemin Raphaël<br/>
-                        97410- Saint Pierre
+                        <strong>{{ provision.seller.name }}</strong><br/>
+                        {{ provision.metas.phone }}
                     </div>
                 </div>
             </div>

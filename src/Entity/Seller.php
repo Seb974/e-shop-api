@@ -16,6 +16,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 /**
  * @ORM\Entity(repositoryClass=SellerRepository::class)
  * @ApiResource(
+ *      denormalizationContext={"groups"={"seller_write"}},
  *      normalizationContext={"groups"={"sellers_read"}},
  *      collectionOperations={
  *          "GET",
@@ -37,7 +38,7 @@ class Seller
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"sellers_read", "products_read", "admin:orders_read", "suppliers_read", "provisions_read"})
+     * @Groups({"sellers_read", "seller_write", "products_read", "admin:orders_read", "suppliers_read", "provisions_read", "stores_read"})
      */
     private $id;
 
@@ -45,85 +46,98 @@ class Seller
      * @ORM\Column(type="string", length=120, nullable=true)
      * @Assert\Length(min = 3, minMessage = "Le nom doit contenir au moins {{ limit }} caractères.",
      *                max = 120, maxMessage = "Le nom ne peut contenir plus de {{ limit }} caractères.")
-     * @Groups({"sellers_read", "products_read", "admin:orders_read", "suppliers_read", "provisions_read"})
+     * @Groups({"sellers_read", "products_read", "admin:orders_read", "suppliers_read", "provisions_read", "stores_read"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
-     * @Groups({"sellers_read", "products_read"})
+     * @Groups({"sellers_read", "seller_write", "products_read"})
      */
     private $delay;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"sellers_read", "admin:orders_read"})
+     * @Groups({"sellers_read", "seller_write", "admin:orders_read"})
      */
     private $ownerRate;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"sellers_read"})
+     * @Groups({"sellers_read", "seller_write"})
      */
     private $turnover;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"sellers_read"})
+     * @Groups({"sellers_read", "seller_write"})
      */
     private $totalToPay;
 
     /**
      * @ORM\ManyToMany(targetEntity=User::class)
-     * @Groups({"sellers_read", "seller:products_read", "admin:orders_read", "provisions_read"})
+     * @Groups({"sellers_read", "seller_write", "seller:products_read", "admin:orders_read", "provisions_read"})
      */
     private $users;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"sellers_read", "seller:products_read", "admin:orders_read"})
+     * @Groups({"sellers_read", "seller_write", "seller:products_read", "admin:orders_read"})
      */
     private $needsRecovery;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"sellers_read", "seller:products_read", "admin:orders_read"})
+     * @Groups({"sellers_read", "seller_write", "seller:products_read", "admin:orders_read"})
      */
     private $delayInDays;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
-     * @Groups({"sellers_read", "seller:products_read", "admin:orders_read"})
+     * @Groups({"sellers_read", "seller_write", "seller:products_read", "admin:orders_read"})
      */
     private $recoveryDelay;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"sellers_read"})
+     * @Groups({"sellers_read", "seller_write"})
      */
     private $turnoverTTC;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"sellers_read"})
+     * @Groups({"sellers_read", "seller_write"})
      */
     private $totalToPayTTC;
 
     /**
      * @ORM\OneToOne(targetEntity=Picture::class, cascade={"persist", "remove"})
-     * @Groups({"sellers_read"})
+     * @Groups({"sellers_read", "seller_write"})
      */
     private $image;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"sellers_read"})
+     * @Groups({"sellers_read", "seller_write"})
      */
     private $isActive;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Store::class, mappedBy="seller")
+     * @Groups({"sellers_read", "seller_write"})
+     */
+    private $stores;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Meta::class, cascade={"persist"})
+     * @Groups({"sellers_read", "seller_write"})
+     */
+    private $metas;
 
     public function __construct()
     {
         $this->users = new ArrayCollection();
+        $this->stores = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -295,6 +309,48 @@ class Seller
     public function setIsActive(?bool $isActive): self
     {
         $this->isActive = $isActive;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Store[]
+     */
+    public function getStores(): Collection
+    {
+        return $this->stores;
+    }
+
+    public function addStore(Store $store): self
+    {
+        if (!$this->stores->contains($store)) {
+            $this->stores[] = $store;
+            $store->setSeller($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStore(Store $store): self
+    {
+        if ($this->stores->removeElement($store)) {
+            // set the owning side to null (unless already changed)
+            if ($store->getSeller() === $this) {
+                $store->setSeller(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getMetas(): ?Meta
+    {
+        return $this->metas;
+    }
+
+    public function setMetas(?Meta $metas): self
+    {
+        $this->metas = $metas;
 
         return $this;
     }

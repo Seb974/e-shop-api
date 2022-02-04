@@ -167,6 +167,7 @@ class Product
      */
     private $categories;
 
+    // @Groups({"products_read", "product_write", "admin:orders_read"})
     /**
      * @ORM\OneToOne(targetEntity=Stock::class, cascade={"persist", "remove"})
      * @Groups({"products_read", "product_write", "admin:orders_read"})
@@ -269,6 +270,13 @@ class Product
      */
     private $storeAvailable;
 
+    // "admin:orders_read"
+    /**
+     * @ORM\OneToMany(targetEntity=Stock::class, mappedBy="product")
+     * @Groups({"products_read", "product_write"})
+     */
+    private $stocks;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
@@ -279,6 +287,7 @@ class Product
         $this->catalogs = new ArrayCollection();
         $this->suppliers = new ArrayCollection();
         $this->costs = new ArrayCollection();
+        $this->stocks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -810,6 +819,36 @@ class Product
     public function setStoreAvailable(?bool $storeAvailable): self
     {
         $this->storeAvailable = $storeAvailable;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Stock[]
+     */
+    public function getStocks(): Collection
+    {
+        return $this->stocks;
+    }
+
+    public function addStock(Stock $stock): self
+    {
+        if (!$this->stocks->contains($stock)) {
+            $this->stocks[] = $stock;
+            $stock->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStock(Stock $stock): self
+    {
+        if ($this->stocks->removeElement($stock)) {
+            // set the owning side to null (unless already changed)
+            if ($stock->getProduct() === $this) {
+                $stock->setProduct(null);
+            }
+        }
 
         return $this;
     }

@@ -29,9 +29,7 @@ class OrderDeletionSubscriber implements EventSubscriberInterface
         $previous = $event->getRequest()->attributes->get('previous_data');
 
         if ($previous instanceof OrderEntity && !is_null($previous->getReservationNumber()) && $method === "DELETE") {
-            dump('In delete condition in KernelRequest event');
             $this->chronopost->cancelSkybill($previous);
-            dump("deletion ended and cancel skybill opered");
         }
     }
 }

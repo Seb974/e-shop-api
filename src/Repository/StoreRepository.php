@@ -19,6 +19,19 @@ class StoreRepository extends ServiceEntityRepository
         parent::__construct($registry, Store::class);
     }
 
+    /**
+     * @return Store[] Returns an array of Seller objects
+     */
+    public function findManagerStores($user)
+    {
+        return $this->createQueryBuilder('s')
+                    ->andWhere(':manager MEMBER OF s.managers')
+                    ->setParameter('manager', $user)
+                    ->getQuery()
+                    ->getResult()
+        ;
+    }
+
     // /**
     //  * @return Store[] Returns an array of Store objects
     //  */

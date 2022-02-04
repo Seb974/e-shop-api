@@ -42,31 +42,50 @@ class Store
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"stores_read", "store_write"})
+     * @Groups({"stores_read", "store_write", "sellers_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"stores_read", "store_write"})
+     * @Groups({"stores_read", "store_write", "sellers_read"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"stores_read", "store_write"})
+     * @Groups({"stores_read", "store_write", "sellers_read"})
      */
     private $main;
 
     /**
      * @ORM\OneToOne(targetEntity=Meta::class, cascade={"persist", "remove"})
-     * @Groups({"stores_read", "store_write"})
+     * @Groups({"stores_read", "store_write", "sellers_read"})
      */
     private $metas;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=User::class)
+     * @Groups({"stores_read", "store_write"})
+     */
+    private $managers;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Seller::class, inversedBy="stores")
+     * @Groups({"stores_read", "store_write"})
+     */
+    private $seller;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Platform::class, inversedBy="stores")
+     * @Groups({"stores_read", "store_write"})
+     */
+    private $platform;
 
     public function __construct()
     {
         $this->warehouses = new ArrayCollection();
+        $this->managers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -106,6 +125,54 @@ class Store
     public function setMetas(?Meta $metas): self
     {
         $this->metas = $metas;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|User[]
+     */
+    public function getManagers(): Collection
+    {
+        return $this->managers;
+    }
+
+    public function addManager(User $manager): self
+    {
+        if (!$this->managers->contains($manager)) {
+            $this->managers[] = $manager;
+        }
+
+        return $this;
+    }
+
+    public function removeManager(User $manager): self
+    {
+        $this->managers->removeElement($manager);
+
+        return $this;
+    }
+
+    public function getSeller(): ?Seller
+    {
+        return $this->seller;
+    }
+
+    public function setSeller(?Seller $seller): self
+    {
+        $this->seller = $seller;
+
+        return $this;
+    }
+
+    public function getPlatform(): ?Platform
+    {
+        return $this->platform;
+    }
+
+    public function setPlatform(?Platform $platform): self
+    {
+        $this->platform = $platform;
 
         return $this;
     }

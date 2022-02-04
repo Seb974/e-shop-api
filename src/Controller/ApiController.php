@@ -11,10 +11,16 @@
 namespace App\Controller;
 
 // use Symfony\Component\HttpFoundation\Response;
+
+use App\Repository\OrderEntityRepository;
+use App\Repository\PlatformRepository;
+use App\Repository\ProvisionRepository;
+use App\Repository\StockRepository;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\BrowserKit\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ApiController extends AbstractController
 {
@@ -26,20 +32,21 @@ class ApiController extends AbstractController
      */
     public function index(): RedirectResponse
     {
-        // return $this->render('base.html.twig');
         return $this->redirectToRoute('api_entrypoint');
     }
 
     /**
-     * @Route("/test", name="hiboutik_webhook_test", methods={"POST"})
-     * 
-     * Informations :
-     * Hiboutik Webhook test
+     * @Route("/moulinette-stocks", name="stocks_link", methods={"GET"})
+     *
      */
-    public function test(Request $request): RedirectResponse
+    public function updateProvisions(ProvisionRepository $provisionRepository, PlatformRepository $platformRepository): JsonResponse
     {
-        dump("Test OK");
-        dump($request);
-        return $this->redirectToRoute('api_entrypoint');
+        $platform = $platformRepository->find(1);
+        $provisions = $provisionRepository->findAll();
+        foreach ($provisions as $provision) {
+            $provision->setPlatform($platform);
+        }
+        $this->getDoctrine()->getManager()->flush();
+        return new JsonResponse($provisions);
     }
 }

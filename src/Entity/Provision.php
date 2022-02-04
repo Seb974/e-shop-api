@@ -24,12 +24,12 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *     },
  *     normalizationContext={"groups"={"provisions_read"}},
  *     collectionOperations={
- *         "get"={"security"="is_granted('ROLE_SELLER')"},
- *         "post"={"security"="is_granted('ROLE_SELLER')"},
+ *         "get"={"security"="is_granted('ROLE_TEAM')"},
+ *         "post"={"security"="is_granted('ROLE_TEAM')"},
  *     },
  *     itemOperations={
- *         "get"={"security"="is_granted('ROLE_SELLER')"},
- *         "put"={"security"="is_granted('ROLE_SELLER')"},
+ *         "get"={"security"="is_granted('ROLE_TEAM')"},
+ *         "put"={"security"="is_granted('ROLE_TEAM')"},
  *         "patch"={"security"="is_granted('ROLE_SELLER')"},
  *         "delete"={"security"="is_granted('ROLE_SELLER')"},
  *     }
@@ -95,6 +95,24 @@ class Provision
      * @Groups({"provisions_read", "provision_write"})
      */
     private $receiveMode;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Platform::class)
+     * @Groups({"provisions_read", "provision_write"})
+     */
+    private $platform;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Store::class)
+     * @Groups({"provisions_read", "provision_write"})
+     */
+    private $store;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Meta::class, cascade={"persist"})
+     * @Groups({"provisions_read", "provision_write"})
+     */
+    private $metas;
 
     public function __construct()
     {
@@ -216,6 +234,42 @@ class Provision
     public function setReceiveMode(?string $receiveMode): self
     {
         $this->receiveMode = $receiveMode;
+
+        return $this;
+    }
+
+    public function getPlatform(): ?Platform
+    {
+        return $this->platform;
+    }
+
+    public function setPlatform(?Platform $platform): self
+    {
+        $this->platform = $platform;
+
+        return $this;
+    }
+
+    public function getStore(): ?Store
+    {
+        return $this->store;
+    }
+
+    public function setStore(?Store $store): self
+    {
+        $this->store = $store;
+
+        return $this;
+    }
+
+    public function getMetas(): ?Meta
+    {
+        return $this->metas;
+    }
+
+    public function setMetas(?Meta $metas): self
+    {
+        $this->metas = $metas;
 
         return $this;
     }
