@@ -219,3 +219,11 @@ services:
         arguments:
             $appName: '%env(APP_NAME)%'
             $website: '%env(PUBLIC_DOMAIN)%'
+
+    App\Repository\CatalogTaxRepository:
+        arguments:
+            $locale: '%env(LOCALE)%'
+
+    App\Service\Hiboutik\Request:
+        arguments:
+            $maxItems: '%env(HIBOUTIK_MAX_ITEMS)%'

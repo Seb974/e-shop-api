@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Price;
+use App\Entity\Product;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -36,15 +37,18 @@ class PriceRepository extends ServiceEntityRepository
     }
     */
 
-    /*
-    public function findOneBySomeField($value): ?Price
+    public function findDefaultPrice(Product $product): ?Price
     {
         return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
+            ->leftJoin("p.product","o")
+            ->leftJoin("p.priceGroup","g")
+            ->leftJoin("g.userGroup","u")
+            ->andWhere('o.id = :productId')
+            ->setParameter('productId', $product->getId())
+            ->andWhere('u.value = :defaultGroup')
+            ->setParameter('defaultGroup', "ROLE_USER")
             ->getQuery()
             ->getOneOrNullResult()
         ;
     }
-    */
 }

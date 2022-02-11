@@ -42,25 +42,25 @@ class Store
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"stores_read", "store_write", "sellers_read"})
+     * @Groups({"stores_read", "store_write", "sellers_read", "sales_read", "platforms_read", "provisions_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"stores_read", "store_write", "sellers_read"})
+     * @Groups({"stores_read", "store_write", "sellers_read", "sales_read", "platforms_read", "provisions_read"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"stores_read", "store_write", "sellers_read"})
+     * @Groups({"stores_read", "store_write", "sellers_read", "sales_read", "platforms_read", "provisions_read"})
      */
     private $main;
 
     /**
      * @ORM\OneToOne(targetEntity=Meta::class, cascade={"persist", "remove"})
-     * @Groups({"stores_read", "store_write", "sellers_read"})
+     * @Groups({"stores_read", "store_write", "sellers_read", "sales_read", "provisions_read"})
      */
     private $metas;
 
@@ -72,19 +72,36 @@ class Store
 
     /**
      * @ORM\ManyToOne(targetEntity=Seller::class, inversedBy="stores")
-     * @Groups({"stores_read", "store_write"})
+     * @Groups({"stores_read", "store_write", "sales_read", "platforms_read", "provisions_read"})
      */
     private $seller;
 
     /**
      * @ORM\ManyToOne(targetEntity=Platform::class, inversedBy="stores")
-     * @Groups({"stores_read", "store_write"})
+     * @Groups({"stores_read", "store_write", "sales_read", "provisions_read"})
      */
     private $platform;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"stores_read", "store_write", "platforms_read"})
+     */
+    private $user;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"store_write"})
+     */
+    private $apiKey;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"stores_read", "store_write", "platforms_read"})
+     */
+    private $url;
+
     public function __construct()
     {
-        $this->warehouses = new ArrayCollection();
         $this->managers = new ArrayCollection();
     }
 
@@ -173,6 +190,42 @@ class Store
     public function setPlatform(?Platform $platform): self
     {
         $this->platform = $platform;
+
+        return $this;
+    }
+
+    public function getUser(): ?string
+    {
+        return $this->user;
+    }
+
+    public function setUser(?string $user): self
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getApiKey(): ?string
+    {
+        return $this->apiKey;
+    }
+
+    public function setApiKey(?string $apiKey): self
+    {
+        $this->apiKey = $apiKey;
+
+        return $this;
+    }
+
+    public function getUrl(): ?string
+    {
+        return $this->url;
+    }
+
+    public function setUrl(?string $url): self
+    {
+        $this->url = $url;
 
         return $this;
     }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * AppiController
+ * ApiController
  *
  * Informations :
  * Default app controller
@@ -10,16 +10,11 @@
  */
 namespace App\Controller;
 
-// use Symfony\Component\HttpFoundation\Response;
-
-use App\Repository\OrderEntityRepository;
 use App\Repository\PlatformRepository;
 use App\Repository\ProvisionRepository;
-use App\Repository\StockRepository;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\BrowserKit\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ApiController extends AbstractController

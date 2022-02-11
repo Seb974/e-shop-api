@@ -35,19 +35,19 @@ class Size
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"sizes_read", "variations_read", "variation_write", "products_read", "orders_read", "provisions_read", "goods_read"})
+     * @Groups({"sizes_read", "variations_read", "variation_write", "products_read", "orders_read", "provisions_read", "goods_read", "purchases_read", "sales_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"sizes_read", "variations_read", "variation_write", "products_read", "orders_read", "provisions_read", "goods_read"})
+     * @Groups({"sizes_read", "variations_read", "variation_write", "products_read", "orders_read", "provisions_read", "goods_read", "purchases_read", "sales_read"})
      */
     private $name;
 
     /**
      * @ORM\OneToOne(targetEntity=Stock::class, cascade={"persist", "remove"})
-     * @Groups({"sizes_read", "variations_read", "variation_write", "products_read", "orders_read", "admin:orders_read"})
+     * @Groups({"sizes_read", "variations_read", "variation_write", "products_read", "orders_read", "admin:orders_read", "purchases_read", "sales_read"})
      */
     private $stock;
 
@@ -59,6 +59,7 @@ class Size
 
     /**
      * @ORM\OneToMany(targetEntity=Stock::class, mappedBy="size")
+     * @Groups({"sizes_read", "variations_read", "variation_write", "products_read"})
      */
     private $stocks;
 

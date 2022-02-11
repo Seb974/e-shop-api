@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\CatalogTax;
+use App\Entity\Product;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -14,9 +15,12 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class CatalogTaxRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private $locale;
+
+    public function __construct($locale, ManagerRegistry $registry)
     {
         parent::__construct($registry, CatalogTax::class);
+        $this->locale = $locale;
     }
 
     // /**
@@ -36,15 +40,17 @@ class CatalogTaxRepository extends ServiceEntityRepository
     }
     */
 
-    /*
-    public function findOneBySomeField($value): ?CatalogTax
+    public function findLocaleTax(Product $product): ?CatalogTax
     {
         return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
+            ->leftJoin("c.catalog","p")
+            ->leftJoin("c.tax","t")
+            ->andWhere('t.id = :taxId')
+            ->setParameter('taxId', $product->getTax()->getId())
+            ->andWhere('p.code = :country')
+            ->setParameter('country', $this->locale)
             ->getQuery()
             ->getOneOrNullResult()
         ;
     }
-    */
 }

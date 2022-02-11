@@ -2,6 +2,7 @@
 
 namespace App\Doctrine;
 
+use App\Entity\Sale;
 use App\Entity\User;
 use App\Entity\Group;
 use App\Entity\Store;
@@ -140,7 +141,7 @@ class CurrentAdminExtension implements QueryCollectionExtensionInterface, QueryI
                 ;
             }
 
-            if ( in_array($resourceClass, [Provision::class, OrderEntity::class, Stock::class]) ) {
+            if ( in_array($resourceClass, [Provision::class, OrderEntity::class, Stock::class, Sale::class]) ) {
                 $queryBuilder->leftJoin("$rootAlias.store","s")
                              ->andWhere("s IS NOT NULL")
                              ->andWhere(":user MEMBER OF s.managers")
@@ -156,6 +157,21 @@ class CurrentAdminExtension implements QueryCollectionExtensionInterface, QueryI
                              ->orWhere("b IS NULL")
                              ->orWhere("p IS NOT NULL")
                 ;
+            }
+
+            if ($origin === $this->adminDomain && $this->auth->isGranted('ROLE_PICKER') && !$this->auth->isGranted('ROLE_ADMIN') && $user instanceof User)
+            {
+                if ( $resourceClass == Provision::class ) {
+                    // $queryBuilder->leftJoin("$rootAlias.platform","p")
+                    //              ->andWhere("p IS NOT NULL")
+                    // ;
+                    $queryBuilder->leftJoin("$rootAlias.store","s")
+                                //  ->leftJoin("$rootAlias.platform","p")
+                                 ->leftJoin("s.platform", "o")
+                                 ->andWhere("o IS NOT NULL")
+                                //  ->andWhere("p IS NOT NULL")
+                    ;
+                }
             }
         }
     }
