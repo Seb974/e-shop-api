@@ -58,7 +58,7 @@ class Size
     private $variation;
 
     /**
-     * @ORM\OneToMany(targetEntity=Stock::class, mappedBy="size")
+     * @ORM\OneToMany(targetEntity=Stock::class, mappedBy="size", cascade={"persist", "remove"})
      * @Groups({"sizes_read", "variations_read", "variation_write", "products_read"})
      */
     private $stocks;

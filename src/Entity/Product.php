@@ -170,7 +170,7 @@ class Product
     // @Groups({"products_read", "product_write", "admin:orders_read"})
     /**
      * @ORM\OneToOne(targetEntity=Stock::class, cascade={"persist", "remove"})
-     * @Groups({"products_read", "product_write", "admin:orders_read"})
+     * 
      */
     private $stock;
 
@@ -272,7 +272,7 @@ class Product
 
     // "admin:orders_read"
     /**
-     * @ORM\OneToMany(targetEntity=Stock::class, mappedBy="product")
+     * @ORM\OneToMany(targetEntity=Stock::class, mappedBy="product", cascade={"persist", "remove"})
      * @Groups({"products_read", "product_write"})
      */
     private $stocks;
