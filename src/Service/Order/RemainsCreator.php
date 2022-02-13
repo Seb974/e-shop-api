@@ -50,6 +50,11 @@ class RemainsCreator
                 ->setUuid($originalOrder->getUuid())
                 ->setStatus("WAITING")
                 ->setIsRemains(true);
+        if (!is_null($originalOrder->getPlatform())) {
+            $remains->setPlatform($originalOrder->getPlatform());
+        } else if (!is_null($originalOrder->getPStore())) {
+            $remains->setStore($originalOrder->getStore());
+        }
         $this->em->persist($remains);
         return $remains;
     }

@@ -2,23 +2,27 @@
 
 namespace App\Doctrine;
 
+use App\Entity\Sale;
 use App\Entity\User;
 use App\Entity\Group;
+use App\Entity\Store;
+use App\Entity\Stock;
 use App\Entity\Seller;
 use App\Entity\Touring;
 use App\Entity\Product;
+use App\Entity\Supplier;
+use App\Entity\Provision;
+use App\Entity\Relaypoint;
 use App\Entity\OrderEntity;
 use Doctrine\ORM\QueryBuilder;
+use App\Repository\StoreRepository;
 use App\Service\User\UserGroupDefiner;
+use App\Repository\SupervisorRepository;
 use Symfony\Component\Security\Core\Security;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
-use App\Entity\Provision;
-use App\Entity\Relaypoint;
-use App\Entity\Supplier;
-use App\Repository\SupervisorRepository;
 
 class CurrentAdminExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
@@ -26,16 +30,18 @@ class CurrentAdminExtension implements QueryCollectionExtensionInterface, QueryI
     private $security;
     private $adminDomain;
     private $requestStack;
+    private $storeRepository;
     private $userGroupDefiner;
     private $supervisorRepository;
 
-    public function __construct($requestStack, $admin, $public, Security $security, AuthorizationCheckerInterface $auth, UserGroupDefiner $userGroupDefiner, SupervisorRepository $supervisorRepository)
+    public function __construct($requestStack, $admin, $public, Security $security, AuthorizationCheckerInterface $auth, UserGroupDefiner $userGroupDefiner, SupervisorRepository $supervisorRepository, StoreRepository $storeRepository)
     {
         $this->auth = $auth;
         $this->adminDomain = $admin;
         $this->security = $security;
         $this->publicDomain = $public;
         $this->requestStack = $requestStack;
+        $this->storeRepository = $storeRepository;
         $this->userGroupDefiner = $userGroupDefiner;
         $this->supervisorRepository = $supervisorRepository;
     }
@@ -56,7 +62,7 @@ class CurrentAdminExtension implements QueryCollectionExtensionInterface, QueryI
         $request = $this->requestStack->getCurrentRequest();
         $origin = $request->headers->get('origin');
 
-        if ($origin === $this->adminDomain && !$this->auth->isGranted('ROLE_PICKER') && !$this->auth->isGranted('ROLE_SUPERVISOR') && $user instanceof User)
+        if ($origin === $this->adminDomain && !$this->auth->isGranted('ROLE_PICKER') && !$this->auth->isGranted('ROLE_SUPERVISOR') && !$this->auth->isGranted('ROLE_STORE_MANAGER') && $user instanceof User)
         {
             $rootAlias = $queryBuilder->getRootAliases()[0];
             $userGroup = $this->userGroupDefiner->getUserGroup($user);
@@ -74,13 +80,7 @@ class CurrentAdminExtension implements QueryCollectionExtensionInterface, QueryI
                              ->setParameter("user", $user);
             }
 
-            if ( $resourceClass == Supplier::class ) {
-                $queryBuilder->leftJoin("$rootAlias.seller","s")
-                             ->andWhere(":user MEMBER OF s.users")
-                             ->setParameter("user", $user);
-            }
-
-            if ( $resourceClass == Provision::class ) {
+            if (in_array($resourceClass, [Supplier::class, Provision::class, Store::class])) {
                 $queryBuilder->leftJoin("$rootAlias.seller","s")
                              ->andWhere(":user MEMBER OF s.users")
                              ->setParameter("user", $user);
@@ -119,6 +119,59 @@ class CurrentAdminExtension implements QueryCollectionExtensionInterface, QueryI
                              ->andWhere("u IS NOT NULL")
                              ->andWhere("u.id IN (:ids)")
                              ->setParameter("ids", $arrayId);
+            }
+        }
+
+        if ($origin === $this->adminDomain && $this->auth->isGranted('ROLE_STORE_MANAGER') && !$this->auth->isGranted('ROLE_ADMIN') && $user instanceof User)
+        {
+            $rootAlias = $queryBuilder->getRootAliases()[0];
+
+            if ( $resourceClass == Store::class ) {
+                $queryBuilder->andWhere(":user MEMBER OF $rootAlias.managers")
+                             ->setParameter("user", $user);
+            }
+
+            if ( $resourceClass == Seller::class ) {
+                $queryBuilder->leftJoin("$rootAlias.stores","b")
+                             ->leftJoin("b.platform","p")
+                             ->andWhere(":user MEMBER OF b.managers")
+                             ->setParameter("user", $user)
+                            //  ->orWhere("b IS NULL")
+                             ->orWhere("p IS NOT NULL AND b IS NULL")
+                ;
+            }
+
+            if ( in_array($resourceClass, [Provision::class, OrderEntity::class, Stock::class, Sale::class]) ) {
+                $queryBuilder->leftJoin("$rootAlias.store","s")
+                             ->andWhere("s IS NOT NULL")
+                             ->andWhere(":user MEMBER OF s.managers")
+                             ->setParameter("user", $user);
+            }
+
+            if ( $resourceClass == Supplier::class ) {
+                $queryBuilder->leftJoin("$rootAlias.seller","v")
+                             ->leftJoin("v.stores", "b")
+                             ->leftJoin("b.platform","p")
+                             ->andWhere(":user MEMBER OF b.managers")
+                             ->setParameter("user", $user)
+                             ->orWhere("b IS NULL")
+                             ->orWhere("p IS NOT NULL")
+                ;
+            }
+
+            if ($origin === $this->adminDomain && $this->auth->isGranted('ROLE_PICKER') && !$this->auth->isGranted('ROLE_ADMIN') && $user instanceof User)
+            {
+                if ( $resourceClass == Provision::class ) {
+                    // $queryBuilder->leftJoin("$rootAlias.platform","p")
+                    //              ->andWhere("p IS NOT NULL")
+                    // ;
+                    $queryBuilder->leftJoin("$rootAlias.store","s")
+                                //  ->leftJoin("$rootAlias.platform","p")
+                                 ->leftJoin("s.platform", "o")
+                                 ->andWhere("o IS NOT NULL")
+                                //  ->andWhere("p IS NOT NULL")
+                    ;
+                }
             }
         }
     }

@@ -39,7 +39,8 @@ class ProvisionNotifier
     {
         $supplierName = $provision->getSupplier()->getName();
         $provisionDate = date_format($provision->getProvisionDate(), 'd/m/Y');
-        return "Bonjour " . $supplierName . ",\nVoici ci-dessous notre commande pour ". ($provision->getReceiveMode() === "livraison" ? "livraison" : "récupération sur place") ." le ". $provisionDate ." :\n";
+        $address = $provision->getReceiveMode() === "livraison" ? " au " . $provision->getMetas()->getAddress() . " " . $provision->getMetas()->getAddress2() . " " . $provision->getMetas()->getZipcode() . " - " . $provision->getMetas()->getCity() : "";
+        return "Bonjour " . $supplierName . ",\nVoici ci-dessous notre commande pour ". ($provision->getReceiveMode() === "livraison" ? "livraison" : "récupération sur place") ." le ". $provisionDate . $address . " :\n";
     }
 
     private function getProductName($good) {

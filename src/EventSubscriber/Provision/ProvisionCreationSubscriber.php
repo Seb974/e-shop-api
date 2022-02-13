@@ -65,7 +65,7 @@ class ProvisionCreationSubscriber implements EventSubscriberInterface
         foreach ($provision->getGoods() as $good) {
             $product = $good->getProduct();
             $product->setLastCost($good->getPrice());
-            $this->stockManager->addToStock($good);
+            $this->stockManager->addToStock($good, $provision);
             $this->updateCost($good, $supplier);
         }
     }

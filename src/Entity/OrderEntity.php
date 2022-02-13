@@ -36,7 +36,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *     },
  *     mercure="object.getMercureOptions(object)"
  * )
- * @ApiFilter(SearchFilter::class, properties={"status"="partial"})
+ * @ApiFilter(SearchFilter::class, properties={"status"="partial", "store"="exact"})
  * @ApiFilter(DateFilter::class, properties={"deliveryDate"})
  */
 class OrderEntity
@@ -209,6 +209,18 @@ class OrderEntity
      * @Groups({"admin:orders_read", "order_write"})
      */
     private $notification;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Platform::class)
+     * @Groups({"admin:orders_read", "order_write"})
+     */
+    private $platform;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Store::class)
+     * @Groups({"admin:orders_read", "order_write"})
+     */
+    private $store;
 
     public function __construct()
     {
@@ -578,6 +590,30 @@ class OrderEntity
     public function setNotification(?string $notification): self
     {
         $this->notification = $notification;
+
+        return $this;
+    }
+
+    public function getPlatform(): ?Platform
+    {
+        return $this->platform;
+    }
+
+    public function setPlatform(?Platform $platform): self
+    {
+        $this->platform = $platform;
+
+        return $this;
+    }
+
+    public function getStore(): ?Store
+    {
+        return $this->store;
+    }
+
+    public function setStore(?Store $store): self
+    {
+        $this->store = $store;
 
         return $this;
     }

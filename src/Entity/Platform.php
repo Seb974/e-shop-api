@@ -79,10 +79,17 @@ class Platform
      */
     private $email;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Store::class, mappedBy="platform")
+     * @Groups({"platforms_read"})
+     */
+    private $stores;
+
     public function __construct()
     {
         $this->pickers = new ArrayCollection();
         $this->socials = new ArrayCollection();
+        $this->stores = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -200,6 +207,36 @@ class Platform
     public function setEmail(?string $email): self
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Store[]
+     */
+    public function getStores(): Collection
+    {
+        return $this->stores;
+    }
+
+    public function addStore(Store $store): self
+    {
+        if (!$this->stores->contains($store)) {
+            $this->stores[] = $store;
+            $store->setPlatform($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStore(Store $store): self
+    {
+        if ($this->stores->removeElement($store)) {
+            // set the owning side to null (unless already changed)
+            if ($store->getPlatform() === $this) {
+                $store->setPlatform(null);
+            }
+        }
 
         return $this;
     }

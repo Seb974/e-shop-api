@@ -58,13 +58,13 @@ class Product
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"products_read", "orders_read", "tourings_read", "provisions_read", "goods_read", "heroes_read", "homepages_read", "countdowns_read", "banners_read"})
+     * @Groups({"products_read", "orders_read", "tourings_read", "provisions_read", "goods_read", "heroes_read", "homepages_read", "countdowns_read", "banners_read", "purchases_read", "sales_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=120, nullable=true)
-     * @Groups({"products_read", "product_write", "orders_read", "tourings_read", "provisions_read", "goods_read", "heroes_read", "homepages_read", "countdowns_read", "banners_read"})
+     * @Groups({"products_read", "product_write", "orders_read", "tourings_read", "provisions_read", "goods_read", "heroes_read", "homepages_read", "countdowns_read", "banners_read", "purchases_read", "sales_read"})
      * @Assert\NotBlank(message="Un nom est obligatoire.")
      */
     private $name;
@@ -133,13 +133,13 @@ class Product
 
     /**
      * @ORM\Column(type="string", length=12, nullable=true)
-     * @Groups({"products_read", "product_write", "orders_read", "tourings_read", "provisions_read", "goods_read", "heroes_read", "homepages_read", "countdowns_read", "banners_read"})
+     * @Groups({"products_read", "product_write", "orders_read", "tourings_read", "provisions_read", "goods_read", "heroes_read", "homepages_read", "countdowns_read", "banners_read", "purchases_read", "sales_read"})
      */
     private $unit;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"products_read", "product_write", "orders_read"})
+     * @Groups({"products_read", "product_write", "orders_read", "purchases_read", "sales_read"})
      */
     private $weight;
 
@@ -157,7 +157,7 @@ class Product
 
     /**
      * @ORM\ManyToOne(targetEntity=Tax::class)
-     * @Groups({"products_read", "product_write", "orders_read", "items_read", "tourings_read"})
+     * @Groups({"products_read", "product_write", "orders_read", "items_read", "tourings_read", "purchases_read", "sales_read"})
      */
     private $tax;
 
@@ -167,9 +167,10 @@ class Product
      */
     private $categories;
 
+    // @Groups({"products_read", "product_write", "admin:orders_read"})
     /**
      * @ORM\OneToOne(targetEntity=Stock::class, cascade={"persist", "remove"})
-     * @Groups({"products_read", "product_write", "admin:orders_read"})
+     * 
      */
     private $stock;
 
@@ -211,7 +212,7 @@ class Product
 
     /**
      * @ORM\ManyToOne(targetEntity=Seller::class)
-     * @Groups({"products_read", "product_write", "orders_read"})
+     * @Groups({"products_read", "product_write", "orders_read", "purchases_read", "sales_read"})
      */
     private $seller;
 
@@ -241,7 +242,7 @@ class Product
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"products_read", "product_write", "orders_read"})
+     * @Groups({"products_read", "product_write", "orders_read", "purchases_read", "sales_read"})
      */
     private $contentWeight;
 
@@ -265,9 +266,22 @@ class Product
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"products_read", "product_write", "heroes_read", "homepages_read", "countdowns_read", "banners_read", "orders_read", "tourings_read"})
+     * @Groups({"products_read", "product_write", "heroes_read", "homepages_read", "countdowns_read", "banners_read", "orders_read", "tourings_read", "purchases_read", "sales_read"})
      */
     private $storeAvailable;
+
+    // "admin:orders_read"
+    /**
+     * @ORM\OneToMany(targetEntity=Stock::class, mappedBy="product", cascade={"persist", "remove"})
+     * @Groups({"products_read", "product_write"})
+     */
+    private $stocks;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Department::class, inversedBy="products")
+     * @Groups({"products_read", "product_write"})
+     */
+    private $department;
 
     public function __construct()
     {
@@ -279,6 +293,7 @@ class Product
         $this->catalogs = new ArrayCollection();
         $this->suppliers = new ArrayCollection();
         $this->costs = new ArrayCollection();
+        $this->stocks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -810,6 +825,48 @@ class Product
     public function setStoreAvailable(?bool $storeAvailable): self
     {
         $this->storeAvailable = $storeAvailable;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Stock[]
+     */
+    public function getStocks(): Collection
+    {
+        return $this->stocks;
+    }
+
+    public function addStock(Stock $stock): self
+    {
+        if (!$this->stocks->contains($stock)) {
+            $this->stocks[] = $stock;
+            $stock->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStock(Stock $stock): self
+    {
+        if ($this->stocks->removeElement($stock)) {
+            // set the owning side to null (unless already changed)
+            if ($stock->getProduct() === $this) {
+                $stock->setProduct(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getDepartment(): ?Department
+    {
+        return $this->department;
+    }
+
+    public function setDepartment(?Department $department): self
+    {
+        $this->department = $department;
 
         return $this;
     }

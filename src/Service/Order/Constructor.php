@@ -4,6 +4,8 @@ namespace App\Service\Order;
 
 use App\Entity\Group;
 use App\Entity\Product;
+use App\Repository\PlatformRepository;
+use App\Repository\StoreRepository;
 use App\Service\Tax\Tax;
 use App\Service\Package\Packer;
 use App\Service\Sms\OrdersNotifier;
@@ -23,8 +25,10 @@ class Constructor
     private $sellerAccount;
     private $remainsCreator;
     private $userGroupDefiner;
+    private $storeRepository;
+    private $platformRepository;
 
-    public function __construct(UserGroupDefiner $userGroupDefiner, Tax $tax, OrdersNotifier $orderNotifier, Security $security, RemainsCreator $remainsCreator, StockManager $stockManager, SellerAccount $sellerAccount, Packer $packer)
+    public function __construct(UserGroupDefiner $userGroupDefiner, Tax $tax, OrdersNotifier $orderNotifier, Security $security, RemainsCreator $remainsCreator, StockManager $stockManager, SellerAccount $sellerAccount, Packer $packer, PlatformRepository $platformRepository, StoreRepository $storeRepository)
     {
         $this->tax = $tax;
         $this->packer = $packer;
@@ -33,7 +37,9 @@ class Constructor
         $this->orderNotifier = $orderNotifier;
         $this->sellerAccount = $sellerAccount;
         $this->remainsCreator = $remainsCreator;
+        $this->storeRepository = $storeRepository;
         $this->userGroupDefiner = $userGroupDefiner;
+        $this->platformRepository = $platformRepository;
     }
 
     public function adjustOrder(&$order)
@@ -43,6 +49,7 @@ class Constructor
             throw new \Exception();
         }
         $user = $this->security->getUser();
+        $platform = $this->platformRepository->find(1);
         $notification = !is_null($order->getNotification()) ? $order->getNotification() : "Email";
         $userGroup = $this->userGroupDefiner->getShopGroup($user);
         $status = $userGroup->getOnlinePayment() ? "ON_PAYMENT" : "WAITING";
@@ -58,7 +65,8 @@ class Constructor
               ->setStatus($status)
               ->setNotification($notification)
               ->setTotalHT($totalHT + $deliveryCostHT)
-              ->setTotalTTC($totalTTC + $deliveryCostTTC);
+              ->setTotalTTC($totalTTC + $deliveryCostTTC)
+              ->setPlatform($platform);
         if ($catalog->getNeedsParcel()) {
             $this->packer->setPackageEntities($order);
         }
@@ -119,7 +127,7 @@ class Constructor
     {
         foreach ($order->getItems() as $item) {
             if (!is_null($item->getPreparedQty()) && !$item->getIsPrepared()) {
-                $this->stockManager->adjustItemPreparation($item);
+                $this->stockManager->adjustItemPreparation($item, $order);
                 $item->setIsPrepared(true);
             }
         }

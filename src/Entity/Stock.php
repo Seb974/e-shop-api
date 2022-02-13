@@ -72,6 +72,30 @@ class Stock
      */
     private $unit;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="stocks")
+     * @Groups({"stocks_read"})
+     */
+    private $product;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Size::class, inversedBy="stocks")
+     * @Groups({"stocks_read"})
+     */
+    private $size;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Platform::class)
+     * @Groups({"stocks_read", "seller:products_read", "product_write","variation_write"})
+     */
+    private $platform;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Store::class)
+     * @Groups({"stocks_read", "seller:products_read", "product_write", "variation_write"})
+     */
+    private $store;
+
     public function __construct()
     {
         $this->warehouses = new ArrayCollection();
@@ -138,6 +162,54 @@ class Stock
     public function setUnit(?string $unit): self
     {
         $this->unit = $unit;
+
+        return $this;
+    }
+
+    public function getProduct(): ?Product
+    {
+        return $this->product;
+    }
+
+    public function setProduct(?Product $product): self
+    {
+        $this->product = $product;
+
+        return $this;
+    }
+
+    public function getSize(): ?Size
+    {
+        return $this->size;
+    }
+
+    public function setSize(?Size $size): self
+    {
+        $this->size = $size;
+
+        return $this;
+    }
+
+    public function getPlatform(): ?Platform
+    {
+        return $this->platform;
+    }
+
+    public function setPlatform(?Platform $platform): self
+    {
+        $this->platform = $platform;
+
+        return $this;
+    }
+
+    public function getStore(): ?Store
+    {
+        return $this->store;
+    }
+
+    public function setStore(?Store $store): self
+    {
+        $this->store = $store;
 
         return $this;
     }
