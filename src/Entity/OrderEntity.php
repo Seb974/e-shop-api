@@ -3,6 +3,9 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use App\Filter\OrderFilterBySellerFilter;
+use App\Filter\OrderNeedingRecoveryFilter;
+use App\Filter\OrderTruckDeliveriesFilter;
 use App\Repository\OrderEntityRepository;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use Doctrine\Common\Collections\Collection;
@@ -12,6 +15,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 
 /**
  * @ORM\Entity(repositoryClass=OrderEntityRepository::class)
@@ -36,8 +40,12 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *     },
  *     mercure="object.getMercureOptions(object)"
  * )
+ * @ApiFilter(OrderFilterBySellerFilter::class, properties={"seller"="exact"})
+ * @ApiFilter(OrderNeedingRecoveryFilter::class, properties={"recovery"="exact"})
+ * @ApiFilter(OrderTruckDeliveriesFilter::class, properties={"truck"="exact"})
  * @ApiFilter(SearchFilter::class, properties={"status"="partial", "store"="exact"})
  * @ApiFilter(DateFilter::class, properties={"deliveryDate"})
+ * @ApiFilter(OrderFilter::class, properties={"deliveryDate", "name"})
  */
 class OrderEntity
 {

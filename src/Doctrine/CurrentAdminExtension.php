@@ -80,6 +80,16 @@ class CurrentAdminExtension implements QueryCollectionExtensionInterface, QueryI
                              ->setParameter("user", $user);
             }
 
+            if ( $resourceClass == OrderEntity::class && $this->auth->isGranted('ROLE_SELLER')) {
+                $queryBuilder->leftJoin("$rootAlias.items","i")
+                             ->leftJoin("i.product", "p")
+                             ->leftJoin("p.seller", "s")
+                             ->leftJoin("s.users", "u")
+                             ->andWhere("u IS NOT NULL")
+                             ->andWhere(":user = u.id")
+                             ->setParameter("user", $user->getId());
+            }
+
             if (in_array($resourceClass, [Supplier::class, Provision::class, Store::class])) {
                 $queryBuilder->leftJoin("$rootAlias.seller","s")
                              ->andWhere(":user MEMBER OF s.users")
@@ -162,14 +172,9 @@ class CurrentAdminExtension implements QueryCollectionExtensionInterface, QueryI
             if ($origin === $this->adminDomain && $this->auth->isGranted('ROLE_PICKER') && !$this->auth->isGranted('ROLE_ADMIN') && $user instanceof User)
             {
                 if ( $resourceClass == Provision::class ) {
-                    // $queryBuilder->leftJoin("$rootAlias.platform","p")
-                    //              ->andWhere("p IS NOT NULL")
-                    // ;
                     $queryBuilder->leftJoin("$rootAlias.store","s")
-                                //  ->leftJoin("$rootAlias.platform","p")
                                  ->leftJoin("s.platform", "o")
                                  ->andWhere("o IS NOT NULL")
-                                //  ->andWhere("p IS NOT NULL")
                     ;
                 }
             }

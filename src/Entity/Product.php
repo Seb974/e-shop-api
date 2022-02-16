@@ -46,9 +46,9 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
  *          "DELETE"={"security"="is_granted('ROLE_TEAM')"}
  *     },
  * )
- * @ApiFilter(SearchFilter::class, properties={"categories"="exact", "catalogs"="exact", "name"="partial"})
+ * @ApiFilter(SearchFilter::class, properties={"categories"="exact", "catalogs"="exact", "name"="partial", "seller"="exact", "suppliers"="exact", "id"="exact"})
  * @ApiFilter(OrderFilter::class, properties={"saleCount", "name"})
- * @ApiFilter(BooleanFilter::class, properties={"new"})
+ * @ApiFilter(BooleanFilter::class, properties={"new", "available", "storeAvailable"})
  * @ApiFilter(RangeFilter::class, properties={"discount"})
  * @ApiFilter(RangeFilter::class, properties={"offerEnd"})
  */
