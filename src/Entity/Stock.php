@@ -10,6 +10,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Annotation\ApiFilter;
+use App\Filter\Stock\StockProductFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 
@@ -29,8 +30,9 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
  *          "DELETE"={"security"="is_granted('ROLE_TEAM')"}
  *     }
  * )
- * @ApiFilter(SearchFilter::class, properties={"name"="word_start"})
+ * @ApiFilter(SearchFilter::class, properties={"name"="word_start", "platform"="exact", "store"="exact"})
  * @ApiFilter(OrderFilter::class, properties={"name"})
+ * @ApiFilter(StockProductFilter::class, properties={"productSearch"="exact"})
  */
 class Stock
 {

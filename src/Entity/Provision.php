@@ -34,7 +34,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *         "delete"={"security"="is_granted('ROLE_SELLER')"},
  *     }
  * )
- * @ApiFilter(SearchFilter::class, properties={"supplier"="exact", "seller"="exact", "status"="exact"})
+ * @ApiFilter(SearchFilter::class, properties={"supplier"="exact", "seller"="exact", "status"="exact", "platform"="exact", "store"="exact"})
  * @ApiFilter(DateFilter::class, properties={"provisionDate"})
  * @ApiFilter(OrderFilter::class, properties={"provisionDate", "name"})
  */

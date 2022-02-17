@@ -3,14 +3,14 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use App\Filter\OrderFilterBySellerFilter;
-use App\Filter\OrderNeedingRecoveryFilter;
-use App\Filter\OrderTruckDeliveriesFilter;
+use App\Filter\OrderEntity\OrderFilterBySellerFilter;
+use App\Filter\OrderEntity\OrderNeedingRecoveryFilter;
+use App\Filter\OrderEntity\OrderTruckDeliveriesFilter;
 use App\Repository\OrderEntityRepository;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
-use App\Filter\OrderFilterByRelaypointFilter;
+use App\Filter\OrderEntity\OrderFilterByRelaypointFilter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;

@@ -1,29 +1,23 @@
 <?php
 
-namespace App\Filter;
+namespace App\Filter\User;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\AbstractContextAwareFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
-use App\Entity\OrderEntity;
 use Doctrine\ORM\QueryBuilder;
 
-final class OrderTruckDeliveriesFilter extends AbstractContextAwareFilter
+final class UserFilterByRolesFilter extends AbstractContextAwareFilter
 {
     protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
-        if ($resourceClass !== OrderEntity::class && (!$this->isPropertyEnabled($property, $resourceClass) || !$this->isPropertyMapped($property, $resourceClass))) {
-            return;
-        } else if ($resourceClass == OrderEntity::class && $property != "truck") {
+        if (!$this->isPropertyEnabled($property, $resourceClass) || !$this->isPropertyMapped($property, $resourceClass)) {
             return;
         }
-        
-        $parameterName = $queryNameGenerator->generateParameterName($property);
-        $rootAlias = $queryBuilder->getRootAliases()[0];
 
+        $parameterName = $queryNameGenerator->generateParameterName($property);
         $queryBuilder
-            ->leftJoin("$rootAlias.catalog","g")
-            ->andWhere(sprintf('g.needsParcel = :%s', $parameterName))
-            ->setParameter($parameterName, intval($value) !== 1);
+            ->andWhere('o.roles LIKE :roles')
+            ->setParameter('roles', '%"ROLE_' . $value . '"%');
     }
 
     public function getDescription(string $resourceClass): array
@@ -39,8 +33,8 @@ final class OrderTruckDeliveriesFilter extends AbstractContextAwareFilter
                 'type' => 'string',
                 'required' => false,
                 'swagger' => [
-                    'description' => 'Filter orderEntities to deliver by truck',
-                    'name' => 'Order filter by truck delivery',
+                    'description' => 'Filter user to allow search by both name and email',
+                    'name' => 'User filter by name and email',
                     'type' => ' ',
                 ],
             ];

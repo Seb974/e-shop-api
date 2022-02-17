@@ -4,10 +4,10 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
-use App\Filter\UserFilterByRolesFilter;
+use App\Filter\User\UserFilterByRolesFilter;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
-use App\Filter\UserFilterByNameAndEmailFilter;
+use App\Filter\User\UserFilterByNameAndEmailFilter;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\MaxDepth;

@@ -75,18 +75,33 @@ class CurrentAdminExtension implements QueryCollectionExtensionInterface, QueryI
                              ->setParameter("user", $user->getId());
             }
 
+            if ( $resourceClass == Stock::class && $this->auth->isGranted('ROLE_SELLER')) {
+                $queryBuilder->leftJoin("$rootAlias.product","p")
+                             ->leftJoin("$rootAlias.size","a")
+                             ->leftJoin("a.variation","b")
+                             ->leftJoin("b.product","e")
+                             ->leftJoin("p.seller","s")
+                             ->leftJoin("s.users", "u")
+                             ->leftJoin("e.seller","t")
+                             ->leftJoin("t.users", "m")
+                             ->andWhere("u IS NOT NULL AND :userP = u.id")
+                             ->setParameter("userP", $user->getId())
+                             ->orWhere("m IS NOT NULL AND :userS = m.id")
+                             ->setParameter("userS", $user->getId());
+            }
+
             if ( $resourceClass == Seller::class ) {
                 $queryBuilder->andWhere(":user MEMBER OF $rootAlias.users")
                              ->setParameter("user", $user);
             }
 
             if ( $resourceClass == OrderEntity::class && $this->auth->isGranted('ROLE_SELLER')) {
-                $queryBuilder->leftJoin("$rootAlias.items","i")
-                             ->leftJoin("i.product", "p")
-                             ->leftJoin("p.seller", "s")
-                             ->leftJoin("s.users", "u")
-                             ->andWhere("u IS NOT NULL")
-                             ->andWhere(":user = u.id")
+                $queryBuilder->leftJoin("$rootAlias.items","n")
+                             ->leftJoin("n.product", "y")
+                             ->leftJoin("y.seller", "d")
+                             ->leftJoin("d.users", "t")
+                             ->andWhere("t IS NOT NULL")
+                             ->andWhere(":user = t.id")
                              ->setParameter("user", $user->getId());
             }
 
@@ -152,9 +167,9 @@ class CurrentAdminExtension implements QueryCollectionExtensionInterface, QueryI
             }
 
             if ( in_array($resourceClass, [Provision::class, OrderEntity::class, Stock::class, Sale::class]) ) {
-                $queryBuilder->leftJoin("$rootAlias.store","s")
-                             ->andWhere("s IS NOT NULL")
-                             ->andWhere(":user MEMBER OF s.managers")
+                $queryBuilder->leftJoin("$rootAlias.store","l")
+                             ->andWhere("l IS NOT NULL")
+                             ->andWhere(":user MEMBER OF l.managers")
                              ->setParameter("user", $user);
             }
 

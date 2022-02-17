@@ -1,19 +1,20 @@
 <?php
 
-namespace App\Filter;
+namespace App\Filter\OrderEntity;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\AbstractContextAwareFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use App\Entity\OrderEntity;
+use App\Repository\RelaypointRepository;
 use Doctrine\ORM\QueryBuilder;
 
-final class OrderNeedingRecoveryFilter extends AbstractContextAwareFilter
+final class OrderFilterByRelaypointFilter extends AbstractContextAwareFilter
 {
     protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
         if ($resourceClass !== OrderEntity::class && (!$this->isPropertyEnabled($property, $resourceClass) || !$this->isPropertyMapped($property, $resourceClass))) {
             return;
-        } else if ($resourceClass == OrderEntity::class && $property != "recovery") {
+        } else if ($resourceClass == OrderEntity::class && $property != "relayPosition") {
             return;
         }
         
@@ -21,11 +22,9 @@ final class OrderNeedingRecoveryFilter extends AbstractContextAwareFilter
         $rootAlias = $queryBuilder->getRootAliases()[0];
 
         $queryBuilder
-            ->leftJoin("$rootAlias.items","z")
-            ->leftJoin("z.product", "k")
-            ->leftJoin("k.seller", "w")
-            ->andWhere(sprintf('w.needsRecovery = :%s', $parameterName))
-            ->setParameter($parameterName, true);
+            ->leftJoin("$rootAlias.metas","u")
+            ->andWhere(sprintf('u.id = :%s', $parameterName))
+            ->setParameter($parameterName, intval($value));
     }
 
     public function getDescription(string $resourceClass): array
@@ -41,8 +40,8 @@ final class OrderNeedingRecoveryFilter extends AbstractContextAwareFilter
                 'type' => 'string',
                 'required' => false,
                 'swagger' => [
-                    'description' => 'Filter orderEntities needing recovery',
-                    'name' => 'Order filter by recovery needs',
+                    'description' => 'Filter orderEntities to allow search by relaypoint',
+                    'name' => 'Order filter by relaypoint',
                     'type' => ' ',
                 ],
             ];

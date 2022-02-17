@@ -1,30 +1,38 @@
 <?php
 
-namespace App\Filter;
+namespace App\Filter\Stock;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\AbstractContextAwareFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
-use App\Entity\OrderEntity;
+use App\Entity\Stock;
 use App\Repository\RelaypointRepository;
 use Doctrine\ORM\QueryBuilder;
 
-final class OrderFilterByRelaypointFilter extends AbstractContextAwareFilter
+final class StockProductFilter extends AbstractContextAwareFilter
 {
     protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
-        if ($resourceClass !== OrderEntity::class && (!$this->isPropertyEnabled($property, $resourceClass) || !$this->isPropertyMapped($property, $resourceClass))) {
+        if ($resourceClass !== Stock::class && (!$this->isPropertyEnabled($property, $resourceClass) || !$this->isPropertyMapped($property, $resourceClass))) {
             return;
-        } else if ($resourceClass == OrderEntity::class && $property != "relayPosition") {
+        } else if ($resourceClass == Stock::class && $property != "productSearch") {
             return;
         }
         
-        $parameterName = $queryNameGenerator->generateParameterName($property);
+        // $parameterName = $queryNameGenerator->generateParameterName($property);
         $rootAlias = $queryBuilder->getRootAliases()[0];
-
-        $queryBuilder
-            ->leftJoin("$rootAlias.metas","u")
-            ->andWhere(sprintf('u.id = :%s', $parameterName))
-            ->setParameter($parameterName, intval($value));
+        if (intval($value) === 1) {
+            $queryBuilder
+                ->leftJoin("$rootAlias.product","p")
+                ->leftJoin("$rootAlias.size","z")
+                ->andWhere("p IS NOT NULL")
+                ->orWhere("z IS NOT NULL");
+        } else {
+            $queryBuilder
+                ->leftJoin("$rootAlias.product","p")
+                ->leftJoin("$rootAlias.size","z")
+                ->andWhere("p IS NULL")
+                ->andWhere("z IS NULL");
+        }
     }
 
     public function getDescription(string $resourceClass): array
