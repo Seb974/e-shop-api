@@ -5,15 +5,16 @@ namespace App\Filter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\AbstractContextAwareFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use App\Entity\OrderEntity;
+use App\Repository\RelaypointRepository;
 use Doctrine\ORM\QueryBuilder;
 
-final class OrderTruckDeliveriesFilter extends AbstractContextAwareFilter
+final class OrderFilterByRelaypointFilter extends AbstractContextAwareFilter
 {
     protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
         if ($resourceClass !== OrderEntity::class && (!$this->isPropertyEnabled($property, $resourceClass) || !$this->isPropertyMapped($property, $resourceClass))) {
             return;
-        } else if ($resourceClass == OrderEntity::class && $property != "truck") {
+        } else if ($resourceClass == OrderEntity::class && $property != "relayPosition") {
             return;
         }
         
@@ -21,9 +22,9 @@ final class OrderTruckDeliveriesFilter extends AbstractContextAwareFilter
         $rootAlias = $queryBuilder->getRootAliases()[0];
 
         $queryBuilder
-            ->leftJoin("$rootAlias.catalog","g")
-            ->andWhere(sprintf('g.needsParcel = :%s', $parameterName))
-            ->setParameter($parameterName, intval($value) !== 1);
+            ->leftJoin("$rootAlias.metas","u")
+            ->andWhere(sprintf('u.id = :%s', $parameterName))
+            ->setParameter($parameterName, intval($value));
     }
 
     public function getDescription(string $resourceClass): array
@@ -39,8 +40,8 @@ final class OrderTruckDeliveriesFilter extends AbstractContextAwareFilter
                 'type' => 'string',
                 'required' => false,
                 'swagger' => [
-                    'description' => 'Filter orderEntities to deliver by truck',
-                    'name' => 'Order filter by truck delivery',
+                    'description' => 'Filter orderEntities to allow search by relaypoint',
+                    'name' => 'Order filter by relaypoint',
                     'type' => ' ',
                 ],
             ];

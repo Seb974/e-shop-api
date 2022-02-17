@@ -41,8 +41,8 @@ final class OrderNeedingRecoveryFilter extends AbstractContextAwareFilter
                 'type' => 'string',
                 'required' => false,
                 'swagger' => [
-                    'description' => 'Filter orderEntities to allow search by seller',
-                    'name' => 'Order filter by seller',
+                    'description' => 'Filter orderEntities needing recovery',
+                    'name' => 'Order filter by recovery needs',
                     'type' => ' ',
                 ],
             ];

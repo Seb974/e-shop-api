@@ -10,6 +10,7 @@ use App\Repository\OrderEntityRepository;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use App\Filter\OrderFilterByRelaypointFilter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -43,6 +44,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
  * @ApiFilter(OrderFilterBySellerFilter::class, properties={"seller"="exact"})
  * @ApiFilter(OrderNeedingRecoveryFilter::class, properties={"recovery"="exact"})
  * @ApiFilter(OrderTruckDeliveriesFilter::class, properties={"truck"="exact"})
+ * @ApiFilter(OrderFilterByRelaypointFilter::class, properties={"relayPosition"="exact"})
  * @ApiFilter(SearchFilter::class, properties={"status"="partial", "store"="exact"})
  * @ApiFilter(DateFilter::class, properties={"deliveryDate"})
  * @ApiFilter(OrderFilter::class, properties={"deliveryDate", "name"})
