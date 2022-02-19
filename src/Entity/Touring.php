@@ -38,7 +38,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
  * )
  * @ApiFilter(SearchFilter::class, properties={"deliverer"="exact", "orderEntities"="exact"})
  * @ApiFilter(DateFilter::class, properties={"start"=DateFilter::EXCLUDE_NULL, "end"=DateFilter::EXCLUDE_NULL})
- * @ApiFilter(BooleanFilter::class, properties={"isOpen"})
+ * @ApiFilter(BooleanFilter::class, properties={"isOpen", "regulated"})
  * @ApiFilter(ExistsFilter::class, properties={"position"})
  * @ApiFilter(OrderFilter::class, properties={"start", "end"})
  */

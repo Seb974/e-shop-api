@@ -28,7 +28,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
  *          "DELETE"={"security"="is_granted('ROLE_SELLER')"}
  *     }
  * )
- * @ApiFilter(SearchFilter::class, properties={"name"="word_start"})
+ * @ApiFilter(SearchFilter::class, properties={"name"="word_start", "seller"="exact"})
  * @ApiFilter(OrderFilter::class, properties={"name"})
  */
 class Supplier

@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 
 /**
  * @ORM\Entity(repositoryClass=OrderEntityRepository::class)
@@ -45,9 +46,10 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
  * @ApiFilter(OrderNeedingRecoveryFilter::class, properties={"recovery"="exact"})
  * @ApiFilter(OrderTruckDeliveriesFilter::class, properties={"truck"="exact"})
  * @ApiFilter(OrderFilterByRelaypointFilter::class, properties={"relayPosition"="exact"})
- * @ApiFilter(SearchFilter::class, properties={"status"="partial", "store"="exact"})
+ * @ApiFilter(SearchFilter::class, properties={"status"="partial", "store"="exact", "email"="exact"})
  * @ApiFilter(DateFilter::class, properties={"deliveryDate"})
  * @ApiFilter(OrderFilter::class, properties={"deliveryDate", "name"})
+ * @ApiFilter(BooleanFilter::class, properties={"regulated"})
  */
 class OrderEntity
 {

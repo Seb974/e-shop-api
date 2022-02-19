@@ -32,7 +32,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
  * )
  * @ApiFilter(SearchFilter::class, properties={"name"="word_start"})
  * @ApiFilter(OrderFilter::class, properties={"name"})
- * @ApiFilter(BooleanFilter::class, properties={"needsRecovery"})
+ * @ApiFilter(BooleanFilter::class, properties={"needsRecovery", "isActive"})
  */
 class Seller
 {

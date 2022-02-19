@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Filter\OrderEntity;
+namespace App\Filter\Product;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\AbstractContextAwareFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
-use App\Entity\OrderEntity;
+use App\Entity\Product;
 use Doctrine\ORM\QueryBuilder;
 
-final class OrderFilterBySellerFilter extends AbstractContextAwareFilter
+final class ProductFilterByGroupFilter extends AbstractContextAwareFilter
 {
     protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
-        if ($resourceClass !== OrderEntity::class && (!$this->isPropertyEnabled($property, $resourceClass) || !$this->isPropertyMapped($property, $resourceClass))) {
+        if ($resourceClass !== Product::class && (!$this->isPropertyEnabled($property, $resourceClass) || !$this->isPropertyMapped($property, $resourceClass))) {
             return;
-        } else if ($resourceClass == OrderEntity::class && $property != "seller") {
+        } else if ($resourceClass == Product::class && $property != "group") {
             return;
         }
         
@@ -21,12 +21,8 @@ final class OrderFilterBySellerFilter extends AbstractContextAwareFilter
         $rootAlias = $queryBuilder->getRootAliases()[0];
 
         $queryBuilder
-            ->leftJoin("$rootAlias.items","i")
-            ->leftJoin("i.product", "p")
-            ->leftJoin("p.seller", "s")
-            // ->andWhere(sprintf('s.id = :%s', $parameterName))
-            // ->setParameter($parameterName, intval($value));
-            ->andWhere(sprintf('s.id IN (:%s)', $parameterName))
+            ->leftJoin("$rootAlias.userGroups","r")
+            ->andWhere(sprintf('r.value IN (:%s)', $parameterName))
             ->setParameter($parameterName, $value);
     }
 

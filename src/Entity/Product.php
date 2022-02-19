@@ -12,11 +12,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Annotation\ApiFilter;
+use App\Filter\Product\ProductFilterByGroupFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
+
 
 // "pagination_enabled"=true, "pagination_items_per_page"=30 word_start
 /**
@@ -46,6 +48,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
  *          "DELETE"={"security"="is_granted('ROLE_TEAM')"}
  *     },
  * )
+ * @ApiFilter(ProductFilterByGroupFilter::class, properties={"group"="exact"})
  * @ApiFilter(SearchFilter::class, properties={"categories"="exact", "catalogs"="exact", "name"="partial", "seller"="exact", "suppliers"="exact", "id"="exact"})
  * @ApiFilter(OrderFilter::class, properties={"saleCount", "name"})
  * @ApiFilter(BooleanFilter::class, properties={"new", "available", "storeAvailable"})
@@ -258,9 +261,10 @@ class Product
      */
     private $suppliers;
 
+    // , "admin:orders_read"
     /**
      * @ORM\OneToMany(targetEntity=Cost::class, mappedBy="product", cascade={"persist", "remove"})
-     * @Groups({"seller:products_read", "product_write", "provisions_read", "provision_write", "admin:orders_read"})
+     * @Groups({"seller:products_read", "product_write", "provisions_read", "provision_write"})
      */
     private $costs;
 
