@@ -20,19 +20,23 @@ class Request
     {
         $page = 0;
         $response = [];
-        $parameters['auth_basic'] = [$store->getUser(), $store->getApiKey()];
-        if (!is_null($body) && count($body) > 0) {
-            $parameters['json'] = $body;
-        }
-        do {
-            $page++;
-            $pageParameter = $type == 'GET' ? '?p=' . $page : '';
-            $stream = $this->client->request($type, $request . $pageParameter, $parameters);
-            $partialResponse = !in_array($type, ['PUT']) ? $stream->toArray() : [];
-            $response = array_merge($response, $partialResponse);
-        } while (count($partialResponse) >= $this->maxItems);
+        try {
+            $parameters['auth_basic'] = [$store->getUser(), $store->getApiKey()];
+            if (!is_null($body) && count($body) > 0) {
+                $parameters['json'] = $body;
+            }
+            do {
+                $page++;
+                $pageParameter = $type == 'GET' ? '?p=' . $page : '';
+                $stream = $this->client->request($type, $request . $pageParameter, $parameters);
+                $partialResponse = !in_array($type, ['PUT']) ? $stream->toArray() : [];
+                $response = array_merge($response, $partialResponse);
+            } while (count($partialResponse) >= $this->maxItems);
 
-        return $response;
+            return $response;
+        } catch (\Exception $e) {
+            return -1;
+        }
     }
 
     public function get(Store $store, string $request, $pagination = true)

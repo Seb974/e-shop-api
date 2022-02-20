@@ -11,6 +11,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
+
 
 // mercure={"private"=true, "normalization_context"={"group"="users_read"}},
 /**
@@ -38,6 +40,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
  * )
  * @ApiFilter(SearchFilter::class, properties={"label"="word_start"})
  * @ApiFilter(OrderFilter::class, properties={"label"})
+ * @ApiFilter(BooleanFilter::class, properties={"hasStoreAccess", "hasShopAccess"})
  */
 class Group
 {
@@ -45,20 +48,20 @@ class Group
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"groups_read", "priceGroups_read", "products_read", "categories_read", "dayOff_read", "conditions_read", "cities_read", "relaypoints_read"})
+     * @Groups({"groups_read", "priceGroups_read", "products_read", "categories_read", "dayOff_read", "conditions_read", "cities_read", "relaypoints_read", "stores_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=30, nullable=true)
      * @Assert\Length(max = 30, maxMessage = "Le nom ne peut dépasser {{ limit }} caractères.")
-     * @Groups({"groups_read", "priceGroups_read", "products_read", "categories_read", "dayOff_read", "conditions_read", "cities_read", "relaypoints_read"})
+     * @Groups({"groups_read", "priceGroups_read", "products_read", "categories_read", "dayOff_read", "conditions_read", "cities_read", "relaypoints_read", "stores_read"})
      */
     private $label;
 
     /**
      * @ORM\Column(type="string", length=35, nullable=true)
-     * @Groups({"groups_read", "priceGroups_read", "products_read", "categories_read", "dayOff_read", "conditions_read", "cities_read", "relaypoints_read"})
+     * @Groups({"groups_read", "priceGroups_read", "products_read", "categories_read", "dayOff_read", "conditions_read", "cities_read", "relaypoints_read", "stores_read"})
      */
     private $value;
 
@@ -115,6 +118,12 @@ class Group
      * @Groups({"admin:groups_read"})
      */
     private $soldOutNotification;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"admin:groups_read"})
+     */
+    private $hasStoreAccess;
 
     public function getId(): ?int
     {
@@ -249,6 +258,18 @@ class Group
     public function setSoldOutNotification(?bool $soldOutNotification): self
     {
         $this->soldOutNotification = $soldOutNotification;
+
+        return $this;
+    }
+
+    public function getHasStoreAccess(): ?bool
+    {
+        return $this->hasStoreAccess;
+    }
+
+    public function setHasStoreAccess(?bool $hasStoreAccess): self
+    {
+        $this->hasStoreAccess = $hasStoreAccess;
 
         return $this;
     }

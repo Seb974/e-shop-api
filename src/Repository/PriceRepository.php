@@ -51,4 +51,19 @@ class PriceRepository extends ServiceEntityRepository
             ->getOneOrNullResult()
         ;
     }
+
+    public function findGroupPrice(Product $product, $group): ?Price
+    {
+        return $this->createQueryBuilder('p')
+            ->leftJoin("p.product","o")
+            ->leftJoin("p.priceGroup","g")
+            ->leftJoin("g.userGroup","u")
+            ->andWhere('o.id = :productId')
+            ->setParameter('productId', $product->getId())
+            ->andWhere('u.value = :selectedGroup')
+            ->setParameter('selectedGroup', $group)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
 }

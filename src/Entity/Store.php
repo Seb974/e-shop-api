@@ -100,6 +100,12 @@ class Store
      */
     private $url;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Group::class)
+     * @Groups({"stores_read", "store_write"})
+     */
+    private $storeGroup;
+
     public function __construct()
     {
         $this->managers = new ArrayCollection();
@@ -226,6 +232,18 @@ class Store
     public function setUrl(?string $url): self
     {
         $this->url = $url;
+
+        return $this;
+    }
+
+    public function getStoreGroup(): ?Group
+    {
+        return $this->storeGroup;
+    }
+
+    public function setStoreGroup(?Group $storeGroup): self
+    {
+        $this->storeGroup = $storeGroup;
 
         return $this;
     }

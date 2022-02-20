@@ -58,13 +58,23 @@ class HiboutikController extends AbstractController
     }
 
     /**
-     * @Route("/api/hiboutik/{id}/products", name="hiboutik_get_products", methods={"GET"})
+     * @Route("/api/hiboutik/{id}/products/{page<\d+>}", name="hiboutik_get_products", methods={"GET"})
      *
      */
-    public function getProducts(Store $store, HiboutikProduct $hiboutik): JsonResponse
+    public function getProducts(Store $store, int $page = 0, HiboutikProduct $hiboutik): JsonResponse
     {
         $hiboutikProducts = $hiboutik->getHiboutikProducts($store);
         return new JsonResponse($hiboutikProducts);
+    }
+
+    /**
+     * @Route("/api/hiboutik/{id}/taxes", name="hiboutik_get_taxes", methods={"GET"})
+     *
+     */
+    public function getTaxes(Store $store, HiboutikProduct $hiboutik): JsonResponse
+    {
+        $hiboutikTaxes = $hiboutik->getTaxes($store);
+        return new JsonResponse($hiboutikTaxes);
     }
 
     /**
@@ -82,6 +92,18 @@ class HiboutikController extends AbstractController
         } 
         $hiboutik->sendProducts($store, $products);
         return new JsonResponse(["status" => 200]);
+    }
+
+    /**
+     * @Route("/api/hiboutik/{id}/products", name="hiboutik_update_product_price", methods={"PUT"})
+     *
+     */
+    public function updateProductPrice(Store $store, Request $request, PostRequest $postRequest, HiboutikProduct $hiboutik): JsonResponse
+    {
+        $data = $postRequest->getData($request);
+        $product = $data->all();
+        $response = $hiboutik->updateProductPrice($store, $product["hiboutikId"], $product["priceTTC"]);
+        return new JsonResponse(["status" => ($response == -1 ? "fail" : "success")]);
     }
 
     /**

@@ -2,9 +2,11 @@
 
 namespace App\EventSubscriber\Provision;
 
+use App\Entity\Product;
 use App\Entity\Provision;
 use App\Service\Axonaut\Expense;
 use App\Service\Stock\StockManager;
+use App\Service\Hiboutik\Product as Hiboutik;
 use App\Service\Sms\ProvisionNotifier as SmsNotifier;
 use App\Service\Email\ProvisionNotifier as EmailNotifier;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -15,13 +17,15 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ProvisionCreationSubscriber implements EventSubscriberInterface 
 {
     private $axonaut;
+    private $hiboutik;
     private $stockManager;
     private $smsNotifier;
     private $emailNotifier;
 
-    public function __construct(SmsNotifier $smsNotifier, EmailNotifier $emailNotifier, StockManager $stockManager, Expense $axonaut)
+    public function __construct(SmsNotifier $smsNotifier, EmailNotifier $emailNotifier, StockManager $stockManager, Expense $axonaut, Hiboutik $hiboutik)
     {
         $this->axonaut = $axonaut;
+        $this->hiboutik = $hiboutik;
         $this->stockManager = $stockManager;
         $this->smsNotifier = $smsNotifier;
         $this->emailNotifier = $emailNotifier;
@@ -64,7 +68,7 @@ class ProvisionCreationSubscriber implements EventSubscriberInterface
         $supplier = $provision->getSupplier();
         foreach ($provision->getGoods() as $good) {
             $product = $good->getProduct();
-            $product->setLastCost($good->getPrice());
+            $this->updateProductCost($product, $provision, $good->getPrice());
             $this->stockManager->addToStock($good, $provision);
             $this->updateCost($good, $supplier);
         }
@@ -77,6 +81,17 @@ class ProvisionCreationSubscriber implements EventSubscriberInterface
                 $cost->setValue($good->getPrice());
                 break;
             }
+        }
+    }
+
+    private function updateProductCost(Product $product, Provision $provision, float $price)
+    {
+        $store = $provision->getStore();
+        if (!is_null($store)) {
+            $hiboutikProduct = $this->hiboutik->getHiboutikProductByProductId($store, $product->getId());
+            $this->hiboutik->updateProductCost($store, $hiboutikProduct["product_id"], $price);
+        } else {
+            $product->setLastCost($price);
         }
     }
 }
