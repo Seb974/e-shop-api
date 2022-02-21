@@ -106,6 +106,12 @@ class Store
      */
     private $storeGroup;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"stores_read", "store_write", "sellers_read"})
+     */
+    private $isTaxIncluded;
+
     public function __construct()
     {
         $this->managers = new ArrayCollection();
@@ -244,6 +250,18 @@ class Store
     public function setStoreGroup(?Group $storeGroup): self
     {
         $this->storeGroup = $storeGroup;
+
+        return $this;
+    }
+
+    public function getIsTaxIncluded(): ?bool
+    {
+        return $this->isTaxIncluded;
+    }
+
+    public function setIsTaxIncluded(?bool $isTaxIncluded): self
+    {
+        $this->isTaxIncluded = $isTaxIncluded;
 
         return $this;
     }

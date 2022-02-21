@@ -102,7 +102,8 @@ class HiboutikController extends AbstractController
     {
         $data = $postRequest->getData($request);
         $product = $data->all();
-        $response = $hiboutik->updateProductPrice($store, $product["hiboutikId"], $product["priceTTC"]);
+        $price = $store->getIsTaxIncluded() ? $product["priceTTC"] : $product["priceHT"];
+        $response = $hiboutik->updateProductPrice($store, $product["hiboutikId"], $price);
         return new JsonResponse(["status" => ($response == -1 ? "fail" : "success")]);
     }
 
