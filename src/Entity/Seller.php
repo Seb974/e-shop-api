@@ -48,7 +48,7 @@ class Seller
      * @ORM\Column(type="string", length=120, nullable=true)
      * @Assert\Length(min = 3, minMessage = "Le nom doit contenir au moins {{ limit }} caractères.",
      *                max = 120, maxMessage = "Le nom ne peut contenir plus de {{ limit }} caractères.")
-     * @Groups({"sellers_read", "products_read", "admin:orders_read", "suppliers_read", "provisions_read", "stores_read"})
+     * @Groups({"sellers_read", "seller_write", "products_read", "admin:orders_read", "suppliers_read", "provisions_read", "stores_read"})
      */
     private $name;
 
