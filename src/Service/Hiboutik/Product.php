@@ -77,6 +77,27 @@ class Product
         }
     }
 
+    public function notifyPriceChange(Store $store, array $products)
+    {
+        try {
+            $productList = $this->getProductListId($products);
+            $body = [
+                "store_id" => 1,
+                "thread" => "notifications",
+                "object" => "product",
+                "title" => "Modification de prix",
+                "message" => "Les prix des produits suivants ont été mis à jour. Merci de modifier les étiquettes associées :\n" . $productList
+            ];
+            return $this->request->send($store, 'POST', $store->getUrl() . '/api/message/', $body);
+        } catch (\Exception $e) {
+            return -1;
+        }
+    }
+
+    private function getProductListId(array $products) {
+        return join(", ", $products);
+    }
+
     private function sendToHiboutik(Store $store, ProductEntity $product, array $categories, array $taxes)
     {
         $categoryId = $this->getProductDepartmentId($product, $categories);

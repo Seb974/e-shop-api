@@ -78,6 +78,18 @@ class HiboutikController extends AbstractController
     }
 
     /**
+     * @Route("/api/hiboutik/{id}/products/notify", name="hiboutik_notify_product_price_update", methods={"POST"})
+     *
+     */
+    public function notifyProductPriceUpdate(Store $store, Request $request, PostRequest $postRequest, HiboutikProduct $hiboutik): JsonResponse
+    {
+        $data = $postRequest->getData($request);
+        $products = $data->all();
+        $response = $hiboutik->notifyPriceChange($store, $products);
+        return new JsonResponse(["status" => ($response == -1 ? "fail" : "success")]);
+    }
+
+    /**
      * @Route("/api/hiboutik/{id}/products", name="hiboutik_send_products", methods={"POST"})
      *
      */
