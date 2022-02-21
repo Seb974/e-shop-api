@@ -39,21 +39,27 @@ class Department
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"departments_read", "department_write", "products_read", "product_write"})
+     * @Groups({"departments_read", "department_write", "products_read", "product_write", "parentDepartments_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"departments_read", "department_write", "products_read", "product_write"})
+     * @Groups({"departments_read", "department_write", "products_read", "product_write", "parentDepartments_read"})
      */
     private $name;
 
     /**
      * @ORM\OneToMany(targetEntity=Product::class, mappedBy="department")
-     * @Groups({"departments_read", "department_write"})
+     * @Groups({"departments_read", "department_write", "parentDepartments_read"})
      */
     private $products;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=ParentDepartment::class, inversedBy="departments")
+     * @Groups({"departments_read", "department_write"})
+     */
+    private $parentDepartment;
 
     public function __construct()
     {
@@ -103,6 +109,18 @@ class Department
                 $product->setDepartment(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getParentDepartment(): ?ParentDepartment
+    {
+        return $this->parentDepartment;
+    }
+
+    public function setParentDepartment(?ParentDepartment $parentDepartment): self
+    {
+        $this->parentDepartment = $parentDepartment;
 
         return $this;
     }
