@@ -17,8 +17,10 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 /**
  * @ORM\Entity(repositoryClass=StockRepository::class)
  * @ApiResource(
+ *      attributes={"force_eager"=false},
  *      mercure={"private": false},
  *      normalizationContext={"groups"={"stocks_read"}},
+ *      denormalizationContext={"groups"={"stock_write"}},
  *      collectionOperations={
  *          "GET",
  *          "POST"={"security"="is_granted('ROLE_TEAM')"},
@@ -40,67 +42,74 @@ class Stock
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"stocks_read", "products_read", "containers_read", "product_write", "variation_write", "container_write", "admin:orders_read"})
+     * @Groups({"stocks_read", "products_read", "containers_read", "product_write", "variation_write", "container_write", "admin:orders_read", "batches_read", "provisions_read", "stock_write"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"stocks_read", "products_read", "containers_read", "product_write", "variation_write", "container_write", "admin:orders_read"})
+     * @Groups({"stocks_read", "products_read", "containers_read", "product_write", "variation_write", "container_write", "admin:orders_read", "batches_read", "provisions_read", "stock_write"})
      */
     private $quantity;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"stocks_read", "products_read", "containers_read", "product_write", "variation_write", "container_write", "admin:orders_read"})
+     * @Groups({"stocks_read", "products_read", "containers_read", "product_write", "variation_write", "container_write", "admin:orders_read", "stock_write"})
      */
     private $security;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"stocks_read", "products_read", "containers_read", "product_write", "variation_write", "container_write", "admin:orders_read"})
+     * @Groups({"stocks_read", "products_read", "containers_read", "product_write", "variation_write", "container_write", "admin:orders_read", "stock_write"})
      */
     private $alert;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"stocks_read", "product_write", "variation_write", "container_write"})
+     * @Groups({"stocks_read", "product_write", "variation_write", "container_write", "stock_write"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=12, nullable=true)
-     * @Groups({"stocks_read", "product_write", "variation_write", "container_write"})
+     * @Groups({"stocks_read", "product_write", "variation_write", "container_write", "stock_write"})
      */
     private $unit;
 
     /**
      * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="stocks")
-     * @Groups({"stocks_read"})
+     * @Groups({"stocks_read", "batches_read", "stock_write"})
      */
     private $product;
 
     /**
      * @ORM\ManyToOne(targetEntity=Size::class, inversedBy="stocks")
-     * @Groups({"stocks_read"})
+     * @Groups({"stocks_read", "batches_read", "stock_write"})
      */
     private $size;
 
     /**
      * @ORM\ManyToOne(targetEntity=Platform::class)
-     * @Groups({"stocks_read", "seller:products_read", "product_write","variation_write"})
+     * @Groups({"stocks_read", "seller:products_read", "product_write","variation_write", "batches_read", "stock_write"})
      */
     private $platform;
 
     /**
      * @ORM\ManyToOne(targetEntity=Store::class)
-     * @Groups({"stocks_read", "seller:products_read", "product_write", "variation_write"})
+     * @Groups({"stocks_read", "seller:products_read", "product_write", "variation_write", "batches_read", "stock_write"})
      */
     private $store;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Batch::class, mappedBy="stock", cascade={"persist", "remove"})
+     * @Groups({"stocks_read", "seller:products_read", "product_write", "variation_write", "admin:orders_read", "stock_write"})
+     */
+    private $batches;
 
     public function __construct()
     {
         $this->warehouses = new ArrayCollection();
+        $this->batches = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -212,6 +221,36 @@ class Stock
     public function setStore(?Store $store): self
     {
         $this->store = $store;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Batch[]
+     */
+    public function getBatches(): Collection
+    {
+        return $this->batches;
+    }
+
+    public function addBatch(Batch $batch): self
+    {
+        if (!$this->batches->contains($batch)) {
+            $this->batches[] = $batch;
+            $batch->setStock($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBatch(Batch $batch): self
+    {
+        if ($this->batches->removeElement($batch)) {
+            // set the owning side to null (unless already changed)
+            if ($batch->getStock() === $this) {
+                $batch->setStock(null);
+            }
+        }
 
         return $this;
     }

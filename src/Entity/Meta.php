@@ -41,7 +41,7 @@ class Meta
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"metas_read", "users_read", "user_write", "relaypoints_read", "relaypoint_write", "orders_read", "order_write", "tourings_read", "platform_write", "platforms_read", "supervisors_read", "stores_read", "store_write", "sellers_read", "seller_write", "sales_read"})
+     * @Groups({"metas_read", "users_read", "user_write", "relaypoints_read", "relaypoint_write", "orders_read", "order_write", "tourings_read", "platform_write", "platforms_read", "supervisors_read", "stores_read", "store_write", "sellers_read", "seller_write", "sales_read", "traceabilities_read"})
      */
     private $id;
 
@@ -83,7 +83,7 @@ class Meta
 
     /**
      * @ORM\Column(type="string", length=15, nullable=true)
-     *  @Groups({"metas_read", "users_read", "user_write", "relaypoints_read", "relaypoint_write", "orders_read", "order_write", "tourings_read", "platform_write", "platforms_read", "supervisors_read", "stores_read", "store_write", "sellers_read", "seller_write", "sales_read"})
+     *  @Groups({"metas_read", "users_read", "user_write", "relaypoints_read", "relaypoint_write", "orders_read", "order_write", "tourings_read", "platform_write", "platforms_read", "supervisors_read", "stores_read", "store_write", "sellers_read", "seller_write", "sales_read", "traceabilities_read"})
      * @Assert\Regex(
      *     pattern="/^(?:(?:\+|00)262|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/",
      *     match=true,

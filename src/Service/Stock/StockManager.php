@@ -55,6 +55,7 @@ class StockManager
                 $newQty = $stock->getQuantity() + $item->getPreparedQty() - $item->getDeliveredQty();
                 $stock->setQuantity($newQty);
             }
+            $this->manageDeliveredBatches($stock, $item);
         }
     }
 
@@ -63,6 +64,19 @@ class StockManager
         $stock = $this->getShopStockEntity($item, $order);
         $newQty = $stock->getQuantity() + $item->getOrderedQty() - $item->getPreparedQty();
         $stock->setQuantity($newQty);
+
+        if (!is_null($stock->getPlatform())) {
+            $allBatches = $stock->getBatches();
+            foreach ($item->getTraceabilities() as $traceability) {
+                $i = 0;
+                $batches = $this->getBatchesWithNumber($traceability->getNumber(), $allBatches);
+                $rest = $traceability->getQuantity();
+                do {
+                    $this->decreaseBatchesQuantities($rest, $batches, $i);
+                    $i++;
+                } while ($rest > 0);
+            }
+        }
     }
 
     public function addToStock($item, $provision)
@@ -70,6 +84,91 @@ class StockManager
         $stock = $this->getShopStockEntity($item, $provision);
         $newQty = $stock->getQuantity() + $item->getReceived();
         $stock->setQuantity($newQty);
+        if ($item->getProduct()->getNeedsTraceability() && !is_null($stock->getPlatform())) {
+            foreach ($item->getBatches() as $batch) {
+                $stock->addBatch($batch);
+            }
+        }
+    }
+
+    private function manageDeliveredBatches(Stock $stock, $item)
+    {
+        if (!is_null($stock->getPlatform())) {
+            $allBatches = $stock->getBatches();
+            foreach ($item->getTraceabilities() as $traceability) {
+                $i = 0;
+                $batches = $this->getUpdatedBatchesWithNumber($traceability, $allBatches);
+                $difference = $traceability->getInitialQty() - $traceability->getQuantity();
+                $rest = $difference > 0 ? $difference : -$difference;
+                do {
+                    if ($difference < 0)
+                        $this->decreaseBatchesQuantities($rest, $batches, $i);
+                    else
+                        $this->increaceBatchesQuantities($rest, $batches, $i);
+                    $i++;
+                } while ($rest > 0 && $i <= count($batches) - 1);
+            }
+            $this->detachVoidBatchesFromStock($stock);
+        }
+    }
+
+    private function increaceBatchesQuantities(float &$rest, &$batches, int $i)
+    {
+        if (!is_null($batches) && count($batches) > 0) {
+            $batchQty = $batches[$i]->getQuantity();
+            $batchInitialQty = $batches[$i]->getInitialQty();
+            if ( $batchInitialQty > $batchQty + $rest || $i == count($batches) - 1) {
+                $batches[$i]->setQuantity($batchQty + $rest);
+                $rest = 0;
+            } else {
+                $batches[$i]->setQuantity($batchInitialQty);
+                $rest -= $batchInitialQty;
+            }
+        }
+    }
+
+    private function decreaseBatchesQuantities(float &$rest, &$batches, int $i)
+    {
+        if (!is_null($batches) && count($batches) > 0 && $i <= count($batches) - 1) {
+            $batchQty = $batches[$i]->getQuantity();
+            if ( $rest <= $batchQty || $i == count($batches) - 1) {
+                $qtyToDecrease = $batchQty - $rest > 0 ? $batchQty - $rest : 0;
+                $batches[$i]->setQuantity($qtyToDecrease);
+                $rest = 0;
+            } else {
+                $batches[$i]->setQuantity(0);
+                $rest -= $batchQty;
+            }
+        }
+    }
+
+    private function detachVoidBatchesFromStock(Stock $stock) 
+    {
+        $batches = $stock->getBatches();
+        foreach ($batches as $batch) {
+            if ($batch->getQuantity() <= 0)
+                $stock->removeBatch($batch);
+        }
+    }
+
+    private function getBatchesWithNumber(string $number, $batches) 
+    {
+        $matchings = [];
+        foreach ($batches as $batch) {
+            if ($batch->getNumber() === $number)
+                $matchings[] = $batch;
+        }
+        return $matchings;
+    }
+
+    private function getUpdatedBatchesWithNumber($traceability, $batches)
+    {
+        $matchings = [];
+        foreach ($batches as $batch) {
+            if ($batch->getNumber() === $traceability->getNumber() && $traceability->getQuantity() !== $traceability->getInitialQty())
+                $matchings[] = $batch;
+        }
+        return $matchings;
     }
 
     private function getStockEntity($item)

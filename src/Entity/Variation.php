@@ -39,13 +39,13 @@ class Variation
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"variations_read", "variation_write", "products_read", "orders_read", "tourings_read", "provisions_read", "goods_read", "purchases_read", "sales_read", "stocks_read"})
+     * @Groups({"variations_read", "variation_write", "products_read", "orders_read", "tourings_read", "provisions_read", "goods_read", "purchases_read", "sales_read", "stocks_read", "traceabilities_read", "batches_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=60, nullable=true)
-     * @Groups({"variations_read", "variation_write", "products_read", "orders_read", "tourings_read", "provisions_read", "goods_read", "purchases_read", "sales_read", "stocks_read"})
+     * @Groups({"variations_read", "variation_write", "products_read", "orders_read", "tourings_read", "provisions_read", "goods_read", "purchases_read", "sales_read", "stocks_read", "traceabilities_read", "batches_read"})
      */
     private $color;
 
@@ -55,9 +55,10 @@ class Variation
      */
     private $image;
 
+    // "tourings_read"
     /**
      * @ORM\OneToMany(targetEntity=Size::class, mappedBy="variation", cascade={"persist", "remove"})
-     * @Groups({"variations_read", "variation_write", "products_read", "orders_read", "tourings_read", "provisions_read", "goods_read", "purchases_read", "sales_read"})
+     * @Groups({"variations_read", "variation_write", "products_read", "orders_read", "provisions_read", "goods_read", "purchases_read", "sales_read"})
      */
     private $sizes;
 
