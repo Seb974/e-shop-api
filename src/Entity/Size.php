@@ -14,6 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity(repositoryClass=SizeRepository::class)
  * @ApiResource(
  *       attributes={
+ *          "force_eager"=false,
  *          "enable_max_depth"=true
  *      },
  *      normalizationContext={"groups"={"sizes_read"}},
@@ -35,31 +36,33 @@ class Size
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"sizes_read", "variations_read", "variation_write", "products_read", "orders_read", "provisions_read", "goods_read", "purchases_read", "sales_read", "stocks_read"})
+     * @Groups({"sizes_read", "variations_read", "variation_write", "products_read", "orders_read", "provisions_read", "goods_read", "purchases_read", "sales_read", "stocks_read", "traceabilities_read", "batches_read", "tourings_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"sizes_read", "variations_read", "variation_write", "products_read", "orders_read", "provisions_read", "goods_read", "purchases_read", "sales_read", "stocks_read"})
+     * @Groups({"sizes_read", "variations_read", "variation_write", "products_read", "orders_read", "provisions_read", "goods_read", "purchases_read", "sales_read", "stocks_read", "traceabilities_read", "batches_read", "tourings_read"})
      */
     private $name;
 
-    /**
+    // @Groups({"sizes_read", "variations_read", "variation_write", "products_read", "orders_read", "admin:orders_read", "purchases_read", "sales_read"})
+    /*
      * @ORM\OneToOne(targetEntity=Stock::class, cascade={"persist", "remove"})
-     * @Groups({"sizes_read", "variations_read", "variation_write", "products_read", "orders_read", "admin:orders_read", "purchases_read", "sales_read"})
+     * 
      */
     private $stock;
 
     /**
      * @ORM\ManyToOne(targetEntity=Variation::class, inversedBy="sizes")
-     * @Groups({"sizes_read", "stocks_read"})
+     * @Groups({"sizes_read", "stocks_read", "traceabilities_read", "batches_read"})
      */
     private $variation;
 
+    // "admin:orders_read"
     /**
      * @ORM\OneToMany(targetEntity=Stock::class, mappedBy="size", cascade={"persist", "remove"})
-     * @Groups({"sizes_read", "variations_read", "variation_write", "products_read"})
+     * @Groups({"sizes_read", "variations_read", "variation_write", "products_read", "provisions_read"})
      */
     private $stocks;
 

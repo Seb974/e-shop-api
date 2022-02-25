@@ -44,19 +44,19 @@ class Provision
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"provisions_read", "provision_write"})
+     * @Groups({"provisions_read", "provision_write", "batches_read"})
      */
     private $id;
 
     /**
      * @ORM\ManyToOne(targetEntity=Supplier::class)
-     * @Groups({"provisions_read", "provision_write"})
+     * @Groups({"provisions_read", "provision_write", "batches_read"})
      */
     private $supplier;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
-     * @Groups({"provisions_read", "provision_write"})
+     * @Groups({"provisions_read", "provision_write", "batches_read"})
      */
     private $provisionDate;
 

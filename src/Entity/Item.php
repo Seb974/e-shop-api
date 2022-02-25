@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ItemRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -34,31 +36,31 @@ class Item
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"items_read", "orders_read", "tourings_read", "order_write", "touring_write"})
+     * @Groups({"items_read", "orders_read", "tourings_read", "order_write", "touring_write", "traceabilities_read"})
      */
     private $id;
 
     /**
      * @ORM\ManyToOne(targetEntity=Product::class)
-     * @Groups({"items_read", "orders_read", "order_write", "tourings_read", "admin:orders_read"})
+     * @Groups({"items_read", "orders_read", "order_write", "tourings_read", "admin:orders_read", "traceabilities_read"})
      */
     private $product;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"items_read", "orders_read", "order_write", "tourings_read"})
+     * @Groups({"items_read", "orders_read", "order_write", "tourings_read", "traceabilities_read"})
      */
     private $orderedQty;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"items_read", "orders_read", "admin:order_write", "tourings_read"})
+     * @Groups({"items_read", "orders_read", "admin:order_write", "tourings_read", "traceabilities_read"})
      */
     private $preparedQty;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"items_read", "orders_read", "admin:order_write", "tourings_read", "touring_write"})
+     * @Groups({"items_read", "orders_read", "admin:order_write", "tourings_read", "touring_write", "traceabilities_read"})
      */
     private $deliveredQty;
 
@@ -82,7 +84,7 @@ class Item
 
     /**
      * @ORM\ManyToOne(targetEntity=OrderEntity::class, inversedBy="items")
-     * @Groups({"admin:items_read"})
+     * @Groups({"admin:items_read", "traceabilities_read"})
      */
     private $orderEntity;
 
@@ -100,15 +102,26 @@ class Item
 
     /**
      * @ORM\ManyToOne(targetEntity=Size::class)
-     * @Groups({"items_read", "orders_read", "order_write", "tourings_read"})
+     * @Groups({"items_read", "orders_read", "order_write", "tourings_read", "traceabilities_read"})
      */
     private $size;
 
     /**
      * @ORM\Column(type="string", length=10, nullable=true)
-     * @Groups({"items_read", "orders_read", "order_write", "tourings_read"})
+     * @Groups({"items_read", "orders_read", "order_write", "tourings_read", "traceabilities_read"})
      */
     private $unit;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Traceability::class, mappedBy="item", cascade={"persist", "remove"})
+     * @Groups({"items_read", "orders_read", "order_write", "tourings_read"})
+     */
+    private $traceabilities;
+
+    public function __construct()
+    {
+        $this->traceabilities = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -255,6 +268,36 @@ class Item
     public function setUnit(?string $unit): self
     {
         $this->unit = $unit;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Traceability[]
+     */
+    public function getTraceabilities(): Collection
+    {
+        return $this->traceabilities;
+    }
+
+    public function addTraceability(Traceability $traceability): self
+    {
+        if (!$this->traceabilities->contains($traceability)) {
+            $this->traceabilities[] = $traceability;
+            $traceability->setItem($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTraceability(Traceability $traceability): self
+    {
+        if ($this->traceabilities->removeElement($traceability)) {
+            // set the owning side to null (unless already changed)
+            if ($traceability->getItem() === $this) {
+                $traceability->setItem(null);
+            }
+        }
 
         return $this;
     }

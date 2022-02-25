@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\GoodRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
@@ -34,25 +36,25 @@ class Good
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"provisions_read", "provision_write", "goods_read"})
+     * @Groups({"provisions_read", "provision_write", "goods_read", "batches_read"})
      */
     private $id;
 
     /**
      * @ORM\ManyToOne(targetEntity=Product::class)
-     * @Groups({"provisions_read", "provision_write", "goods_read"})
+     * @Groups({"provisions_read", "provision_write", "goods_read", "batches_read"})
      */
     private $product;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"provisions_read", "provision_write", "goods_read"})
+     * @Groups({"provisions_read", "provision_write", "goods_read", "batches_read"})
      */
     private $quantity;
 
     /**
      * @ORM\Column(type="string", length=12, nullable=true)
-     * @Groups({"provisions_read", "provision_write", "goods_read"})
+     * @Groups({"provisions_read", "provision_write", "goods_read", "batches_read"})
      */
     private $unit;
 
@@ -64,19 +66,19 @@ class Good
 
     /**
      * @ORM\ManyToOne(targetEntity=Provision::class, inversedBy="goods")
-     * @Groups({"goods_read"})
+     * @Groups({"goods_read", "batches_read"})
      */
     private $provision;
 
     /**
      * @ORM\ManyToOne(targetEntity=Variation::class)
-     * @Groups({"provisions_read", "provision_write", "goods_read"})
+     * @Groups({"provisions_read", "provision_write", "goods_read", "batches_read"})
      */
     private $variation;
 
     /**
      * @ORM\ManyToOne(targetEntity=Size::class)
-     * @Groups({"provisions_read", "provision_write", "goods_read"})
+     * @Groups({"provisions_read", "provision_write", "goods_read", "batches_read"})
      */
     private $size;
 
@@ -85,6 +87,17 @@ class Good
      * @Groups({"provisions_read", "provision_write", "goods_read"})
      */
     private $received;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Batch::class, mappedBy="good", cascade={"persist", "remove"})
+     * @Groups({"provisions_read", "provision_write", "goods_read"})
+     */
+    private $batches;
+
+    public function __construct()
+    {
+        $this->batches = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -183,6 +196,36 @@ class Good
     public function setReceived(?float $received): self
     {
         $this->received = $received;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Batch[]
+     */
+    public function getBatches(): Collection
+    {
+        return $this->batches;
+    }
+
+    public function addBatch(Batch $batch): self
+    {
+        if (!$this->batches->contains($batch)) {
+            $this->batches[] = $batch;
+            $batch->setGood($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBatch(Batch $batch): self
+    {
+        if ($this->batches->removeElement($batch)) {
+            // set the owning side to null (unless already changed)
+            if ($batch->getGood() === $this) {
+                $batch->setGood(null);
+            }
+        }
 
         return $this;
     }
