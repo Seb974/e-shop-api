@@ -36,19 +36,19 @@ class Price
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"price_read", "products_read", "product_write"})
+     * @Groups({"price_read", "products_read", "product_write", "admin:orders_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"price_read", "products_read", "product_write"})
+     * @Groups({"price_read", "products_read", "product_write", "admin:orders_read"})
      */
     private $amount;
 
     /**
      * @ORM\ManyToOne(targetEntity=PriceGroup::class)
-     * @Groups({"price_read", "products_read", "product_write"})
+     * @Groups({"price_read", "products_read", "product_write", "admin:orders_read"})
      */
     private $priceGroup;
 

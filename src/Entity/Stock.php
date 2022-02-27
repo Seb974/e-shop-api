@@ -90,7 +90,7 @@ class Stock
 
     /**
      * @ORM\ManyToOne(targetEntity=Platform::class)
-     * @Groups({"stocks_read", "seller:products_read", "product_write","variation_write", "batches_read", "stock_write"})
+     * @Groups({"stocks_read", "seller:products_read", "product_write","variation_write", "batches_read", "stock_write", "admin:orders_read"})
      */
     private $platform;
 

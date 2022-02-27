@@ -48,20 +48,20 @@ class Group
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"groups_read", "priceGroups_read", "products_read", "categories_read", "dayOff_read", "conditions_read", "cities_read", "relaypoints_read", "stores_read"})
+     * @Groups({"groups_read", "priceGroups_read", "products_read", "categories_read", "dayOff_read", "conditions_read", "cities_read", "relaypoints_read", "stores_read", "admin:orders_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=30, nullable=true)
      * @Assert\Length(max = 30, maxMessage = "Le nom ne peut dépasser {{ limit }} caractères.")
-     * @Groups({"groups_read", "priceGroups_read", "products_read", "categories_read", "dayOff_read", "conditions_read", "cities_read", "relaypoints_read", "stores_read"})
+     * @Groups({"groups_read", "priceGroups_read", "products_read", "categories_read", "dayOff_read", "conditions_read", "cities_read", "relaypoints_read", "stores_read", "admin:orders_read"})
      */
     private $label;
 
     /**
      * @ORM\Column(type="string", length=35, nullable=true)
-     * @Groups({"groups_read", "priceGroups_read", "products_read", "categories_read", "dayOff_read", "conditions_read", "cities_read", "relaypoints_read", "stores_read"})
+     * @Groups({"groups_read", "priceGroups_read", "products_read", "categories_read", "dayOff_read", "conditions_read", "cities_read", "relaypoints_read", "stores_read", "admin:orders_read"})
      */
     private $value;
 
@@ -79,7 +79,7 @@ class Group
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"groups_read", "priceGroups_read"})
+     * @Groups({"groups_read", "priceGroups_read", "admin:orders_read"})
      */
     private $subjectToTaxes;
 
