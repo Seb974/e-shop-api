@@ -2,6 +2,7 @@
 
 namespace App\Service\Stock;
 
+use App\Entity\Item;
 use App\Entity\Stock;
 use App\Entity\Store;
 use App\Entity\Platform;
@@ -197,12 +198,13 @@ class StockManager
 
     private function createNewStock($entity, $item)
     {
+        $quantity = $item instanceof Item ? $item->getOrderedQty() : $item->getQuantity();
         $newStock = new Stock();
         $newStock->setProduct($item->getProduct())
                  ->setSize($item->getSize())
                  ->setAlert(0)
                  ->setSecurity(0)
-                 ->setQuantity($item->getQuantity());
+                 ->setQuantity($quantity);
 
         if ($entity instanceof Platform)
             $newStock->setPlatform($entity);
