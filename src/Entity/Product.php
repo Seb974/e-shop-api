@@ -19,7 +19,6 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
 
-
 // "pagination_enabled"=true, "pagination_items_per_page"=30 word_start
 /**
  * @ORM\Entity(repositoryClass=ProductRepository::class)
@@ -52,8 +51,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
  * @ApiFilter(SearchFilter::class, properties={"categories"="exact", "catalogs"="exact", "name"="partial", "seller"="exact", "suppliers"="exact", "id"="exact"})
  * @ApiFilter(OrderFilter::class, properties={"saleCount", "name"})
  * @ApiFilter(BooleanFilter::class, properties={"new", "available", "storeAvailable"})
- * @ApiFilter(RangeFilter::class, properties={"discount"})
- * @ApiFilter(RangeFilter::class, properties={"offerEnd"})
+ * @ApiFilter(RangeFilter::class, properties={"discount", "offerEnd", "saleCcount"})
  */
 class Product
 {

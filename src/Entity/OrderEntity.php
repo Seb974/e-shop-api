@@ -62,19 +62,19 @@ class OrderEntity
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"orders_read", "order_write", "tourings_read", "touring_write", "traceabilities_read"})
+     * @Groups({"orders_read", "order_write", "tourings_read", "touring_write", "traceabilities_read", "admin:items_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=120, nullable=true)
-     * @Groups({"orders_read", "order_write", "tourings_read", "traceabilities_read"})
+     * @Groups({"orders_read", "order_write", "tourings_read", "traceabilities_read", "admin:items_read"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=120, nullable=true)
-     * @Groups({"orders_read", "order_write", "tourings_read", "traceabilities_read"})
+     * @Groups({"orders_read", "order_write", "tourings_read", "traceabilities_read", "admin:items_read"})
      */
     private $email;
 
@@ -92,13 +92,13 @@ class OrderEntity
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
-     * @Groups({"orders_read", "order_write", "tourings_read", "traceabilities_read"})
+     * @Groups({"orders_read", "order_write", "tourings_read", "traceabilities_read", "admin:items_read"})
      */
     private $deliveryDate;
 
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
-     * @Groups({"orders_read", "order_write", "tourings_read", "touring_write", "traceabilities_read"})
+     * @Groups({"orders_read", "order_write", "tourings_read", "touring_write", "traceabilities_read", "admin:items_read"})
      */
     private $status;
 

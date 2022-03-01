@@ -66,6 +66,12 @@ class Size
      */
     private $stocks;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"sizes_read", "variations_read", "variation_write", "products_read"})
+     */
+    private $saleCount;
+
     public function __construct()
     {
         $this->stocks = new ArrayCollection();
@@ -138,6 +144,18 @@ class Size
                 $stock->setSize(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getSaleCount(): ?int
+    {
+        return $this->saleCount;
+    }
+
+    public function setSaleCount(?int $saleCount): self
+    {
+        $this->saleCount = $saleCount;
 
         return $this;
     }
