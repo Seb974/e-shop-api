@@ -114,6 +114,24 @@ class Provision
      */
     private $metas;
 
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     * @Groups({"provisions_read", "provision_write", "batches_read"})
+     */
+    private $temperature;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     * @Groups({"provisions_read", "provision_write", "batches_read"})
+     */
+    private $comments;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"provisions_read", "provision_write", "batches_read"})
+     */
+    private $isTruckCompliant;
+
     public function __construct()
     {
         $this->goods = new ArrayCollection();
@@ -270,6 +288,42 @@ class Provision
     public function setMetas(?Meta $metas): self
     {
         $this->metas = $metas;
+
+        return $this;
+    }
+
+    public function getTemperature(): ?float
+    {
+        return $this->temperature;
+    }
+
+    public function setTemperature(?float $temperature): self
+    {
+        $this->temperature = $temperature;
+
+        return $this;
+    }
+
+    public function getComments(): ?string
+    {
+        return $this->comments;
+    }
+
+    public function setComments(?string $comments): self
+    {
+        $this->comments = $comments;
+
+        return $this;
+    }
+
+    public function getIsTruckCompliant(): ?bool
+    {
+        return $this->isTruckCompliant;
+    }
+
+    public function setIsTruckCompliant(?bool $isTruckCompliant): self
+    {
+        $this->isTruckCompliant = $isTruckCompliant;
 
         return $this;
     }

@@ -2,13 +2,21 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\GoodRepository;
+use App\Filter\Good\GoodFilterByStore;
+use App\Filter\Good\GoodFilterBySeller;
+use App\Filter\Good\GoodFilterByStatus;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use App\Filter\Good\GoodFilterByDateAfter;
+use App\Filter\Good\GoodFilterByDateBefore;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+
 
 /**
  * @ORM\Entity(repositoryClass=GoodRepository::class)
@@ -29,6 +37,13 @@ use Symfony\Component\Validator\Constraints as Assert;
  *          "DELETE"={"security"="is_granted('ROLE_SELLER')"}
  *     },
  * )
+ * @ApiFilter(GoodFilterByDateBefore::class, properties={"before"="exact"})
+ * @ApiFilter(GoodFilterByDateAfter::class, properties={"after"="exact"})
+ * @ApiFilter(GoodFilterByStatus::class, properties={"active"="exact"})
+ * @ApiFilter(GoodFilterBySeller::class, properties={"seller"="exact"})
+ * @ApiFilter(GoodFilterByStore::class, properties={"store"="exact"})
+ * @ApiFilter(SearchFilter::class, properties={"product"="exact"})
+ * 
  */
 class Good
 {
