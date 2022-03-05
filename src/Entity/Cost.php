@@ -13,6 +13,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 /**
  * @ORM\Entity(repositoryClass=CostRepository::class)
  * @ApiResource(
+ *      mercure="object.getMercureOptions(object.getProduct())",
  *      normalizationContext={"groups"={"costs_read"}},
  *      collectionOperations={
  *          "GET"={"security"="is_granted('ROLE_TEAM')"},
@@ -28,6 +29,11 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  */
 class Cost
 {
+    /**
+     * server domain, used to configure the Mercure hub topics
+     */
+    private static $domain = 'http://localhost:8000';
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -53,6 +59,15 @@ class Cost
      * @Groups({"costs_read", "seller:products_read", "product_write", "provisions_read", "provision_write", "admin:orders_read"})
      */
     private $value;
+
+    public function getMercureOptions($product): array
+    {
+        return !is_null($product) ? [
+            "private" => false, 
+            "topics" => self::$domain . "/api/products/" . $product->getId()
+        ] : 
+        ["private" => false];
+    }
 
     public function getId(): ?int
     {

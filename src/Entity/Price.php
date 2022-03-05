@@ -60,10 +60,11 @@ class Price
 
     public function getMercureOptions($product): array
     {
-        return [
+        return !is_null($product) ? [
             "private" => false, 
             "topics" => self::$domain . "/api/products/" . $product->getId()
-        ];
+        ] : 
+        ["private" => false];
     }
 
     public function getId(): ?int
