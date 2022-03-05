@@ -10,10 +10,13 @@
  */
 namespace App\Controller;
 
+use App\Entity\Stock;
+use App\Repository\ContainerRepository;
 use App\Repository\OrderEntityRepository;
 use App\Repository\PlatformRepository;
 use App\Repository\ProductRepository;
 use App\Repository\ProvisionRepository;
+use App\Repository\SizeRepository;
 use App\Repository\StockRepository;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -61,18 +64,22 @@ class ApiController extends AbstractController
      * @Route("/moulinette-entities", name="entities_stocks_link", methods={"GET"})
      *
      */
-    public function updateEntities(ProvisionRepository $provisionRepository, PlatformRepository $platformRepository, OrderEntityRepository $orderRepository, StockRepository $stockRepository): JsonResponse
+    public function updateEntities(ContainerRepository $containerRepository): JsonResponse
     {
-        $platform = $platformRepository->find(1);
-        $stocks = $stockRepository->findAll();
-        $provisions = $provisionRepository->findAll();
-        $orders = $orderRepository->findAll();
-        $entities = array_merge($stocks, $orders, $provisions);
-
-        foreach ($entities as $entity) {
-            $entity->setPlatform($platform);
+        $containers = $containerRepository->findAll();
+        $em = $this->getDoctrine()->getManager();
+        foreach ($containers as $container) {
+            $stock = $container->getStock();
+            if (is_null($stock)) {
+                $newStock = new Stock();
+                $newStock->setAlert(0)
+                        ->setSecurity(0)
+                        ->setQuantity(0);
+                $em->persist($newStock);
+                $container->setStock(($newStock));
+            }
         }
         $this->getDoctrine()->getManager()->flush();
-        return new JsonResponse($entities);
+        return new JsonResponse($containers);
     }
 }
