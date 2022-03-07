@@ -66,7 +66,7 @@ class Store
 
     /**
      * @ORM\ManyToMany(targetEntity=User::class)
-     * @Groups({"stores_read", "store_write"})
+     * @Groups({"stores_read", "store_write", "sellers_read"})
      */
     private $managers;
 
