@@ -266,25 +266,4 @@ class Constructor
         }
         return 0;
     }
-
-    // private function getPackagesCost(array $items, Catalog $catalog)
-    // {
-    //     $accumulator = 0;
-    //     $packages = $this->packer->getPackages($items);
-    //     foreach ($packages as $package) {
-    //         $price = $this->getContainerPrice($package['container'], $catalog);
-    //         $accumulator += ($package['quantity'] * $price);
-    //     }
-    //     return $accumulator;
-    // }
-
-    // private function getContainerPrice(Container $container, Catalog $catalog)
-    // {
-    //     $tax = $this->tax->getTaxRate($container, $catalog);
-    //     foreach ($container->getCatalogPrices() as $catalogPrice) {
-    //         if ($catalogPrice->getCatalog()->getId() == $catalog->getId())
-    //             return ($catalogPrice->getAmount() * (1 + $tax));
-    //     }
-    //     return 0;
-    // }
 }

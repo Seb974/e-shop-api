@@ -4,15 +4,18 @@ namespace App\Service\Order;
 
 use App\Entity\Item;
 use App\Entity\OrderEntity;
+use App\Service\Package\Packer;
 use Doctrine\ORM\EntityManagerInterface;
 
 class RemainsCreator
 {
     private $em;
+    private $packer;
 
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(EntityManagerInterface $em, Packer $packer)
     {
         $this->em = $em;
+        $this->packer = $packer;
     }
 
     public function hasRemains($items)
@@ -30,7 +33,10 @@ class RemainsCreator
     public function createRemains($originalOrder, $isPaidOnline)
     {
         $remains = $this->createRemainsEntity($originalOrder);
-        return $this->setRemainsItems($originalOrder, $remains, $isPaidOnline);
+        $remainsWithItems = $this->setRemainsItems($originalOrder, $remains, $isPaidOnline);
+        $remainsWithPackages = $this->getPackageIfNeeded($remainsWithItems);
+        $remainsWithTotal = $this->getTotalRemains($remainsWithPackages, $isPaidOnline);
+        return $remainsWithTotal;
     }
 
     private function createRemainsEntity($originalOrder)
@@ -79,5 +85,40 @@ class RemainsCreator
             }
         }
         return $remains;
+    }
+
+    private function getPackageIfNeeded(OrderEntity $remains)
+    {
+        if ($remains->getCatalog()->getNeedsParcel()) {
+            $this->packer->setPackageEntities($remains);
+        }
+        return $remains;
+    }
+
+    private function getTotalRemains(OrderEntity $remains, $isPaidOnline)
+    {
+        $totalHT = 0;
+        $totalTTC = 0;
+        if (!$isPaidOnline) {
+            $totals = $this->getTotals($remains->getItems());
+            $totalHT = $totals['totalHT'];
+            $totalTTC = $totals['totalTTC'];
+        }
+        $remains->setTotalHT($totalHT)
+                ->setTotalTTC($totalTTC);
+        $this->em->persist($remains);
+        return $remains;
+    }
+
+    private function getTotals($items)
+    {
+        $totalHT = 0;
+        $totalTTC = 0;
+        foreach ($items as $item) {
+            $totalItem = $item->getOrderedQty() * $item->getPrice();
+            $totalHT += $totalItem;
+            $totalTTC += ($totalItem  * (1 + $item->getTaxRate()));
+        }
+        return ['totalHT' => $totalHT, 'totalTTC' => $totalTTC];
     }
 }
