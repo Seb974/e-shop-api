@@ -36,13 +36,13 @@ class Size
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"sizes_read", "variations_read", "variation_write", "products_read", "orders_read", "provisions_read", "goods_read", "purchases_read", "sales_read", "stocks_read", "traceabilities_read", "batches_read", "tourings_read"})
+     * @Groups({"sizes_read", "variations_read", "variation_write", "products_read", "orders_read", "provisions_read", "goods_read", "purchases_read", "sales_read", "stocks_read", "traceabilities_read", "batches_read", "tourings_read", "losts_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"sizes_read", "variations_read", "variation_write", "products_read", "orders_read", "provisions_read", "goods_read", "purchases_read", "sales_read", "stocks_read", "traceabilities_read", "batches_read", "tourings_read"})
+     * @Groups({"sizes_read", "variations_read", "variation_write", "products_read", "orders_read", "provisions_read", "goods_read", "purchases_read", "sales_read", "stocks_read", "traceabilities_read", "batches_read", "tourings_read", "losts_read"})
      */
     private $name;
 

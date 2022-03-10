@@ -46,31 +46,31 @@ class Batch
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"batches_read", "batch_write", "stocks_read", "seller:products_read", "provisions_read", "provision_write", "goods_read", "admin:orders_read"})
+     * @Groups({"batches_read", "batch_write", "stocks_read", "seller:products_read", "provisions_read", "provision_write", "goods_read", "admin:orders_read", "losts_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"batches_read", "batch_write", "stocks_read", "seller:products_read", "provisions_read", "provision_write", "goods_read", "admin:orders_read", "stock_write"})
+     * @Groups({"batches_read", "batch_write", "stocks_read", "seller:products_read", "provisions_read", "provision_write", "goods_read", "admin:orders_read", "stock_write", "losts_read"})
      */
     private $number;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
-     * @Groups({"batches_read", "batch_write", "stocks_read", "seller:products_read", "provisions_read", "provision_write", "goods_read", "admin:orders_read", "stock_write"})
+     * @Groups({"batches_read", "batch_write", "stocks_read", "seller:products_read", "provisions_read", "provision_write", "goods_read", "admin:orders_read", "stock_write", "losts_read"})
      */
     private $endDate;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"batches_read", "batch_write", "stocks_read", "seller:products_read", "provisions_read", "provision_write", "goods_read", "admin:orders_read", "stock_write"})
+     * @Groups({"batches_read", "batch_write", "stocks_read", "seller:products_read", "provisions_read", "provision_write", "goods_read", "admin:orders_read", "stock_write", "losts_read"})
      */
     private $initialQty;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"batches_read", "batch_write", "stocks_read", "seller:products_read", "provisions_read", "provision_write", "goods_read", "admin:orders_read", "stock_write"})
+     * @Groups({"batches_read", "batch_write", "stocks_read", "seller:products_read", "provisions_read", "provision_write", "goods_read", "admin:orders_read", "stock_write", "losts_read"})
      */
     private $quantity;
 

@@ -3,6 +3,7 @@
 namespace App\Service\Stock;
 
 use App\Entity\Item;
+use App\Entity\Lost;
 use App\Entity\Stock;
 use App\Entity\Store;
 use App\Entity\Platform;
@@ -80,6 +81,37 @@ class StockManager
         }
     }
 
+    public function decreaseLostFromStock(Lost $lost) {
+        $stock = $lost->getStock();
+        $newQty = $lost->getQuantity() <= $stock->getQuantity() ? $stock->getQuantity() - $lost->getQuantity() : 0;
+        $stock->setQuantity($newQty);
+
+        if (!is_null($lost->getNumber()) && !is_null($stock->getPlatform())) {
+            $i = 0;
+            $batches = $this->getBatchesWithNumber($lost->getNumber(), $stock->getBatches());
+            $rest = $lost->getQuantity();
+            do {
+                $this->decreaseBatchesQuantities($rest, $batches, $i);
+                $i++;
+            } while ($rest > 0);
+        }
+    }
+
+    public function sendBackLostToStock(Lost $lost) {
+        $stock = $lost->getStock();
+        $stock->setQuantity($stock->getQuantity() + $lost->getQuantity());
+
+        if (!is_null($lost->getNumber()) && !is_null($stock->getPlatform())) {
+            $i = 0;
+            $batches = $this->getBatchesWithNumber($lost->getNumber(), $stock->getBatches());
+            $rest = $lost->getQuantity();
+            do {
+                $this->increaseBatchesQuantities($rest, $batches, $i);
+                $i++;
+            } while ($rest > 0);
+        }
+    }
+
     public function addToStock($item, $provision)
     {
         $stock = $this->getShopStockEntity($item, $provision);
@@ -105,7 +137,7 @@ class StockManager
                     if ($difference < 0)
                         $this->decreaseBatchesQuantities($rest, $batches, $i);
                     else
-                        $this->increaceBatchesQuantities($rest, $batches, $i);
+                        $this->increaseBatchesQuantities($rest, $batches, $i);
                     $i++;
                 } while ($rest > 0 && $i <= count($batches) - 1);
             }
@@ -113,7 +145,7 @@ class StockManager
         }
     }
 
-    private function increaceBatchesQuantities(float &$rest, &$batches, int $i)
+    private function increaseBatchesQuantities(float &$rest, &$batches, int $i)
     {
         if (!is_null($batches) && count($batches) > 0) {
             $batchQty = $batches[$i]->getQuantity();

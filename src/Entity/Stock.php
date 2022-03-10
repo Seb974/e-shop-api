@@ -42,25 +42,25 @@ class Stock
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"stocks_read", "products_read", "containers_read", "product_write", "variation_write", "container_write", "admin:orders_read", "batches_read", "provisions_read", "stock_write"})
+     * @Groups({"stocks_read", "products_read", "containers_read", "product_write", "variation_write", "container_write", "admin:orders_read", "batches_read", "provisions_read", "stock_write", "losts_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"stocks_read", "products_read", "containers_read", "product_write", "variation_write", "container_write", "admin:orders_read", "batches_read", "provisions_read", "stock_write"})
+     * @Groups({"stocks_read", "products_read", "containers_read", "product_write", "variation_write", "container_write", "admin:orders_read", "batches_read", "provisions_read", "stock_write", "losts_read"})
      */
     private $quantity;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"stocks_read", "products_read", "containers_read", "product_write", "variation_write", "container_write", "admin:orders_read", "stock_write"})
+     * @Groups({"stocks_read", "products_read", "containers_read", "product_write", "variation_write", "container_write", "admin:orders_read", "stock_write", "losts_read"})
      */
     private $security;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"stocks_read", "products_read", "containers_read", "product_write", "variation_write", "container_write", "admin:orders_read", "stock_write"})
+     * @Groups({"stocks_read", "products_read", "containers_read", "product_write", "variation_write", "container_write", "admin:orders_read", "stock_write", "losts_read"})
      */
     private $alert;
 
@@ -78,31 +78,31 @@ class Stock
 
     /**
      * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="stocks")
-     * @Groups({"stocks_read", "batches_read", "stock_write"})
+     * @Groups({"stocks_read", "batches_read", "stock_write", "losts_read"})
      */
     private $product;
 
     /**
      * @ORM\ManyToOne(targetEntity=Size::class, inversedBy="stocks")
-     * @Groups({"stocks_read", "batches_read", "stock_write"})
+     * @Groups({"stocks_read", "batches_read", "stock_write", "losts_read"})
      */
     private $size;
 
     /**
      * @ORM\ManyToOne(targetEntity=Platform::class)
-     * @Groups({"stocks_read", "seller:products_read", "product_write","variation_write", "batches_read", "stock_write", "admin:orders_read"})
+     * @Groups({"stocks_read", "seller:products_read", "product_write","variation_write", "batches_read", "stock_write", "admin:orders_read", "losts_read"})
      */
     private $platform;
 
     /**
      * @ORM\ManyToOne(targetEntity=Store::class)
-     * @Groups({"stocks_read", "seller:products_read", "product_write", "variation_write", "batches_read", "stock_write"})
+     * @Groups({"stocks_read", "seller:products_read", "product_write", "variation_write", "batches_read", "stock_write", "losts_read"})
      */
     private $store;
 
     /**
      * @ORM\OneToMany(targetEntity=Batch::class, mappedBy="stock", cascade={"persist", "remove"})
-     * @Groups({"stocks_read", "seller:products_read", "product_write", "variation_write", "admin:orders_read", "stock_write"})
+     * @Groups({"stocks_read", "seller:products_read", "product_write", "variation_write", "admin:orders_read", "stock_write", "losts_read"})
      */
     private $batches;
 

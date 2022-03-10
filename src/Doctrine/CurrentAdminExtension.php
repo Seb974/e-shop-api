@@ -23,6 +23,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
+use App\Entity\Lost;
 
 class CurrentAdminExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
@@ -105,6 +106,15 @@ class CurrentAdminExtension implements QueryCollectionExtensionInterface, QueryI
                              ->setParameter("user", $user->getId());
             }
 
+            if ( $resourceClass == Lost::class && $this->auth->isGranted('ROLE_SELLER')) {
+                $queryBuilder->leftJoin("$rootAlias.product","y")
+                             ->leftJoin("y.seller", "d")
+                             ->leftJoin("d.users", "t")
+                             ->andWhere("t IS NOT NULL")
+                             ->andWhere(":user = t.id")
+                             ->setParameter("user", $user->getId());
+            }
+
             if (in_array($resourceClass, [Supplier::class, Provision::class, Store::class])) {
                 $queryBuilder->leftJoin("$rootAlias.seller","s")
                              ->andWhere(":user MEMBER OF s.users")
@@ -168,6 +178,14 @@ class CurrentAdminExtension implements QueryCollectionExtensionInterface, QueryI
 
             if ( in_array($resourceClass, [Provision::class, OrderEntity::class, Stock::class, Sale::class]) ) {
                 $queryBuilder->leftJoin("$rootAlias.store","l")
+                             ->andWhere("l IS NOT NULL")
+                             ->andWhere(":user MEMBER OF l.managers")
+                             ->setParameter("user", $user);
+            }
+
+            if ( $resourceClass == Lost::class ) {
+                $queryBuilder->leftJoin("$rootAlias.stock","r")
+                             ->leftJoin("r.store","l")
                              ->andWhere("l IS NOT NULL")
                              ->andWhere(":user MEMBER OF l.managers")
                              ->setParameter("user", $user);
