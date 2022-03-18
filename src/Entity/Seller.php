@@ -2,12 +2,13 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\SellerRepository;
 use ApiPlatform\Core\Annotation\ApiFilter;
+use App\Filter\Seller\SellerFilterByImage;
+use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
@@ -30,9 +31,10 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
  *          "DELETE"={"security"="is_granted('ROLE_TEAM')"}
  *     }
  * )
- * @ApiFilter(SearchFilter::class, properties={"name"="word_start"})
  * @ApiFilter(OrderFilter::class, properties={"name"})
+ * @ApiFilter(SearchFilter::class, properties={"name"="word_start"})
  * @ApiFilter(BooleanFilter::class, properties={"needsRecovery", "isActive"})
+ * @ApiFilter(SellerFilterByImage::class, properties={"existingImage"="exact"})
  */
 class Seller
 {
