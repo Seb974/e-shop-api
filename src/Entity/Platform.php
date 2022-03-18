@@ -85,6 +85,12 @@ class Platform
      */
     private $stores;
 
+    /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     * @Groups({"platforms_read", "platform_write"})
+     */
+    private $siret;
+
     public function __construct()
     {
         $this->pickers = new ArrayCollection();
@@ -237,6 +243,18 @@ class Platform
                 $store->setPlatform(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getSiret(): ?string
+    {
+        return $this->siret;
+    }
+
+    public function setSiret(?string $siret): self
+    {
+        $this->siret = $siret;
 
         return $this;
     }
