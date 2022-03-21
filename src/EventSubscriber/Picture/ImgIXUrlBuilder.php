@@ -5,12 +5,13 @@ namespace App\EventSubscriber\Picture;
 use Imgix\UrlBuilder;
 use App\Entity\Picture;
 use App\Service\Image\Dimension;
+use App\Repository\SellerRepository;
+use App\Repository\PlatformRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use ApiPlatform\Core\EventListener\EventPriorities;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 /**
  * ImgIXUrlBuilder
  *
@@ -24,16 +25,16 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class ImgIXUrlBuilder implements EventSubscriberInterface 
 {
     private $em;
-    private $key;
-    private $domain;
     private $dimension;
+    private $sellerRepository;
+    private $platformRepository;
 
-    public function __construct($key, $domain, EntityManagerInterface $em, Dimension $dimension)
+    public function __construct(EntityManagerInterface $em, Dimension $dimension, PlatformRepository $platformRepository, SellerRepository $sellerRepository)
     {
         $this->em = $em;
-        $this->key = $key;
-        $this->domain = $domain;
         $this->dimension = $dimension;
+        $this->sellerRepository = $sellerRepository;
+        $this->platformRepository = $platformRepository;
     }
 
     public static function getSubscribedEvents()
@@ -46,11 +47,13 @@ class ImgIXUrlBuilder implements EventSubscriberInterface
     public function addImgIXUrl(ViewEvent $event)
     {
         $result = $event->getControllerResult();
-        $method = $event->getRequest()->getMethod();
+        $request = $event->getRequest();
+        $method = $request->getMethod();
+        $owner = $this->getOwner($request->query->get('owner'));
 
         if ($result instanceof Picture && ($method === "POST" || $method === "PUT" || $method === "PATCH")) {
             $params = $this->getParams($result);
-            $builder = new UrlBuilder($this->domain, true, $this->key, false);
+            $builder = new UrlBuilder($owner->getImgDomain(), true, $owner->getImgKey(), false);
             $imgPath = $builder->createURL($result->filePath, $params);
             $result->setImgPath($imgPath);
             $this->em->flush();
@@ -75,5 +78,13 @@ class ImgIXUrlBuilder implements EventSubscriberInterface
             $params = array_merge($params, ["dpr" => 0.9]);
         }
         return $params;
+    }
+
+    private function getOwner($ownerId)
+    {
+        if (!is_null($ownerId)) {
+            return $this->sellerRepository->find($ownerId);
+        }
+        return $this->platformRepository->find(1);
     }
 }

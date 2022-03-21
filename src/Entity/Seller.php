@@ -138,6 +138,18 @@ class Seller
      */
     private $metas;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"sellers_read", "seller_write"})
+     */
+    private $imgDomain;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"seller_write"})
+     */
+    private $imgKey;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -355,6 +367,30 @@ class Seller
     public function setMetas(?Meta $metas): self
     {
         $this->metas = $metas;
+
+        return $this;
+    }
+
+    public function getImgDomain(): ?string
+    {
+        return $this->imgDomain;
+    }
+
+    public function setImgDomain(?string $imgDomain): self
+    {
+        $this->imgDomain = $imgDomain;
+
+        return $this;
+    }
+
+    public function getImgKey(): ?string
+    {
+        return $this->imgKey;
+    }
+
+    public function setImgKey(?string $imgKey): self
+    {
+        $this->imgKey = $imgKey;
 
         return $this;
     }

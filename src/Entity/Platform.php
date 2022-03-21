@@ -91,6 +91,18 @@ class Platform
      */
     private $siret;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"platforms_read", "platform_write"})
+     */
+    private $imgDomain;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"platform_write"})
+     */
+    private $imgKey;
+
     public function __construct()
     {
         $this->pickers = new ArrayCollection();
@@ -255,6 +267,30 @@ class Platform
     public function setSiret(?string $siret): self
     {
         $this->siret = $siret;
+
+        return $this;
+    }
+
+    public function getImgDomain(): ?string
+    {
+        return $this->imgDomain;
+    }
+
+    public function setImgDomain(?string $imgDomain): self
+    {
+        $this->imgDomain = $imgDomain;
+
+        return $this;
+    }
+
+    public function getImgKey(): ?string
+    {
+        return $this->imgKey;
+    }
+
+    public function setImgKey(string $imgKey): self
+    {
+        $this->imgKey = $imgKey;
 
         return $this;
     }
