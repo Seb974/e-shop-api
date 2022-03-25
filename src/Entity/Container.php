@@ -10,8 +10,10 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Annotation\ApiFilter;
+use App\Filter\Container\ContainerFilterByGroupFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 
 /**
  * @ORM\Entity(repositoryClass=ContainerRepository::class)
@@ -30,6 +32,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
  *          "DELETE"={"security"="is_granted('ROLE_ADMIN')"}
  *     }
  * )
+ * @ApiFilter(ContainerFilterByGroupFilter::class, properties={"group"="exact"})
+ * @ApiFilter(BooleanFilter::class, properties={"available"})
  * @ApiFilter(SearchFilter::class, properties={"name"="word_start"})
  * @ApiFilter(OrderFilter::class, properties={"name"})
  */
@@ -39,13 +43,13 @@ class Container
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"containers_read", "container_write", "packages_read", "orders_read"})
+     * @Groups({"containers_read", "container_write", "packages_read", "orders_read", "tourings_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=120, nullable=true)
-     * @Groups({"containers_read", "container_write", "packages_read", "orders_read"})
+     * @Groups({"containers_read", "container_write", "packages_read", "orders_read", "tourings_read"})
      * @Assert\NotBlank(message="Un nom est obligatoire.")
      */
     private $name;
@@ -53,67 +57,80 @@ class Container
     // @Assert\PositiveOrZero(message="Le prix du colis doit être un nombre positif.")
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"containers_read", "container_write", "packages_read", "orders_read"})
+     * @Groups({"containers_read", "container_write", "packages_read", "orders_read", "tourings_read"})
      */
     private $max;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"containers_read", "container_write", "packages_read", "orders_read"})
+     * @Groups({"containers_read", "container_write", "packages_read", "orders_read", "tourings_read"})
      */
     private $tare;
 
     /**
      * @ORM\ManyToOne(targetEntity=Tax::class)
-     * @Groups({"containers_read", "container_write", "packages_read", "orders_read"})
+     * @Groups({"containers_read", "container_write", "packages_read", "orders_read", "tourings_read"})
      */
     private $tax;
 
     /**
      * @ORM\OneToOne(targetEntity=Stock::class, cascade={"persist", "remove"})
-     * @Groups({"containers_read", "container_write", "packages_read", "orders_read"})
+     * @Groups({"containers_read", "container_write", "packages_read", "orders_read", "tourings_read"})
      */
     private $stock;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"containers_read", "container_write", "packages_read", "orders_read"})
+     * @Groups({"containers_read", "container_write", "packages_read", "orders_read", "tourings_read"})
      */
     private $height;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"containers_read", "container_write", "packages_read", "orders_read"})
+     * @Groups({"containers_read", "container_write", "packages_read", "orders_read", "tourings_read"})
      */
     private $width;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"containers_read", "container_write", "packages_read", "orders_read"})
+     * @Groups({"containers_read", "container_write", "packages_read", "orders_read", "tourings_read"})
      */
     private $length;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"containers_read", "container_write", "packages_read", "orders_read"})
+     * @Groups({"containers_read", "container_write", "packages_read", "orders_read", "tourings_read"})
      */
     private $available;
 
     /**
      * @ORM\OneToMany(targetEntity=CatalogPrice::class, mappedBy="container", cascade={"persist", "remove"})
-     * @Groups({"containers_read", "container_write", "packages_read", "orders_read"})
+     * @Groups({"containers_read", "container_write", "packages_read", "orders_read", "tourings_read"})
      */
     private $catalogPrices;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
-     * @Groups({"containers_read", "container_write", "packages_read", "orders_read"})
+     * @Groups({"containers_read", "container_write", "packages_read", "orders_read", "tourings_read"})
      */
     private $accountingId;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Group::class)
+     * @Groups({"containers_read", "container_write"})
+     */
+    private $userGroups;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"containers_read", "container_write", "packages_read"})
+     */
+    private $isReturnable;
 
     public function __construct()
     {
         $this->catalogPrices = new ArrayCollection();
+        $this->userGroups = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -267,6 +284,42 @@ class Container
     public function setAccountingId(?int $accountingId): self
     {
         $this->accountingId = $accountingId;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Group[]
+     */
+    public function getUserGroups(): Collection
+    {
+        return $this->userGroups;
+    }
+
+    public function addUserGroup(Group $userGroup): self
+    {
+        if (!$this->userGroups->contains($userGroup)) {
+            $this->userGroups[] = $userGroup;
+        }
+
+        return $this;
+    }
+
+    public function removeUserGroup(Group $userGroup): self
+    {
+        $this->userGroups->removeElement($userGroup);
+
+        return $this;
+    }
+
+    public function getIsReturnable(): ?bool
+    {
+        return $this->isReturnable;
+    }
+
+    public function setIsReturnable(?bool $isReturnable): self
+    {
+        $this->isReturnable = $isReturnable;
 
         return $this;
     }

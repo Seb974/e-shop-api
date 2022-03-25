@@ -48,26 +48,26 @@ class Group
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"groups_read", "priceGroups_read", "products_read", "categories_read", "dayOff_read", "conditions_read", "cities_read", "relaypoints_read", "stores_read", "admin:orders_read"})
+     * @Groups({"groups_read", "priceGroups_read", "products_read", "categories_read", "dayOff_read", "conditions_read", "cities_read", "relaypoints_read", "stores_read", "admin:orders_read", "containers_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=30, nullable=true)
      * @Assert\Length(max = 30, maxMessage = "Le nom ne peut dépasser {{ limit }} caractères.")
-     * @Groups({"groups_read", "priceGroups_read", "products_read", "categories_read", "dayOff_read", "conditions_read", "cities_read", "relaypoints_read", "stores_read", "admin:orders_read"})
+     * @Groups({"groups_read", "priceGroups_read", "products_read", "categories_read", "dayOff_read", "conditions_read", "cities_read", "relaypoints_read", "stores_read", "admin:orders_read", "containers_read"})
      */
     private $label;
 
     /**
      * @ORM\Column(type="string", length=35, nullable=true)
-     * @Groups({"groups_read", "priceGroups_read", "products_read", "categories_read", "dayOff_read", "conditions_read", "cities_read", "relaypoints_read", "stores_read", "admin:orders_read"})
+     * @Groups({"groups_read", "priceGroups_read", "products_read", "categories_read", "dayOff_read", "conditions_read", "cities_read", "relaypoints_read", "stores_read", "admin:orders_read", "containers_read"})
      */
     private $value;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"groups_read", "priceGroups_read", "products_read", "categories_read", "dayOff_read", "conditions_read", "cities_read", "relaypoints_read"})
+     * @Groups({"groups_read", "priceGroups_read", "products_read", "categories_read", "dayOff_read", "conditions_read", "cities_read", "relaypoints_read", "containers_read"})
      */
     private $isFixed;
 
@@ -124,6 +124,12 @@ class Group
      * @Groups({"admin:groups_read"})
      */
     private $hasStoreAccess;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"groups_read", "priceGroups_read", "products_read", "categories_read", "dayOff_read", "conditions_read", "cities_read", "relaypoints_read"})
+     */
+    private $paymentParcel;
 
     public function getId(): ?int
     {
@@ -270,6 +276,18 @@ class Group
     public function setHasStoreAccess(?bool $hasStoreAccess): self
     {
         $this->hasStoreAccess = $hasStoreAccess;
+
+        return $this;
+    }
+
+    public function getPaymentParcel(): ?bool
+    {
+        return $this->paymentParcel;
+    }
+
+    public function setPaymentParcel(?bool $paymentParcel): self
+    {
+        $this->paymentParcel = $paymentParcel;
 
         return $this;
     }

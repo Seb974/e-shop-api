@@ -57,10 +57,6 @@ services:
             $mercurePath: '%env(MERCURE_PATH)%'
             $cookieDomain: '%env(STRICT_DOMAIN)%'
 
-    App\Service\Stripe\Stripe:
-        arguments:
-            $secretKey: '%env(STRIPE_SECRET_KEY)%'
-
     App\Service\User\UserGroupDefiner:
         arguments:
             $requestStack: '@request_stack'
@@ -138,44 +134,38 @@ services:
 
     App\Service\Chronopost\Shipping:
         arguments:
-            $password: '%env(CHRONOPOST_ACCOUNT_PASSWORD)%'
             $contractNumber: '%env(CHRONOPOST_CONTRACT_NUMBER)%'
-            $accountNumber: '%env(CHRONOPOST_ACCOUNT_NUMBER)%'
+            # $password: '%env(CHRONOPOST_ACCOUNT_PASSWORD)%'
+            # $accountNumber: '%env(CHRONOPOST_ACCOUNT_NUMBER)%'
 
-    App\Service\Chronopost\Tracking:
-        arguments:
-            $rootPath: '%kernel.project_dir%'
-            $password: '%env(CHRONOPOST_ACCOUNT_PASSWORD)%'
-            $accountNumber: '%env(CHRONOPOST_ACCOUNT_NUMBER)%'
+    # App\Service\Chronopost\Tracking:
+    #     arguments:
+    #         $rootPath: '%kernel.project_dir%'
+    #         $password: '%env(CHRONOPOST_ACCOUNT_PASSWORD)%'
+    #         $accountNumber: '%env(CHRONOPOST_ACCOUNT_NUMBER)%'
 
     App\Service\Axonaut\User:
         arguments:
-            $key: '%env(AXONAUT_API_KEY)%'
             $domain: '%env(AXONAUT_DOMAIN)%'
 
     App\Service\Axonaut\Product:
         arguments:
-            $key: '%env(AXONAUT_API_KEY)%'
             $domain: '%env(AXONAUT_DOMAIN)%'
 
     App\Service\Axonaut\Container:
         arguments:
-            $key: '%env(AXONAUT_API_KEY)%'
             $domain: '%env(AXONAUT_DOMAIN)%'
 
     App\Service\Axonaut\Invoice:
         arguments:
-            $key: '%env(AXONAUT_API_KEY)%'
             $domain: '%env(AXONAUT_DOMAIN)%'
 
     App\Service\Axonaut\Supplier:
         arguments:
-            $key: '%env(AXONAUT_API_KEY)%'
             $domain: '%env(AXONAUT_DOMAIN)%'
 
     App\Service\Axonaut\Expense:
         arguments:
-            $key: '%env(AXONAUT_API_KEY)%'
             $domain: '%env(AXONAUT_DOMAIN)%'
 
     App\Service\Email\Mailer:
@@ -208,7 +198,6 @@ services:
         arguments: 
             $sender: '%env(EMAIL_SENDER)%'
             $appName: '%env(APP_NAME)%'
-            $receptor: '%env(AXONAUT_PROSPECT_RECEPTOR)%'
 
     App\Service\Email\OrderConfirmer:
         arguments:

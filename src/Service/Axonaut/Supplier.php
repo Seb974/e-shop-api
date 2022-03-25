@@ -2,54 +2,64 @@
 
 namespace App\Service\Axonaut;
 
-use App\Service\Axonaut\User;
+use App\Repository\PlatformRepository;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class Supplier
 {
-    private $key;
     private $domain;
     private $client;
-    private $axonautUser;
+    private $platformRepository;
 
-    public function __construct($key, $domain, HttpClientInterface $client, User $axonautUser)
+    public function __construct($domain, HttpClientInterface $client, PlatformRepository $platformRepository)
     {
-        $this->key = $key;
         $this->domain = $domain;
         $this->client = $client;
-        $this->axonautUser = $axonautUser;
+        $this->platformRepository = $platformRepository;
     }
 
-    public function createSupplier($entity)
+    public function createSupplier($entity, $loadedPlatform = null)
     {
-        $axonautSupplier = $this->getAxonautSupplier($entity);
-        $parameters = [ 'headers' => ['userApiKey' => $this->key], 'body' => $axonautSupplier];
-        $response = $this->client->request('POST', $this->domain . 'suppliers', $parameters);
-        $content = $response->toArray();
-        $this->updateSupplierCompany($entity, $content['company_id']);
-        return $content;
+        $platform = !is_null($loadedPlatform) ? $loadedPlatform : $this->getPlatform();
+        if ($platform->getHasAxonautLink() && !is_null($platform->getAxonautKey())) {
+            $axonautSupplier = $this->getAxonautSupplier($entity);
+            $parameters = [ 'headers' => ['userApiKey' => $platform->getAxonautKey()], 'body' => $axonautSupplier];
+            $response = $this->client->request('POST', $this->domain . 'suppliers', $parameters);
+            $content = $response->toArray();
+            $this->updateSupplierCompany($entity, $content['company_id'], $platform);
+            return $content;
+        }
+        return null;
     }
 
-    public function updateSupplierCompany($supplier, $companyId)
+    public function updateSupplierCompany($supplier, $companyId, $loadedPlatform = null)
     {
-        $axonautSupplierCompany = $this->getAxonautSupplierCompany($supplier);
-        $parameters = [ 'headers' => ['userApiKey' => $this->key], 'body' => $axonautSupplierCompany];
-        $response = $this->client->request('PATCH', $this->domain . 'companies/' . $companyId, $parameters);
-        $content = $response->toArray();
-        return $content['id'];
+        $platform = !is_null($loadedPlatform) ? $loadedPlatform : $this->getPlatform();
+        if ($platform->getHasAxonautLink() && !is_null($platform->getAxonautKey())) {
+            $axonautSupplierCompany = $this->getAxonautSupplierCompany($supplier);
+            $parameters = [ 'headers' => ['userApiKey' => $platform->getAxonautKey()], 'body' => $axonautSupplierCompany];
+            $response = $this->client->request('PATCH', $this->domain . 'companies/' . $companyId, $parameters);
+            $content = $response->toArray();
+            return $content['id'];
+        }
+        return null;
     }
 
     public function updateSupplier($entity)
     {
-        $axonautId = $entity->getAccountingCompanyId();
-        if (is_null($axonautId))
-            return $this->createSupplier($entity);
+        $platform = $this->getPlatform();
+        if ($platform->getHasAxonautLink() && !is_null($platform->getAxonautKey())) {
+            $axonautId = $entity->getAccountingCompanyId();
+            if (is_null($axonautId))
+                return $this->createSupplier($entity, $platform);
 
-        $axonautSupplier = $this->getAxonautSupplierCompany($entity);
-        $parameters = [ 'headers' => ['userApiKey' => $this->key], 'body' => $axonautSupplier];
-        $response = $this->client->request('PATCH', $this->domain . 'companies/' . $axonautId, $parameters);
-        $content = $response->toArray();
-        return $content['id'];
+            $axonautSupplier = $this->getAxonautSupplierCompany($entity);
+            $parameters = [ 'headers' => ['userApiKey' => $platform->getAxonautKey()], 'body' => $axonautSupplier];
+            $response = $this->client->request('PATCH', $this->domain . 'companies/' . $axonautId, $parameters);
+            $content = $response->toArray();
+            return $content['id'];
+        }
+        return null;
     }
 
     private function getAxonautSupplier($entity)
@@ -73,5 +83,10 @@ class Supplier
                 'tel' => $entity->getPhone()
             ]
         ];
+    }
+
+    private function getPlatform()
+    {
+        return $this->platformRepository->find(1);
     }
 }

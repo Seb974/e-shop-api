@@ -39,8 +39,10 @@ class UpdateSubscriber implements EventSubscriberInterface
         if ($result instanceof Supplier) {
             if ($method === "POST") {
                 $ids = $this->axonaut->createSupplier($result);
-                $result->setAccountingId($ids['supplier_id'])
-                       ->setAccountingCompanyId($ids['company_id']);
+                if (!is_null($ids)) {
+                    $result->setAccountingId($ids['supplier_id'])
+                           ->setAccountingCompanyId($ids['company_id']);
+                }
             }
             else if ($method === "PUT" || $method === "PATCH") {
                 $accountingId = $this->axonaut->updateSupplier($result);

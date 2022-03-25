@@ -157,7 +157,7 @@ class OrderEntity
 
     /**
      * @ORM\ManyToOne(targetEntity=Condition::class)
-     * @Groups({"admin:orders_read", "order_write"})
+     * @Groups({"orders_read", "admin:orders_read", "order_write"})
      */
     private $appliedCondition;
 

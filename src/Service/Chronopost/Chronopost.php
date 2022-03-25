@@ -20,7 +20,7 @@ class Chronopost
     public function setReservationNumbers(OrderEntity &$order)
     {
         $reservation = $this->shipping->getReservationNumbers($order);
-        if (isset($reservation->return)) {
+        if (!is_null($reservation) && isset($reservation->return) && $reservation->return->errorCode == 0) {
             $results = $reservation->return->resultMultiParcelValue;
             $reservationNumber = $reservation->return->reservationNumber;
             $trackIds = $this->tracking->getTrackIds($results, $order);

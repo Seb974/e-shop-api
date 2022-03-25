@@ -22,16 +22,14 @@ use App\Entity\Chronopost\GetReservedSkybillWithTypeAndModeAuth;
 
 class Shipping
 {
-    private $password;
     private $declarations;
-    private $accountNumber;
     private $contractNumber;
     private $shippingService;
     private $packagesPlanner;
     private $catalogRepository;
     private $platformRepository;
 
-    public function __construct($contractNumber, $accountNumber, $password, PackagePlanner $packagesPlanner, Declarations $declarations, PlatformRepository $platformRepository, CatalogRepository $catalogRepository)
+    public function __construct($contractNumber, PackagePlanner $packagesPlanner, Declarations $declarations, PlatformRepository $platformRepository, CatalogRepository $catalogRepository)
     {
         $this->shippingService = new \SoapClient('https://ws.chronopost.fr/shipping-cxf/ShippingServiceWS?wsdl');
         $this->shippingService->soap_defencoding = 'UTF-8';
@@ -40,38 +38,45 @@ class Shipping
         $this->shippingService->decode_utf8 = false;
         $this->packagesPlanner = $packagesPlanner;
         $this->contractNumber = $contractNumber;
-        $this->accountNumber = $accountNumber;
         $this->declarations = $declarations;
-        $this->password = $password;
     }
 
     public function getReservationNumbers(OrderEntity $order)
     {
-        try {
-            $packagesPlan = $this->packagesPlanner->getParcelPlan($order);
-            $params = $this->getBillParams($order, $packagesPlan);
-            $reservation = $this->shippingService->shippingMultiParcelV4($params);
-            return $reservation;
-        } catch (\SoapFault $soapFault) { 
-            return $soapFault;
+        $platform = $this->getPlatform();
+        $catalog = $order->getCatalog();
+        if (!is_null($platform->getChronopostNumber()) && !is_null($platform->getChronopostPassword()) && $catalog->getDeliveredByChronopost()) {
+            try {
+                $packagesPlan = $this->packagesPlanner->getParcelPlan($order);
+                $params = $this->getBillParams($order, $packagesPlan, $platform);
+                $reservation = $this->shippingService->shippingMultiParcelV4($params);
+                return $reservation;
+            } catch (\SoapFault $soapFault) { 
+                return $soapFault;
+            }
         }
+        return null;
     }
 
     public function getSkybill($reservationNumber)
     {
-        try {
-            $params = $this->getReservationParams($reservationNumber);
-            $encodedResult = $this->shippingService->getReservedSkybillWithTypeAndModeAuth($params);
-            return base64_decode($encodedResult->return->skybill, false);
-
-        } catch (\SoapFault $soapFault) { 
-            return $soapFault; 
+        $platform = $this->getPlatform();
+        if (!is_null($platform->getChronopostNumber()) && !is_null($platform->getChronopostPassword())) {
+            try {
+                $params = $this->getReservationParams($reservationNumber, $platform);
+                $encodedResult = $this->shippingService->getReservedSkybillWithTypeAndModeAuth($params);
+                return base64_decode($encodedResult->return->skybill, false);
+    
+            } catch (\SoapFault $soapFault) { 
+                return $soapFault; 
+            }
         }
+        return null;
     }
 
-    private function getBillParams(OrderEntity $order, array $packagesPlan)
+    private function getBillParams(OrderEntity $order, array $packagesPlan, Platform $loadedPlatform = null)
     {
-        $platform = $this->getPlatform();
+        $platform = !is_null($loadedPlatform) ? $loadedPlatform : $this->getPlatform();
         $catalog = $this->getDefaultCatalog();
         $packages = $this->getPackages($order);
         $skybillValue = count($packages) > 1 ? 
@@ -79,14 +84,14 @@ class Shipping
             $this->getSkybillValueForOneParcel($order, $packagesPlan);
         $params = new ShippingMultiParcelV4();
         $params->setEsdValue($this->getEsdValue($order))
-               ->setHeaderValue($this->getHeaderValue())
+               ->setHeaderValue($this->getHeaderValue($platform))
                ->setShipperValue($this->getShipperValue($platform, $catalog))
                ->setCustomerValue($this->getCustomerValue($platform, $catalog))
                ->setRecipientValue($this->getRecipientValue($order))
                ->setRefValue($this->getRefValue($order))
                ->setSkybillValue($skybillValue)
                ->setSkybillParamsValue($this->getSkybillParamsValue())
-               ->setPassword($this->password)
+               ->setPassword($platform->getChronopostPassword())      // $this->password
                ->setModeRetour('2')
                ->setNumberOfParcel(count($packages))
                ->setVersion('2.0')
@@ -96,8 +101,7 @@ class Shipping
 
     private function getPlatform()
     {
-        $platforms = $this->platformRepository->findAll();
-        return $platforms[0];
+        return $this->platformRepository->find(1);
     }
 
     private function getDefaultCatalog()
@@ -142,10 +146,11 @@ class Shipping
         return $esd;
     }
 
-    private function getHeaderValue()
+    private function getHeaderValue(Platform $loadedPlatform = null)
     {
+        $platform = !is_null($loadedPlatform) ? $loadedPlatform : $this->getPlatform();
         $header = new HeaderValue();
-        $header->setAccountNumber($this->accountNumber)
+        $header->setAccountNumber($platform->getChronopostNumber())    // $this->accountNumber
                ->setIdEmit('CHRFR')
                ->setSubAccount(0);
         return $header;
@@ -263,7 +268,6 @@ class Shipping
                 ->setWidth($packages[0]->getContainer()->getWidth())
                 ->setAs('');
         $this->declarations->setContent($skybill, $order, $packagesPlan[0]);
-        dump($skybill);
         $skybills[] = $skybill;
         return $skybill;
     }
@@ -298,20 +302,20 @@ class Shipping
                     ->setWidth($package['width'])
                     ->setAs('');
             $this->declarations->setContent($skybill, $order, $packagesPlan[$i]);
-            dump($skybill);
             $skybills[] = $skybill;
         }
         return $skybills;
     }
 
-    public function getReservationParams($reservationNumber)
+    public function getReservationParams($reservationNumber, Platform $loadedPlatform = null)
     {
+        $platform = !is_null($loadedPlatform) ? $loadedPlatform : $this->getPlatform();
         $reservedSkybill = new GetReservedSkybillWithTypeAndModeAuth();
         $reservedSkybill->setReservationNumber($reservationNumber)
                         ->setMode('ZPL')
                         ->setNumberSearch($reservationNumber)
-                        ->setAccountNumber($this->accountNumber)
-                        ->setPassword($this->password);
+                        ->setAccountNumber($platform->getChronopostNumber())    // $this->accountNumber
+                        ->setPassword($platform->getChronopostPassword());     // $this->password
         return $reservedSkybill;
     }
 }

@@ -45,7 +45,7 @@ class Constructor
     public function adjustOrder(&$order)
     {
         $catalog = $order->getCatalog();
-        if ($catalog === null || !$catalog->getNeedsParcel() && $order->getAppliedCondition() === null) {
+        if ($catalog === null || !$catalog->getDeliveredByChronopost() && $order->getAppliedCondition() === null) {     // getNeedsParcel()
             throw new \Exception();
         }
         $user = $this->security->getUser();
@@ -58,14 +58,16 @@ class Constructor
         $totalTTC = $this->getItemsCostTTC($items, 'ORDERED');
         $deliveryCostHT = $this->getDeliveryCostHT($order->getAppliedCondition(), $totalHT);
         $deliveryCostTTC = $this->getDeliveryCostTTC($order->getAppliedCondition(), $catalog, $deliveryCostHT);
+        $packageCostHT = $this->getPackagesCostHT($order);
+        $packageCostTTC = $this->getPackagesCostTTC($order);
         $order->setUser($user)
               ->setIsRemains(false)
               ->setRegulated(false)
               ->setInvoiced(false)
               ->setStatus($status)
               ->setNotification($notification)
-              ->setTotalHT($totalHT + $deliveryCostHT)
-              ->setTotalTTC($totalTTC + $deliveryCostTTC)
+              ->setTotalHT($totalHT + $deliveryCostHT + $packageCostHT)
+              ->setTotalTTC($totalTTC + $deliveryCostTTC + $packageCostTTC)
               ->setPlatform($platform);
         if ($catalog->getNeedsParcel()) {
             $this->packer->setPackageEntities($order);
@@ -79,10 +81,12 @@ class Constructor
         $totalTTC = $this->getItemsCostTTC($order->getItems(), 'ORDERED');
         $deliveryCostHT = $this->getDeliveryCostHT($order->getAppliedCondition(), $totalHT);
         $deliveryCostTTC = $this->getDeliveryCostTTC($order->getAppliedCondition(), $catalog, $deliveryCostHT);
+        $packageCostHT = $this->getPackagesCostHT($order);
+        $packageCostTTC = $this->getPackagesCostTTC($order);
         $order->setRegulated(false)
               ->setInvoiced(false)
-              ->setTotalHT($totalHT + $deliveryCostHT)
-              ->setTotalTTC($totalTTC + $deliveryCostTTC);
+              ->setTotalHT($totalHT + $deliveryCostHT + $packageCostHT)
+              ->setTotalTTC($totalTTC + $deliveryCostTTC + $packageCostTTC);
         if ($catalog->getNeedsParcel()) {
             $this->packer->setPackageEntities($order);
         }
@@ -134,8 +138,12 @@ class Constructor
 
         $totalHT  = $this->getItemsCostHT($order->getItems(),  ($isPaidOnline ? 'ORDERED' : 'PREPARED'));
         $totalTTC = $this->getItemsCostTTC($order->getItems(), ($isPaidOnline ? 'ORDERED' : 'PREPARED'));
-        $order->setTotalHT($totalHT)
-              ->setTotalTTC($totalTTC);
+        $deliveryCostHT = $this->getDeliveryCostHT($order->getAppliedCondition(), $totalHT);
+        $deliveryCostTTC = $this->getDeliveryCostTTC($order->getAppliedCondition(), $order->getCatalog(), $deliveryCostHT);
+        $packageCostHT = $this->getPackagesCostHT($order);
+        $packageCostTTC = $this->getPackagesCostTTC($order);
+        $order->setTotalHT($totalHT + $deliveryCostHT + $packageCostHT)
+              ->setTotalTTC($totalTTC + $deliveryCostTTC + $packageCostTTC);
     }
 
     private function updateDeliveredOrder(&$order, $isPaidOnline)
@@ -149,16 +157,20 @@ class Constructor
         }
         $totalHT  = $this->getItemsCostHT($order->getItems(),  ($isPaidOnline ? 'ORDERED' : 'DELIVERED'));
         $totalTTC = $this->getItemsCostTTC($order->getItems(), ($isPaidOnline ? 'ORDERED' : 'DELIVERED'));
+        $deliveryCostHT = $this->getDeliveryCostHT($order->getAppliedCondition(), $totalHT);
+        $deliveryCostTTC = $this->getDeliveryCostTTC($order->getAppliedCondition(), $order->getCatalog(), $deliveryCostHT);
+        $packageCostHT = $this->getPackagesCostHT($order);
+        $packageCostTTC = $this->getPackagesCostTTC($order);
         $this->sellerAccount->dispatchTurnover($order, "INCREASE");
-        $order->setTotalHT($totalHT)
-              ->setTotalTTC($totalTTC)
+        $order->setTotalHT($totalHT + $deliveryCostHT + $packageCostHT)
+              ->setTotalTTC($totalTTC + $deliveryCostTTC + $packageCostTTC)
               ->setRegulated(true);
     }
 
     private function needsStatusUpdate(&$order)
     {
         $isComplete = true;
-        if ($order->getCatalog()->getNeedsParcel() && !$this->security->isGranted('ROLE_PICKER')) {
+        if ($order->getCatalog()->getDeliveredByChronopost() && !$this->security->isGranted('ROLE_PICKER')) {       // getNeedsParcel()
             $isComplete = false;
         } else {
             foreach ($order->getItems() as $item) {
@@ -173,7 +185,7 @@ class Constructor
 
     private function getAdaptedStatus(&$order)
     {
-        return $order->getCatalog()->getNeedsParcel() ? "READY" : (!$this->security->isGranted('ROLE_PICKER') && $this->needsRecovery($order) ? "PRE-PREPARED" : "PREPARED");
+        return $order->getCatalog()->getDeliveredByChronopost() ? "READY" : (!$this->security->isGranted('ROLE_PICKER') && $this->needsRecovery($order) ? "PRE-PREPARED" : "PREPARED");       // getNeedsParcel()
     }
 
     private function needsRecovery(&$order)
@@ -227,6 +239,48 @@ class Constructor
             $accumulator += ($qty * $item->getPrice());
         }
         return $accumulator;
+    }
+
+    private function getPackagesCostHT($order)
+    {
+        $accumulator = 0;
+        foreach ($order->getPackages() as $package) {
+            $price = $this->getContainerPrice($package->getContainer(),$order->getCatalog());
+            $accumulator += ($package->getQuantity() * $price);
+        }
+        return $accumulator;
+    }
+
+    private function getPackagesCostTTC($order)
+    {
+        $accumulator = 0;
+        foreach ($order->getPackages() as $package) {
+            $price = $this->getContainerPrice($package->getContainer(),$order->getCatalog());
+            $tax = $this->getContainerTaxAmount($package->getContainer(),$order->getCatalog());
+            $accumulator += ($package->getQuantity() * $price * (1 + $tax));
+        }
+        return $accumulator;
+    }
+
+
+    private function getContainerPrice($container, $catalog)
+    {
+        foreach ($container->getCatalogPrices() as $catalogPrice) {
+            if ($catalogPrice->getCatalog()->getId() === $catalog->getId()) {
+                return $catalogPrice->getAmount();
+            }
+        }
+        return 0;
+    }
+
+    private function getContainerTaxAmount($container, $catalog)
+    {
+        foreach ($container->getTax()->getCatalogTaxes() as $catalogTax) {
+            if ($catalogTax->getCatalog()->getId() === $catalog->getId()) {
+                return $catalogTax->getPercent();
+            }
+        }
+        return 0;
     }
 
     private function getDeliveryCostHT($condition, $totalHT)

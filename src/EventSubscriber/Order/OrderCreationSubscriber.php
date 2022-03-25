@@ -83,7 +83,7 @@ class OrderCreationSubscriber implements EventSubscriberInterface
         }
         if (($method === "POST" || $method === "PUT") && $order->getStatus() === "WAITING") {
             $this->updateEntitiesCounters($order);
-            if ($order->getCatalog()->getNeedsParcel())
+            if ($order->getCatalog()->getNeedsParcel() && $order->getCatalog()->getDeliveredByChronopost())
                 $this->chronopost->setReservationNumbers($order);
             if ($userGroup->getOnlinePayment())
                 $this->orderConfirmer->notify($order);
@@ -95,7 +95,7 @@ class OrderCreationSubscriber implements EventSubscriberInterface
         if ( $method === "POST" && $order->getStatus() === "WAITING" ) {
             $this->constructor->adjustAdminOrder($order);
             $this->updateEntitiesCounters($order);
-            if ($order->getCatalog()->getNeedsParcel())
+            if ($order->getCatalog()->getNeedsParcel() && $order->getCatalog()->getDeliveredByChronopost())
                 $this->chronopost->setReservationNumbers($order);
         } else if ( $method === "PUT" ) {
             if ( in_array($order->getStatus(), ["WAITING", "PRE-PREPARED"]) )

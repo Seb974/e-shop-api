@@ -22,7 +22,7 @@ final class OrderTruckDeliveriesFilter extends AbstractContextAwareFilter
 
         $queryBuilder
             ->leftJoin("$rootAlias.catalog","g")
-            ->andWhere(sprintf('g.needsParcel = :%s', $parameterName))
+            ->andWhere(sprintf('g.deliveredByChronopost = :%s', $parameterName))
             ->setParameter($parameterName, intval($value) !== 1);
     }
 
