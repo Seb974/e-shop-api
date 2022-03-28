@@ -151,11 +151,18 @@ class Platform
      */
     private $hasChronopostLink;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Logo::class, mappedBy="platform", cascade={"persist", "remove"})
+     * @Groups({"platforms_read", "platform_write"})
+     */
+    private $logos;
+
     public function __construct()
     {
         $this->pickers = new ArrayCollection();
         $this->socials = new ArrayCollection();
         $this->stores = new ArrayCollection();
+        $this->logos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -435,6 +442,36 @@ class Platform
     public function setHasChronopostLink(?bool $hasChronopostLink): self
     {
         $this->hasChronopostLink = $hasChronopostLink;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Logo[]
+     */
+    public function getLogos(): Collection
+    {
+        return $this->logos;
+    }
+
+    public function addLogo(Logo $logo): self
+    {
+        if (!$this->logos->contains($logo)) {
+            $this->logos[] = $logo;
+            $logo->setPlatform($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLogo(Logo $logo): self
+    {
+        if ($this->logos->removeElement($logo)) {
+            // set the owning side to null (unless already changed)
+            if ($logo->getPlatform() === $this) {
+                $logo->setPlatform(null);
+            }
+        }
 
         return $this;
     }
