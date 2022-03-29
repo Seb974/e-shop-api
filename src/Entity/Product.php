@@ -213,7 +213,7 @@ class Product
 
     /**
      * @ORM\ManyToOne(targetEntity=Seller::class)
-     * @Groups({"products_read", "product_write", "orders_read", "purchases_read", "sales_read"})
+     * @Groups({"products_read", "product_write", "orders_read", "purchases_read", "sales_read", "tourings_read"})
      */
     private $seller;
 

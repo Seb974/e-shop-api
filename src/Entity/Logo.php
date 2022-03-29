@@ -40,19 +40,19 @@ class Logo
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"logos_read", "platforms_read", "logo_write", "platform_write"})
+     * @Groups({"logos_read", "platforms_read", "sellers_read", "logo_write", "platform_write", "seller_write"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"logos_read", "platforms_read", "logo_write", "platform_write"})
+     * @Groups({"logos_read", "platforms_read", "sellers_read", "logo_write", "platform_write", "seller_write"})
      */
     private $type;
 
     /**
      * @ORM\OneToOne(targetEntity=Picture::class, cascade={"persist", "remove"})
-     * @Groups({"logos_read", "platforms_read", "logo_write", "platform_write"})
+     * @Groups({"logos_read", "platforms_read", "sellers_read", "logo_write", "platform_write", "seller_write"})
      */
     private $image;
 
@@ -61,6 +61,12 @@ class Logo
      * @Groups({"logos_read"})
      */
     private $platform;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Seller::class, inversedBy="logos")
+     * @Groups({"logos_read"})
+     */
+    private $seller;
 
     public function getId(): ?int
     {
@@ -99,6 +105,18 @@ class Logo
     public function setPlatform(?Platform $platform): self
     {
         $this->platform = $platform;
+
+        return $this;
+    }
+
+    public function getSeller(): ?Seller
+    {
+        return $this->seller;
+    }
+
+    public function setSeller(?Seller $seller): self
+    {
+        $this->seller = $seller;
 
         return $this;
     }

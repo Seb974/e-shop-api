@@ -102,7 +102,7 @@ class Picture
      *
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue
-     * @Groups({"picture_read", "products_read", "articles_read", "heroes_read", "homepages_read", "banners_read", "countdowns_read", "about_read", "agents_read", "sellers_read", "platforms_read"})
+     * @Groups({"picture_read", "products_read", "articles_read", "heroes_read", "homepages_read", "banners_read", "countdowns_read", "about_read", "agents_read", "sellers_read", "platforms_read", "sellers_read"})
      * @ORM\Id
      */
     protected $id;
@@ -111,7 +111,7 @@ class Picture
      * @var string|null
      *
      * @ApiProperty(iri="http://schema.org/contentUrl")
-     * @Groups({"picture_read", "products_read", "articles_read", "heroes_read", "homepages_read", "banners_read", "countdowns_read", "about_read", "agents_read", "sellers_read", "platforms_read"})
+     * @Groups({"picture_read", "products_read", "articles_read", "heroes_read", "homepages_read", "banners_read", "countdowns_read", "about_read", "agents_read", "sellers_read", "platforms_read", "sellers_read"})
      */
     public $contentUrl;
 
@@ -127,19 +127,19 @@ class Picture
      * @var string|null
      *
      * @ORM\Column(nullable=true)
-     * @Groups({"picture_read", "products_read", "articles_read", "heroes_read", "homepages_read", "banners_read", "countdowns_read", "about_read", "agents_read", "sellers_read", "platforms_read"})
+     * @Groups({"picture_read", "products_read", "articles_read", "heroes_read", "homepages_read", "banners_read", "countdowns_read", "about_read", "agents_read", "sellers_read", "platforms_read", "sellers_read"})
      */
     public $filePath;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"picture_read", "products_read", "articles_read", "heroes_read", "homepages_read", "banners_read", "countdowns_read", "about_read", "agents_read", "sellers_read", "platforms_read"})
+     * @Groups({"picture_read", "products_read", "articles_read", "heroes_read", "homepages_read", "banners_read", "countdowns_read", "about_read", "agents_read", "sellers_read", "platforms_read", "sellers_read"})
      */
     private $imgPath;
 
     /**
      * @ORM\Column(type="string", length=120, nullable=true)
-     * @Groups({"picture_read", "products_read", "articles_read", "heroes_read", "homepages_read", "banners_read", "countdowns_read", "about_read", "agents_read", "sellers_read", "platforms_read"})
+     * @Groups({"picture_read", "products_read", "articles_read", "heroes_read", "homepages_read", "banners_read", "countdowns_read", "about_read", "agents_read", "sellers_read", "platforms_read", "sellers_read"})
      */
     private $linkInstance;
 
