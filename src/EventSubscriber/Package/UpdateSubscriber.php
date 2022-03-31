@@ -43,7 +43,6 @@ class UpdateSubscriber implements EventSubscriberInterface
         $method = $event->getRequest()->getMethod();
 
         if ($result instanceof Package && $method === "PATCH") {
-            dump("In condition");
             if ($result->getReturned() > $result->getQuantity()) {
                 $this->dispatchReturns($result->getReturned(), $result->getOrderEntity()->getEmail());
             }
