@@ -6,6 +6,9 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\PackageRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use App\Filter\Package\PackageFilterNeedingReturns;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 
 /**
  * @ORM\Entity(repositoryClass=PackageRepository::class)
@@ -26,6 +29,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
  *          "DELETE"={"security"="is_granted('ROLE_ADMIN')"}
  *     }
  * )
+ * @ApiFilter(OrderFilter::class, properties={"id"})
+ * @ApiFilter(PackageFilterNeedingReturns::class, properties={"needsReturn"="exact"})
  */
 class Package
 {
@@ -54,6 +59,12 @@ class Package
      * @Groups({"packages_read"})
      */
     private $orderEntity;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups({"packages_read"})
+     */
+    private $returned;
 
     public function getId(): ?int
     {
@@ -94,5 +105,31 @@ class Package
         $this->orderEntity = $orderEntity;
 
         return $this;
+    }
+
+    public function getReturned(): ?int
+    {
+        return $this->returned;
+    }
+
+    public function setReturned(?int $returned): self
+    {
+        $this->returned = $returned;
+
+        return $this;
+    }
+    /**
+     * Gives the total of containers to return
+     *
+     * @Groups({"packages_read"})
+     * @return integer|null
+     */
+    public function getQuantityToReturn(): ?int
+    {
+        if ($this->getContainer()->getIsReturnable()) {
+            $returned = !is_null($this->getReturned()) ? $this->getReturned() : 0;
+            return $this->getQuantity() - $returned;
+        }
+        return 0;
     }
 }

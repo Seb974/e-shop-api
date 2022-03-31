@@ -19,22 +19,26 @@ class PackageRepository extends ServiceEntityRepository
         parent::__construct($registry, Package::class);
     }
 
-    // /**
-    //  * @return Package[] Returns an array of Package objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @return Package[] Returns an array of Package objects
+     */
+    public function findReturnablesByEmail($email)
     {
         return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
+            ->leftJoin("p.container","m")
+            ->leftJoin("p.orderEntity","q")
+            ->andWhere("q IS NOT NULL")
+            ->andWhere('m.isReturnable = :isReturnable')
+            ->setParameter('isReturnable', true)
+            ->andWhere('q.email = :email')
+            ->setParameter('email', $email)
+            ->andWhere("p.returned IS NULL")
+            ->orWhere("p.quantity < p.returned")
+            ->orderBy("q.deliveryDate", 'ASC')
             ->getQuery()
             ->getResult()
         ;
     }
-    */
 
     /*
     public function findOneBySomeField($value): ?Package

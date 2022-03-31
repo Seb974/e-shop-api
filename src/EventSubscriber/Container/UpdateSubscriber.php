@@ -43,8 +43,8 @@ class UpdateSubscriber implements EventSubscriberInterface
                 $accountingId = $this->axonaut->createContainer($result);
                 $result->setAccountingId($accountingId);
             } else if ($method === "PUT" || $method === "PATCH") {
-                $accountingId = $this->axonaut->updateContainer($result);
-                $result->setAccountingId($accountingId);
+                // $accountingId = $this->axonaut->updateContainer($result);
+                // $result->setAccountingId($accountingId);
             }
         }
     }

@@ -61,25 +61,25 @@ class OrderEntity
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"orders_read", "order_write", "tourings_read", "touring_write", "traceabilities_read", "admin:items_read"})
+     * @Groups({"orders_read", "order_write", "tourings_read", "touring_write", "traceabilities_read", "admin:items_read", "packages_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=120, nullable=true)
-     * @Groups({"orders_read", "order_write", "tourings_read", "traceabilities_read", "admin:items_read"})
+     * @Groups({"orders_read", "order_write", "tourings_read", "traceabilities_read", "admin:items_read", "packages_read"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=120, nullable=true)
-     * @Groups({"orders_read", "order_write", "tourings_read", "traceabilities_read", "admin:items_read"})
+     * @Groups({"orders_read", "order_write", "tourings_read", "traceabilities_read", "admin:items_read", "packages_read"})
      */
     private $email;
 
     /**
      * @ORM\ManyToOne(targetEntity=Meta::class, cascade={"persist"})
-     * @Groups({"admin:orders_read", "order_write", "tourings_read", "traceabilities_read"})
+     * @Groups({"admin:orders_read", "order_write", "tourings_read", "traceabilities_read", "packages_read"})
      */
     private $metas;
 
@@ -91,37 +91,37 @@ class OrderEntity
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
-     * @Groups({"orders_read", "order_write", "tourings_read", "traceabilities_read", "admin:items_read"})
+     * @Groups({"orders_read", "order_write", "tourings_read", "traceabilities_read", "admin:items_read", "packages_read"})
      */
     private $deliveryDate;
 
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
-     * @Groups({"orders_read", "order_write", "tourings_read", "touring_write", "traceabilities_read", "admin:items_read"})
+     * @Groups({"orders_read", "order_write", "tourings_read", "touring_write", "traceabilities_read", "admin:items_read", "packages_read"})
      */
     private $status;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"admin:orders_read", "order_write", "tourings_read"})
+     * @Groups({"admin:orders_read", "order_write", "tourings_read", "packages_read"})
      */
     private $isRemains;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"orders_read", "order_write", "tourings_read"})
+     * @Groups({"orders_read", "order_write", "tourings_read", "packages_read"})
      */
     private $totalHT;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"orders_read", "order_write", "tourings_read"})
+     * @Groups({"orders_read", "order_write", "tourings_read", "packages_read"})
      */
     private $totalTTC;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class)
-     * @Groups({"admin:orders_read", "order_write", "tourings_read"})
+     * @Groups({"admin:orders_read", "order_write", "tourings_read", "packages_read"})
      */
     private $user;
 
