@@ -48,8 +48,7 @@ final class PackageFilterNeedingReturns extends AbstractContextAwareFilter
             ->andWhere(sprintf('m.isReturnable = (:%s)', $parameterName))
             ->setParameter($parameterName, true)
             ->andWhere("$rootAlias.returned IS NULL")
-            ->orWhere("$rootAlias.quantity < $rootAlias.returned")
-            ->groupBy("q.email");
+            ->orWhere("$rootAlias.quantity > $rootAlias.returned");
     }
 
     public function getDescription(string $resourceClass): array

@@ -42,8 +42,8 @@ class UpdateSubscriber implements EventSubscriberInterface
         $result = $event->getControllerResult();
         $method = $event->getRequest()->getMethod();
 
-        if ($result instanceof Package && $method === "PATCH") {
-            if ($result->getReturned() > $result->getQuantity()) {
+        if ($result instanceof Package && $method === "PUT") {
+            if ($result->getReturned() >= $result->getQuantity()) {
                 $this->dispatchReturns($result->getReturned(), $result->getOrderEntity()->getEmail());
             }
         }
@@ -53,8 +53,6 @@ class UpdateSubscriber implements EventSubscriberInterface
     {
         $concernedPackages = $this->packageRepository->findReturnablesByEmail($email);
         $rest = $quantity;
-        dump($concernedPackages);
-        dump($rest);
         foreach ($concernedPackages as $package) {
             if ($rest > 0) {
                 $quantityReturned = $rest > $package->getQuantity() ? $package->getQuantity() : $rest;

@@ -14,7 +14,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
  * @ORM\Entity(repositoryClass=PackageRepository::class)
  * @ApiResource(
  *      denormalizationContext={
- *          "groups"={"order_write"},
+ *          "groups"={"order_write", "package_write"},
  *          "disable_type_enforcement"=true
  *      },
  *      normalizationContext={"groups"={"packages_read"}},
@@ -38,19 +38,19 @@ class Package
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     *  @Groups({"packages_read", "orders_read", "order_write", "tourings_read", "touring_write"})
+     *  @Groups({"packages_read", "orders_read", "order_write", "tourings_read", "touring_write", "package_write"})
      */
     private $id;
 
     /**
      * @ORM\ManyToOne(targetEntity=Container::class)
-     * @Groups({"packages_read", "orders_read", "order_write", "tourings_read", "touring_write"})
+     * @Groups({"packages_read", "orders_read", "order_write", "tourings_read", "touring_write", "package_write"})
      */
     private $container;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
-     * @Groups({"packages_read", "orders_read", "order_write", "tourings_read", "touring_write"})
+     * @Groups({"packages_read", "orders_read", "order_write", "tourings_read", "touring_write", "package_write"})
      */
     private $quantity;
 
@@ -62,7 +62,7 @@ class Package
 
     /**
      * @ORM\Column(type="integer", nullable=true)
-     * @Groups({"packages_read"})
+     * @Groups({"packages_read", "package_write"})
      */
     private $returned;
 
