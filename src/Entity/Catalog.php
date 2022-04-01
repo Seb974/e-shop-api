@@ -106,6 +106,18 @@ class Catalog
      */
     private $isActive;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"catalogs_read", "catalogTaxes_read", "catalogPrices_read", "taxes_read", "containers_read", "products_read", "conditions_read", "cities_read", "orders_read", "items_read", "tourings_read"})
+     */
+    private $deliveredByChronopost;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"catalogs_read", "catalogTaxes_read", "catalogPrices_read", "taxes_read", "containers_read", "products_read", "conditions_read", "cities_read", "orders_read", "items_read", "tourings_read"})
+     */
+    private $paymentParcel;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -239,6 +251,30 @@ class Catalog
     public function setIsActive(?bool $isActive): self
     {
         $this->isActive = $isActive;
+
+        return $this;
+    }
+
+    public function getDeliveredByChronopost(): ?bool
+    {
+        return $this->deliveredByChronopost;
+    }
+
+    public function setDeliveredByChronopost(?bool $deliveredByChronopost): self
+    {
+        $this->deliveredByChronopost = $deliveredByChronopost;
+
+        return $this;
+    }
+
+    public function getPaymentParcel(): ?bool
+    {
+        return $this->paymentParcel;
+    }
+
+    public function setPaymentParcel(?bool $paymentParcel): self
+    {
+        $this->paymentParcel = $paymentParcel;
 
         return $this;
     }

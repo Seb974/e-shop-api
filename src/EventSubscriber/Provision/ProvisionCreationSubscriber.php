@@ -56,7 +56,7 @@ class ProvisionCreationSubscriber implements EventSubscriberInterface
             }
             else if ( $method === "PUT" && $result->getStatus() === "ORDERED" && !$result->getIntegrated() ) {
                 $this->integrateProvision($result);
-                // $this->axonaut->createExpense($result);
+                $this->axonaut->createExpense($result);
                 $result->setStatus("RECEIVED")
                        ->setIntegrated(true);
             }

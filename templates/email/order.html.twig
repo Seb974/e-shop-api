@@ -15,7 +15,8 @@
             </p>
             <p>
                 Nous avons bien reçu votre commande et nous vous remercions pour votre confiance ! <br/>
-                Celle-ci vous sera {{ order.packages is not defined or order.packages is null or order.packages|length == 0 ? "livrée" : "expédiée" }} le {{ order.deliveryDate|date("d/m/Y") }} {{ order.packages is not defined or order.packages is null or order.packages|length == 0 ? "" : "et vous serez livré par Chronopost dans les 48 à 72 heures suivantes" }} à l'adresse ci-dessous :
+                {# Celle-ci vous sera {{ order.packages is not defined or order.packages is null or order.packages|length == 0 ? "livrée" : "expédiée" }} le {{ order.deliveryDate|date("d/m/Y") }} {{ order.packages is not defined or order.packages is null or order.packages|length == 0 ? "" : "et vous serez livré par Chronopost dans les 48 à 72 heures suivantes" }} à l'adresse ci-dessous : #}
+                Celle-ci vous sera {{ order.catalog.deliveredByChronopost == false ? "livrée" : "expédiée" }} le {{ order.deliveryDate|date("d/m/Y") }} {{ order.catalog.deliveredByChronopost ? "et vous serez livré par Chronopost dans les 48 à 72 heures suivantes" : "" }} à l'adresse ci-dessous :
                 <br/><br/>
                 <i>{{ order.metas.address }}</i><br/>
                 <i>{{ order.metas.address2 }}</i><br/>
@@ -73,7 +74,7 @@
                             {% endif %}
                         </tr>
                     {% endfor %}
-                    {% if order.packages is not defined or order.packages is null or order.packages|length == 0 %}
+                    {% if order.packages is not defined or order.packages is null or order.packages|length == 0 or (order.catalog.deliveredByChronopost == false and order.catalog.paymentParcel == false)  %}
                     {% else %}
                         {% for package in order.packages %}
                             {% set packagePrice, packageTax = 0, 0 %}

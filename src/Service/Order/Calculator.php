@@ -42,10 +42,10 @@ class Calculator
         $condition = $parameters->get('condition') !== null ? $this->conditionRepository->find($parameters->get('condition')['id']) : 0;
         $itemsCost = $this->getItemsCost($parameters->get('items'), $catalog, $userGroup);
         $finalItemsCost = $this->applyDiscount($parameters->get('promotion'), $itemsCost);
-        $packagesCost = $catalog->getNeedsParcel() ?
-                        $this->getPackagesCost($parameters->get('items'), $catalog) :
-                        $this->getDeliveryCost($condition, $catalog, $itemsCost);
-        return $finalItemsCost + $packagesCost;
+        $packagesCost = $catalog->getNeedsParcel() && ($catalog->getDeliveredByChronopost() || ($catalog->getPaymentParcel() && $userGroup->getPaymentParcel())) ?
+                        $this->getPackagesCost($parameters->get('items'), $catalog) : 0;
+        $deliveryCost = $this->getDeliveryCost($condition, $catalog, $itemsCost);
+        return $finalItemsCost + $packagesCost + $deliveryCost;
     }
 
     private function applyDiscount($discount, $itemsCost)

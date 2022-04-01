@@ -3,71 +3,96 @@
 namespace App\Service\Axonaut;
 
 use App\Entity\Item;
+use App\Entity\Platform;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\OrderEntityRepository;
+use App\Repository\PlatformRepository;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class Invoice
 {
     private $em;
-    private $key;
     private $domain;
     private $client;
     private $orderRepository;
+    private $platformRepository;
 
-    public function __construct($key, $domain, HttpClientInterface $client, OrderEntityRepository $orderRepository, EntityManagerInterface $em)
+    public function __construct($domain, HttpClientInterface $client, OrderEntityRepository $orderRepository, EntityManagerInterface $em, PlatformRepository $platformRepository)
     {
         $this->em = $em;
-        $this->key = $key;
         $this->domain = $domain;
         $this->client = $client;
         $this->orderRepository = $orderRepository;
+        $this->platformRepository = $platformRepository;
     }
 
     public function getAllInvoices($from, $to)
     {
-        $parameters = [ 'headers' => ['userApiKey' => $this->key]];
-        $response = $this->client->request('GET', $this->domain . 'invoices?date_before=' . $to->format('d/m/Y') . '&date_after=' . $from->format('d/m/Y') , $parameters);
-        return $response->toArray();
+        $platform = $this->getPlatform();
+        if ($platform->getHasAxonautLink() && !is_null($platform->getAxonautKey())) {
+            try {
+                $parameters = [ 'headers' => ['userApiKey' => $platform->getAxonautKey()]];
+                $response = $this->client->request('GET', $this->domain . 'invoices?date_before=' . $to->format('d/m/Y') . '&date_after=' . $from->format('d/m/Y') , $parameters);
+                return $response->toArray();
+            } catch (\Exception $e) {
+                return null;
+            }
+        }
+        return null;
     }
 
     public function getInvoicesForUser($userId, $from, $to)
     {
-        $parameters = [ 'headers' => ['userApiKey' => $this->key]];
-        $response = $this->client->request('GET', $this->domain . 'companies/' . $userId . '/invoices?updated_before=' . $to->format('d/m/Y') . '&updated_after=' . $from->format('d/m/Y'), $parameters);
-        return $response->toArray();
+        $platform = $this->getPlatform();
+        if ($platform->getHasAxonautLink() && !is_null($platform->getAxonautKey())) {
+            try {
+                $parameters = [ 'headers' => ['userApiKey' => $platform->getAxonautKey()]];
+                $response = $this->client->request('GET', $this->domain . 'companies/' . $userId . '/invoices?updated_before=' . $to->format('d/m/Y') . '&updated_after=' . $from->format('d/m/Y'), $parameters);
+                return $response->toArray();
+            } catch (\Exception $e) {
+                return null;
+            }
+        }
+        return null;
     }
 
     public function createInvoices($invoices)
     {
-        $contents = [];
-        foreach ($invoices as $invoice) {
-            $axonautInvoice = $this->getAxonautInvoice($invoice);
-            $parameters = [ 'headers' => ['userApiKey' => $this->key], 'body' => $axonautInvoice];
-            $response = $this->client->request('POST', $this->domain . 'invoices', $parameters);
-            $content = $response->toArray();
-            $contents[] = $content;
-            $this->updateStatuses($invoice['orders'], $content);
+        $platform = $this->getPlatform();
+        if ($platform->getHasAxonautLink() && !is_null($platform->getAxonautKey())) {
+            $contents = [];
+            foreach ($invoices as $invoice) {
+                $axonautInvoice = $this->getAxonautInvoice($invoice);
+                $parameters = [ 'headers' => ['userApiKey' => $platform->getAxonautKey()], 'body' => $axonautInvoice];
+                $response = $this->client->request('POST', $this->domain . 'invoices', $parameters);
+                $content = $response->toArray();
+                $contents[] = $content;
+                $this->updateStatuses($invoice['orders'], $content, $platform);
+            }
+            return $contents;
         }
-        return $contents;
+        return null;
     }
 
     public function createPayment($invoices, $paymentId)
     {
-        try {
-            foreach ($invoices as $invoice) {
-                $this->setInvoiceAsPaid($invoice);
-                $orders = $this->orderRepository->findBy(['invoiceId' => $invoice['id']]);
-                foreach ($orders as $order) {
-                    $order->setPaymentId($paymentId);
+        $platform = $this->getPlatform();
+        if ($platform->getHasAxonautLink() && !is_null($platform->getAxonautKey())) {
+            try {
+                foreach ($invoices as $invoice) {
+                    $this->setInvoiceAsPaid($invoice, $platform);
+                    $orders = $this->orderRepository->findBy(['invoiceId' => $invoice['id']]);
+                    foreach ($orders as $order) {
+                        $order->setPaymentId($paymentId);
+                    }
+                    $this->em->flush();
                 }
-                $this->em->flush();
+                return ['data' => true];
+            } catch(\Exception $e) {
+                return ['error' => $e->getMessage()];
             }
-            return ['data' => true];
-        } catch(\Exception $e) {
-            dump($e->getMessage());
-            return ['error' => $e->getMessage()];
         }
+        return null;
     }
 
     private function getOrdersDetails($invoice)
@@ -271,7 +296,7 @@ class Invoice
         ];
     }
 
-    private function updateStatuses($orders, $invoice)
+    private function updateStatuses($orders, $invoice, Platform $platform)
     {
         $isPaid = true;
         foreach ($orders as $id) {
@@ -284,14 +309,14 @@ class Invoice
 
         if ($isPaid) {
             try {
-                $this->setInvoiceAsPaid($invoice);
+                $this->setInvoiceAsPaid($invoice, $platform);
             } catch(\Exception $e) {
                 dump($e->getMessage());
             }
         }
     }
 
-    private function setInvoiceAsPaid($invoice)
+    private function setInvoiceAsPaid($invoice, Platform $platform)
     {
         $axonautPayment = [
             'invoice_id' => $invoice['id'],
@@ -300,8 +325,13 @@ class Invoice
             'date' => (new \DateTime())->format(\DateTime::RFC3339),
             'reference' => ''
         ];
-        $parameters = [ 'headers' => ['userApiKey' => $this->key], 'body' => $axonautPayment];
+        $parameters = [ 'headers' => ['userApiKey' => $platform->getAxonautKey()], 'body' => $axonautPayment];
         $response = $this->client->request('POST', $this->domain . 'payments', $parameters);
         return $response->toArray();
+    }
+
+    private function getPlatform()
+    {
+        return $this->platformRepository->find(1);
     }
 }

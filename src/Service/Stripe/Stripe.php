@@ -2,22 +2,30 @@
 
 namespace App\Service\Stripe;
 
+use App\Repository\PlatformRepository;
+
 class Stripe
 {
-    public function __construct(string $secretKey)
+    private $platform;
+
+    public function __construct(PlatformRepository $platformRepository)     // string $secretKey, 
     {
-        \Stripe\Stripe::setApiKey($secretKey);
+        $this->platform = $platformRepository->find(1);
+        \Stripe\Stripe::setApiKey($this->platform->getStripePrivateKey());
     }
 
     public function getClientSecret($amount)
     {
-        $paymentIntent = \Stripe\PaymentIntent::create([
-            'amount' => (round($amount, 2) * 100),
-            'currency' => 'eur'
-        ]);
-        return [
-            'clientSecret' => $paymentIntent->client_secret,
-            'amount' => $paymentIntent->amount
-        ];
+        if (!is_null($this->platform->getStripePrivateKey())) {
+            $paymentIntent = \Stripe\PaymentIntent::create([
+                'amount' => (round($amount, 2) * 100),
+                'currency' => 'eur'
+            ]);
+            return [
+                'clientSecret' => $paymentIntent->client_secret,
+                'amount' => $paymentIntent->amount
+            ];
+        }
+        return null;
     }
 }

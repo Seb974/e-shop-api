@@ -91,11 +91,96 @@ class Platform
      */
     private $siret;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"platforms_read", "platform_write"})
+     */
+    private $imgDomain;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"platform_write"})
+     */
+    private $imgKey;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"platforms_read", "platform_write"})
+     */
+    private $hasAxonautLink;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"platform_write"})
+     */
+    private $axonautKey;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"platforms_read", "platform_write"})
+     */
+    private $axonautEmail;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"platforms_read", "platform_write"})
+     */
+    private $stripePublicKey;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"platform_write"})
+     */
+    private $stripePrivateKey;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"platforms_read", "platform_write"})
+     */
+    private $chronopostNumber;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     *  @Groups({"platform_write"})
+     */
+    private $chronopostPassword;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"platforms_read", "platform_write"})
+     */
+    private $hasChronopostLink;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Logo::class, mappedBy="platform", cascade={"persist", "remove"})
+     * @Groups({"platforms_read", "platform_write"})
+     */
+    private $logos;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"platforms_read", "platform_write"})
+     */
+    private $hasSMSOption;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"platforms_read", "platform_write"})
+     */
+    private $SMSUser;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"platform_write"})
+     */
+    private $SMSKey;
+
     public function __construct()
     {
         $this->pickers = new ArrayCollection();
         $this->socials = new ArrayCollection();
         $this->stores = new ArrayCollection();
+        $this->logos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -255,6 +340,192 @@ class Platform
     public function setSiret(?string $siret): self
     {
         $this->siret = $siret;
+
+        return $this;
+    }
+
+    public function getImgDomain(): ?string
+    {
+        return $this->imgDomain;
+    }
+
+    public function setImgDomain(?string $imgDomain): self
+    {
+        $this->imgDomain = $imgDomain;
+
+        return $this;
+    }
+
+    public function getImgKey(): ?string
+    {
+        return $this->imgKey;
+    }
+
+    public function setImgKey(string $imgKey): self
+    {
+        $this->imgKey = $imgKey;
+
+        return $this;
+    }
+
+    public function getHasAxonautLink(): ?bool
+    {
+        return $this->hasAxonautLink;
+    }
+
+    public function setHasAxonautLink(?bool $hasAxonautLink): self
+    {
+        $this->hasAxonautLink = $hasAxonautLink;
+
+        return $this;
+    }
+
+    public function getAxonautKey(): ?string
+    {
+        return $this->axonautKey;
+    }
+
+    public function setAxonautKey(?string $axonautKey): self
+    {
+        $this->axonautKey = $axonautKey;
+
+        return $this;
+    }
+
+    public function getAxonautEmail(): ?string
+    {
+        return $this->axonautEmail;
+    }
+
+    public function setAxonautEmail(?string $axonautEmail): self
+    {
+        $this->axonautEmail = $axonautEmail;
+
+        return $this;
+    }
+
+    public function getStripePublicKey(): ?string
+    {
+        return $this->stripePublicKey;
+    }
+
+    public function setStripePublicKey(?string $stripePublicKey): self
+    {
+        $this->stripePublicKey = $stripePublicKey;
+
+        return $this;
+    }
+
+    public function getStripePrivateKey(): ?string
+    {
+        return $this->stripePrivateKey;
+    }
+
+    public function setStripePrivateKey(?string $stripePrivateKey): self
+    {
+        $this->stripePrivateKey = $stripePrivateKey;
+
+        return $this;
+    }
+
+    public function getChronopostNumber(): ?string
+    {
+        return $this->chronopostNumber;
+    }
+
+    public function setChronopostNumber(?string $chronopostNumber): self
+    {
+        $this->chronopostNumber = $chronopostNumber;
+
+        return $this;
+    }
+
+    public function getChronopostPassword(): ?string
+    {
+        return $this->chronopostPassword;
+    }
+
+    public function setChronopostPassword(?string $chronopostPassword): self
+    {
+        $this->chronopostPassword = $chronopostPassword;
+
+        return $this;
+    }
+
+    public function getHasChronopostLink(): ?bool
+    {
+        return $this->hasChronopostLink;
+    }
+
+    public function setHasChronopostLink(?bool $hasChronopostLink): self
+    {
+        $this->hasChronopostLink = $hasChronopostLink;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Logo[]
+     */
+    public function getLogos(): Collection
+    {
+        return $this->logos;
+    }
+
+    public function addLogo(Logo $logo): self
+    {
+        if (!$this->logos->contains($logo)) {
+            $this->logos[] = $logo;
+            $logo->setPlatform($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLogo(Logo $logo): self
+    {
+        if ($this->logos->removeElement($logo)) {
+            // set the owning side to null (unless already changed)
+            if ($logo->getPlatform() === $this) {
+                $logo->setPlatform(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getHasSMSOption(): ?bool
+    {
+        return $this->hasSMSOption;
+    }
+
+    public function setHasSMSOption(?bool $hasSMSOption): self
+    {
+        $this->hasSMSOption = $hasSMSOption;
+
+        return $this;
+    }
+
+    public function getSMSUser(): ?string
+    {
+        return $this->SMSUser;
+    }
+
+    public function setSMSUser(?string $SMSUser): self
+    {
+        $this->SMSUser = $SMSUser;
+
+        return $this;
+    }
+
+    public function getSMSKey(): ?string
+    {
+        return $this->SMSKey;
+    }
+
+    public function setSMSKey(?string $SMSKey): self
+    {
+        $this->SMSKey = $SMSKey;
 
         return $this;
     }

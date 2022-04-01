@@ -34,13 +34,13 @@ class Condition
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"conditions_read", "cities_read", "city_write", "relaypoints_read", "relaypoint_write"})
+     * @Groups({"conditions_read", "cities_read", "city_write", "relaypoints_read", "relaypoint_write", "orders_read"})
      */
     private $id;
 
     /**
      * @ORM\ManyToMany(targetEntity=Group::class)
-     * @Groups({"conditions_read", "cities_read", "city_write", "relaypoints_read", "relaypoint_write"})
+     * @Groups({"conditions_read", "cities_read", "city_write", "relaypoints_read", "relaypoint_write", "orders_read"})
      */
     private $userGroups;
 
@@ -52,19 +52,19 @@ class Condition
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"conditions_read", "cities_read", "city_write", "relaypoints_read", "relaypoint_write"})
+     * @Groups({"conditions_read", "cities_read", "city_write", "relaypoints_read", "relaypoint_write", "orders_read"})
      */
     private $price;
 
     /**
      * @ORM\ManyToOne(targetEntity=Tax::class)
-     * @Groups({"conditions_read", "cities_read", "city_write", "relaypoints_read", "relaypoint_write"})
+     * @Groups({"conditions_read", "cities_read", "city_write", "relaypoints_read", "relaypoint_write", "orders_read"})
      */
     private $tax;
 
     /**
      * @ORM\Column(type="float", nullable=true)
-     * @Groups({"conditions_read", "cities_read", "city_write", "relaypoints_read", "relaypoint_write"})
+     * @Groups({"conditions_read", "cities_read", "city_write", "relaypoints_read", "relaypoint_write", "orders_read"})
      */
     private $minForFree;
 

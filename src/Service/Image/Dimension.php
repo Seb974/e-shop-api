@@ -53,6 +53,12 @@ class Dimension
                 return 945;
             case 'COUNTDOWN-CHRISTMAS':
                 return 549;
+            case 'LOGO_FULL_LIGHT':
+            case 'LOGO_FULL_DARK':
+            case 'LOGO_STRETCHED_LIGHT':
+            case 'LOGO_STRETCHED_DARK':
+            case 'LOGO_SQUARE':
+                return 500;
             case 'COUNTDOWN-BLACK_FRIDAY':
             case 'COUNTDOWN-BLACK_FRIDAY_TWO':
             default;
@@ -69,6 +75,9 @@ class Dimension
                 return 440;
             case 'AGENT':
                 return 330;
+            case 'LOGO_STRETCHED_LIGHT':
+            case 'LOGO_STRETCHED_DARK':
+                return 200;
             case 'SELLER-LOGO':
                 return 120;
             case 'HERO-DEFAULT':
@@ -111,6 +120,9 @@ class Dimension
             case 'BANNER-VALENTINES_DAY-1-MAIN':
             case 'BANNER-VALENTINES_DAY-2':
             case 'BANNER-VALENTINES_DAY-2-MAIN':
+            case 'LOGO_FULL_LIGHT':
+            case 'LOGO_FULL_DARK':
+            case 'LOGO_SQUARE':
                 return 300;
             case 'COUNTDOWN-DEFAULT':
                 return 525;

@@ -4,55 +4,65 @@ namespace App\Service\Axonaut;
 
 use App\Entity\OrderEntity;
 use App\Entity\User as UserEntity;
+use App\Repository\PlatformRepository;
 use App\Service\User\RolesManager;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class User
 {
-    private $key;
     private $domain;
     private $client;
     private $rolesManager;
+    private $platformRepository;
 
-    public function __construct($key, $domain, HttpClientInterface $client, RolesManager $rolesManager)
+    public function __construct($domain, HttpClientInterface $client, RolesManager $rolesManager, PlatformRepository $platformRepository)
     {
-        $this->key = $key;
         $this->domain = $domain;
         $this->client = $client;
         $this->rolesManager = $rolesManager;
+        $this->platformRepository = $platformRepository;
     }
 
-    public function createUser($entity)
+    public function createUser($entity, $loadedPlatform = null)
     {
-        $axonautUser = $this->getAxonautUser($entity);
-        $parameters = [ 'headers' => ['userApiKey' => $this->key], 'body' => $axonautUser];
-        $response = $this->client->request('POST', $this->domain . 'companies', $parameters);
-        $content = $response->toArray();
-        return $content['id'];
+        $platform = !is_null($loadedPlatform) ? $loadedPlatform : $this->getPlatform();
+        if ($platform->getHasAxonautLink() && !is_null($platform->getAxonautKey())) {
+            $axonautUser = $this->getAxonautUser($entity);
+            $parameters = [ 'headers' => ['userApiKey' => $platform->getAxonautKey()], 'body' => $axonautUser];
+            $response = $this->client->request('POST', $this->domain . 'companies', $parameters);
+            $content = $response->toArray();
+            return $content['id'];
+        }
+        return null;
     }
 
     public function updateUser($user)
     {
-        $axonautId = $user->getAccountingId();
-        if (is_null($axonautId))
-            return $this->createUser($user);
+        $platform = $this->getPlatform();
+        if ($platform->getHasAxonautLink() && !is_null($platform->getAxonautKey())) {
+            $axonautId = $user->getAccountingId();
+            if (is_null($axonautId))
+                return $this->createUser($user, $platform);
 
-        $axonautUser = $this->getAxonautUser($user);
-        $parameters = [ 'headers' => ['userApiKey' => $this->key], 'body' => $axonautUser];
-        $response = $this->client->request('PATCH', $this->domain . 'companies/' . $axonautId, $parameters);
-        $content = $response->toArray();
-        return $content['id'];
+            $axonautUser = $this->getAxonautUser($user);
+            $parameters = [ 'headers' => ['userApiKey' => $platform->getAxonautKey()], 'body' => $axonautUser];
+            $response = $this->client->request('PATCH', $this->domain . 'companies/' . $axonautId, $parameters);
+            $content = $response->toArray();
+            return $content['id'];
+        }
+        return null;
     }
 
     public function removeFromCustomers($user)
     {
+        $platform = $this->getPlatform();
         $axonautId = $user->getAccountingId();
-        if (is_null($axonautId))
-            return ;
-
-        $axonautUser = ['is_prospect' => true, 'is_customer' => false];
-        $parameters = [ 'headers' => ['userApiKey' => $this->key], 'body' => $axonautUser];
-        $this->client->request('PATCH', $this->domain . 'companies/' . $axonautId, $parameters);
+        if ($platform->getHasAxonautLink() && !is_null($platform->getAxonautKey()) && !is_null($axonautId)) {
+            $axonautUser = ['is_prospect' => true, 'is_customer' => false];
+            $parameters = [ 'headers' => ['userApiKey' => $platform->getAxonautKey()], 'body' => $axonautUser];
+            $this->client->request('PATCH', $this->domain . 'companies/' . $axonautId, $parameters);
+        }
+        return ;
     }
 
     private function getAxonautUser($entity)
@@ -76,5 +86,10 @@ class User
                 'tel' => is_null($metas) || is_null($metas->getPhone()) ? '' : $metas->getPhone()
             ]
         ];
+    }
+
+    private function getPlatform()
+    {
+        return $this->platformRepository->find(1);
     }
 }

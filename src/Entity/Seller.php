@@ -42,7 +42,7 @@ class Seller
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"sellers_read", "seller_write", "products_read", "admin:orders_read", "suppliers_read", "provisions_read", "stores_read"})
+     * @Groups({"sellers_read", "seller_write", "products_read", "orders_read", "suppliers_read", "provisions_read", "stores_read", "tourings_read"})
      */
     private $id;
 
@@ -138,10 +138,35 @@ class Seller
      */
     private $metas;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"sellers_read", "seller_write"})
+     */
+    private $imgDomain;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"seller_write"})
+     */
+    private $imgKey;
+
+    /**
+     * @ORM\OneToMany(targetEntity=Logo::class, mappedBy="seller", cascade={"persist", "remove"})
+     * @Groups({"sellers_read", "seller_write"})
+     */
+    private $logos;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"sellers_read", "seller_write"})
+     */
+    private $hasSeparatedNote;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
         $this->stores = new ArrayCollection();
+        $this->logos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -355,6 +380,72 @@ class Seller
     public function setMetas(?Meta $metas): self
     {
         $this->metas = $metas;
+
+        return $this;
+    }
+
+    public function getImgDomain(): ?string
+    {
+        return $this->imgDomain;
+    }
+
+    public function setImgDomain(?string $imgDomain): self
+    {
+        $this->imgDomain = $imgDomain;
+
+        return $this;
+    }
+
+    public function getImgKey(): ?string
+    {
+        return $this->imgKey;
+    }
+
+    public function setImgKey(?string $imgKey): self
+    {
+        $this->imgKey = $imgKey;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Logo[]
+     */
+    public function getLogos(): Collection
+    {
+        return $this->logos;
+    }
+
+    public function addLogo(Logo $logo): self
+    {
+        if (!$this->logos->contains($logo)) {
+            $this->logos[] = $logo;
+            $logo->setSeller($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLogo(Logo $logo): self
+    {
+        if ($this->logos->removeElement($logo)) {
+            // set the owning side to null (unless already changed)
+            if ($logo->getSeller() === $this) {
+                $logo->setSeller(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getHasSeparatedNote(): ?bool
+    {
+        return $this->hasSeparatedNote;
+    }
+
+    public function setHasSeparatedNote(?bool $hasSeparatedNote): self
+    {
+        $this->hasSeparatedNote = $hasSeparatedNote;
 
         return $this;
     }

@@ -5,30 +5,35 @@ namespace App\Service\Axonaut;
 use App\Entity\Catalog;
 use App\Entity\Provision;
 use App\Repository\CatalogRepository;
+use App\Repository\PlatformRepository;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class Expense
 {
-    private $key;
     private $domain;
     private $client;
     private $catalogRepository;
+    private $platformRepository;
 
-    public function __construct($key, $domain, HttpClientInterface $client, CatalogRepository $catalogRepository)
+    public function __construct($domain, HttpClientInterface $client, CatalogRepository $catalogRepository, PlatformRepository $platformRepository)
     {
-        $this->key = $key;
         $this->domain = $domain;
         $this->client = $client;
         $this->catalogRepository = $catalogRepository;
+        $this->platformRepository = $platformRepository;
     }
 
     public function createExpense(Provision $provision)
     {
-        $axonautExpense = $this->getAxonautExpense($provision);
-        $parameters = [ 'headers' => ['userApiKey' => $this->key], 'body' => $axonautExpense];
-        $response = $this->client->request('POST', $this->domain . 'expenses', $parameters);
-        $content = $response->toArray();
-        return $content;
+        $platform = $this->getPlatform();
+        if ($platform->getHasAxonautLink() && !is_null($platform->getAxonautKey())) {
+            $axonautExpense = $this->getAxonautExpense($provision);
+            $parameters = [ 'headers' => ['userApiKey' => $platform->getAxonautKey()], 'body' => $axonautExpense];
+            $response = $this->client->request('POST', $this->domain . 'expenses', $parameters);
+            $content = $response->toArray();
+            return $content;
+        }
+        return null;
     }
 
     private function getAxonautExpense(Provision $provision)
@@ -78,5 +83,10 @@ class Expense
     private function getDefaultCatalog()
     {
         return $this->catalogRepository->findOneBy(['isDefault' => true]);
+    }
+
+    private function getPlatform()
+    {
+        return $this->platformRepository->find(1);
     }
 }
