@@ -2,24 +2,25 @@
 
 namespace App\Service\Sms;
 
+use App\Repository\PlatformRepository;
+
 class Sms
 {
     private $url;
-    private $user;
-    private $pass;
+    private $platformRepository;
 
-    public function __construct($url, $user, $pass)
+    public function __construct($url, PlatformRepository $platformRepository)
     {
         $this->url = $url;
-        $this->user = $user;
-        $this->pass = $pass;
+        $this->platformRepository = $platformRepository;
     }
 
     public function sendTo($clientPhone, $message)
     {
+        $platform = $this->getPlatform();
         $data = [
-            'user'  => $this->user,
-            'pass'  => $this->pass,
+            'user'  => $platform->getSMSUser(),
+            'pass'  => $platform->getSMSKey(),
             'cmd'   => 'sendsms',
             'to'    => $clientPhone,
             'txt'   => $message,
@@ -46,5 +47,10 @@ class Sms
         } finally {
             return $response;
         }
+    }
+
+    private function getPlatform()
+    {
+        return $this->platformRepository->find(1);
     }
 }

@@ -157,6 +157,24 @@ class Platform
      */
     private $logos;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"platforms_read", "platform_write"})
+     */
+    private $hasSMSOption;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"platforms_read", "platform_write"})
+     */
+    private $SMSUser;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Groups({"platform_write"})
+     */
+    private $SMSKey;
+
     public function __construct()
     {
         $this->pickers = new ArrayCollection();
@@ -472,6 +490,42 @@ class Platform
                 $logo->setPlatform(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getHasSMSOption(): ?bool
+    {
+        return $this->hasSMSOption;
+    }
+
+    public function setHasSMSOption(?bool $hasSMSOption): self
+    {
+        $this->hasSMSOption = $hasSMSOption;
+
+        return $this;
+    }
+
+    public function getSMSUser(): ?string
+    {
+        return $this->SMSUser;
+    }
+
+    public function setSMSUser(?string $SMSUser): self
+    {
+        $this->SMSUser = $SMSUser;
+
+        return $this;
+    }
+
+    public function getSMSKey(): ?string
+    {
+        return $this->SMSKey;
+    }
+
+    public function setSMSKey(?string $SMSKey): self
+    {
+        $this->SMSKey = $SMSKey;
 
         return $this;
     }

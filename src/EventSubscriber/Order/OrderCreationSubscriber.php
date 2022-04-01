@@ -97,6 +97,8 @@ class OrderCreationSubscriber implements EventSubscriberInterface
             $this->updateEntitiesCounters($order);
             if ($order->getCatalog()->getNeedsParcel() && $order->getCatalog()->getDeliveredByChronopost())
                 $this->chronopost->setReservationNumbers($order);
+            if (!is_null($order->getNotification()) && str_contains(strtoupper($order->getNotification()), "EMAIL"))
+                $this->orderConfirmer->notify($order);
         } else if ( $method === "PUT" ) {
             if ( in_array($order->getStatus(), ["WAITING", "PRE-PREPARED"]) )
                 $this->constructor->adjustPreparation($order);

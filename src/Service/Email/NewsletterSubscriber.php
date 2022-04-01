@@ -8,14 +8,12 @@ class NewsletterSubscriber
 {
     private $sender;
     private $mailer;
-    private $appName;
     private $platformRepository;
 
-    public function __construct($sender, $appName, \Swift_Mailer $mailer, PlatformRepository $platformRepository)
+    public function __construct($sender, \Swift_Mailer $mailer, PlatformRepository $platformRepository)
     {
         $this->sender             = $sender;
         $this->mailer             = $mailer;
-        $this->appName            = $appName;
         $this->platformRepository = $platformRepository;
     }
 
@@ -29,7 +27,7 @@ class NewsletterSubscriber
 
                 $message = new \Swift_Message();
                 $message->setSubject('Création d\'un prospect')
-                        ->setFrom([$this->sender => $this->appName])
+                        ->setFrom([$this->sender => $platform->getName()])
                         ->setTo([$platform->getAxonautEmail()])
                         ->setBody($namePart . "Email # " . $email)
                         ;

@@ -106,8 +106,10 @@ class Constructor
         if ( in_array($order->getStatus(), ["WAITING", "PRE-PREPARED"]) && $this->needsStatusUpdate($order) ) {
             $status = $this->getAdaptedStatus($order);
             $order->setStatus($status);
-            if ( $status == 'PREPARED' && !$order->getIsRemains() && $userGroup->getSoldOutNotification()) 
-                $this->orderNotifier->notifySoldOut($order);
+            if ( $status == 'PREPARED' && !$order->getIsRemains() && $userGroup->getSoldOutNotification()) {
+                if (!is_null($order->getPlatform()) && $order->getPlatform()->getHasSMSOption())
+                    $this->orderNotifier->notifySoldOut($order);
+            }
         }
     }
 
@@ -170,7 +172,7 @@ class Constructor
     private function needsStatusUpdate(&$order)
     {
         $isComplete = true;
-        if ($order->getCatalog()->getDeliveredByChronopost() && !$this->security->isGranted('ROLE_PICKER')) {       // getNeedsParcel()
+        if ($order->getCatalog()->getDeliveredByChronopost() && !$this->security->isGranted('ROLE_PICKER')) {
             $isComplete = false;
         } else {
             foreach ($order->getItems() as $item) {

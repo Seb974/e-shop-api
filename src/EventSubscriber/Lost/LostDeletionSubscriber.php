@@ -17,7 +17,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * @author Sébastien : sebastien.maillot@coding-academy.fr
  */
-class OrderDeletionSubscriber implements EventSubscriberInterface
+class LostDeletionSubscriber implements EventSubscriberInterface
 {
     private $stockManager;
 
